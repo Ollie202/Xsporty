@@ -4920,3 +4920,325 @@ input:focus-visible {
     max-width: 310px;
   }
 }
+
+/* Compact card refresh */
+.topbar {
+  height: 68px;
+}
+
+.topbar__inner {
+  width: min(1520px, calc(100% - 32px));
+}
+
+.brand__mark {
+  width: 42px;
+  height: 38px;
+  font-size: 23px;
+}
+
+.brand strong {
+  font-size: 20px;
+}
+
+.header-search {
+  max-width: 390px;
+}
+
+.dashboard-shell {
+  width: min(1520px, calc(100% - 32px));
+  grid-template-columns: minmax(0, 1fr) 300px;
+  min-height: calc(100vh - 68px);
+  gap: 14px;
+  padding-top: 12px;
+}
+
+.right-rail {
+  top: 82px;
+}
+
+.hero-banner {
+  min-height: 168px;
+  grid-template-columns: minmax(250px, 0.82fr) minmax(280px, 1fr);
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+}
+
+.hero-banner__players {
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+}
+
+.hero-player-card {
+  width: min(132px, 42%);
+  min-width: 0;
+  height: 146px;
+  border-radius: 14px;
+}
+
+.hero-player-card--blue {
+  height: 152px;
+}
+
+.hero-banner__copy {
+  gap: 7px;
+  padding: 10px 6px 10px 0;
+}
+
+.hero-banner__copy span {
+  font-size: 11px;
+}
+
+.hero-banner__copy h1 {
+  font-size: clamp(26px, 2.5vw, 38px);
+}
+
+.hero-banner__copy p {
+  max-width: 460px;
+  font-size: 14px;
+}
+
+.hero-banner__copy button {
+  min-height: 36px;
+  padding: 0 13px;
+  font-size: 13px;
+}
+
+.featured-games {
+  grid-auto-columns: minmax(226px, 1fr);
+  gap: 8px;
+}
+
+.featured-card {
+  min-height: 146px;
+  padding: 11px;
+  border-radius: 12px;
+}
+
+.sport-icon,
+.feature-time {
+  top: 12px;
+}
+
+.sport-icon {
+  left: 12px;
+  font-size: 13px;
+}
+
+.feature-time {
+  right: 12px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.featured-flags {
+  grid-template-columns: 1fr 30px 1fr;
+  gap: 8px;
+  margin: 32px 8px 7px;
+}
+
+.featured-flags img {
+  width: 40px;
+  height: 28px;
+}
+
+.featured-flags strong {
+  font-size: 16px;
+}
+
+.featured-names {
+  gap: 6px;
+  margin-bottom: 7px;
+  font-size: 12px;
+}
+
+.featured-odds {
+  gap: 6px;
+}
+
+.featured-odds button,
+.quick-odds button {
+  border-radius: 9px;
+}
+
+.featured-odds button {
+  min-height: 34px;
+  font-size: 12px;
+}
+
+.featured-odds b,
+.quick-odds span {
+  margin-top: 1px;
+  font-size: 12px;
+}
+
+.market-board {
+  padding: 12px;
+}
+
+.section-head {
+  margin-bottom: 8px;
+}
+
+.section-head h2 {
+  font-size: 16px;
+}
+
+.market-tabs {
+  margin-bottom: 10px;
+}
+
+.market-tabs button,
+.option-tabs button {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.match-list {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 8px;
+}
+
+.match-row {
+  min-height: 0;
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.match-teams {
+  gap: 5px;
+}
+
+.match-meta-line {
+  width: fit-content;
+  margin-bottom: 2px;
+  border: 1px solid #e4e7ec;
+  border-radius: 999px;
+  padding: 3px 7px;
+  color: #667085;
+  background: #f8fafc;
+  font-size: 10px;
+}
+
+.match-teams strong {
+  gap: 7px;
+  font-size: 14px;
+}
+
+.match-teams img {
+  width: 25px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.quick-odds {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.quick-odds button {
+  min-height: 38px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.trade-slip {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.slip-tabs {
+  margin-bottom: 10px;
+}
+
+.slip-tabs button,
+.side-toggle button {
+  min-height: 34px;
+  font-size: 13px;
+}
+
+.ticket-view {
+  gap: 10px;
+}
+
+.ticket-view h2 {
+  font-size: 17px;
+}
+
+.ticket-view input {
+  min-height: 38px;
+  font-size: 14px;
+}
+
+.quote-grid {
+  gap: 7px;
+  padding: 11px;
+  font-size: 13px;
+}
+
+.connect-btn.full {
+  min-height: 38px;
+}
+
+.league-selector,
+.league-market-grid,
+.player-market-grid {
+  gap: 8px;
+}
+
+.league-panel,
+.league-match-card {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.league-panel {
+  min-height: 74px;
+}
+
+.league-panel strong {
+  font-size: 15px;
+}
+
+.player-prop-copy {
+  padding: 9px 10px 0;
+}
+
+.player-prop-copy strong {
+  font-size: 14px;
+}
+
+@media (max-width: 1180px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .right-rail {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    height: auto;
+  }
+
+  .dashboard-shell,
+  .topbar__inner {
+    width: calc(100% - 20px);
+  }
+
+  .hero-banner {
+    grid-template-columns: 1fr;
+  }
+
+  .match-list {
+    grid-template-columns: 1fr;
+  }
+}

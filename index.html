@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>X Cup Markets</title>
+    <link rel="stylesheet" href="styles.css?v=20260522-search-left" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="brand" href="#" aria-label="X Cup Markets home" data-action="home">
+          <span class="brand__mark">X</span>
+          <span>
+            <strong>X Cup</strong>
+            <small>Prediction Market</small>
+          </span>
+        </a>
+        <nav class="top-sport-nav" aria-label="Sports">
+          <button class="is-active" type="button" data-sport="football">Football</button>
+          <button type="button" data-sport="basketball">Basketball</button>
+          <button type="button" data-sport="cricket">Cricket</button>
+          <button type="button" data-sport="formula-1">Formula 1</button>
+          <button type="button" data-sport="ufc">UFC</button>
+        </nav>
+        <label class="search-box header-search">
+          <span>⌕</span>
+          <input type="search" placeholder="Search teams, players, markets" />
+        </label>
+        <div class="wallet-panel">
+          <span class="balance-pill" hidden>1,250 USDT</span>
+          <button class="connect-btn" type="button" data-action="connect">Connect Wallet</button>
+          <div class="profile-menu" hidden>
+            <button class="profile-button" type="button" data-action="profile" aria-label="Open profile menu">
+              <span class="profile-avatar" data-profile-avatar>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20 21a8 8 0 0 0-16 0" />
+                  <circle cx="12" cy="8" r="4" />
+                </svg>
+              </span>
+            </button>
+            <div class="profile-dropdown" hidden>
+              <div class="profile-picture-control">
+                <span class="profile-avatar large" data-profile-avatar>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M20 21a8 8 0 0 0-16 0" />
+                    <circle cx="12" cy="8" r="4" />
+                  </svg>
+                </span>
+                <label class="profile-edit" aria-label="Change profile picture">
+                  ✎
+                  <input type="file" accept="image/*" data-profile-image-input hidden />
+                </label>
+              </div>
+              <div class="profile-wallet" hidden>
+                <div class="profile-wallet__row">
+                  <span>Wallet address</span>
+                  <button type="button" class="copy-wallet" data-action="copy-wallet">Copy</button>
+                </div>
+                <strong data-wallet-address>0x7A9C...21F8</strong>
+                <small>1,250 USDT</small>
+              </div>
+              <button type="button" data-profile-view="settings">Settings</button>
+              <button type="button" data-profile-view="history">History</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-shell">
+      <section class="main-column">
+        <section class="hero-banner home-section" aria-label="Featured World Cup market">
+          <div class="hero-banner__players">
+            <div class="hero-player-card hero-player-card--red">
+              <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Cristiano_Ronaldo_2018.jpg?width=460" alt="Featured football player" />
+            </div>
+            <div class="hero-player-card hero-player-card--blue">
+              <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Kylian_Mbapp%C3%A9_2019.jpg?width=460" alt="Featured football player" />
+            </div>
+          </div>
+          <div class="hero-banner__copy">
+            <span>World Cup headline market</span>
+            <h1>Brazil vs Spain</h1>
+            <p>Trade winner, goals, cards, corners, player props, and live moments on X Layer.</p>
+            <button type="button" data-hero-market="brazil-spain">Open market</button>
+          </div>
+          <div class="hero-dots" aria-hidden="true">
+            <span class="is-active"></span>
+            <span></span>
+          </div>
+        </section>
+
+        <section class="match-page" id="match-page" hidden>
+          <button class="back-button" type="button" data-action="back-home">Back to games</button>
+          <div class="match-detail-card">
+            <div class="match-meta detail-meta">
+              <span id="detail-meta">Wednesday · 20/05 · 17:45</span>
+            </div>
+            <div class="detail-title-row">
+              <div class="detail-matchup">
+                <div class="detail-team">
+                  <img id="detail-home-flag" src="https://flagcdn.com/w160/br.png" alt="Brazil flag" />
+                  <span id="detail-home-code">BRA</span>
+                </div>
+                <h2 id="detail-title">Brazil vs Spain</h2>
+                <div class="detail-team">
+                  <img id="detail-away-flag" src="https://flagcdn.com/w160/es.png" alt="Spain flag" />
+                  <span id="detail-away-code">ESP</span>
+                </div>
+              </div>
+              <span id="detail-id">ID:23099</span>
+            </div>
+            <div class="match-insight" id="detail-insight" aria-label="Match insight"></div>
+            <div class="option-tabs" id="detail-tabs" aria-label="Match market groups"></div>
+            <div class="option-list" id="detail-options"></div>
+          </div>
+        </section>
+
+        <section class="history-page" id="history-page" hidden>
+          <button class="back-button" type="button" data-action="back-home">Back to games</button>
+          <div class="history-hero">
+            <div>
+              <span class="status-dot"></span>
+              <h2>History</h2>
+            </div>
+            <p>Review settled wins and losses from your market activity.</p>
+          </div>
+          <div class="history-summary">
+            <article>
+              <span>Wins</span>
+              <strong id="history-win-count">0</strong>
+            </article>
+            <article>
+              <span>Losses</span>
+              <strong id="history-loss-count">0</strong>
+            </article>
+            <article>
+              <span>Net P/L</span>
+              <strong id="history-net-pnl">+0.00 USDT</strong>
+            </article>
+          </div>
+          <div class="history-columns" id="history-columns"></div>
+        </section>
+
+        <section class="featured-strip home-section" aria-label="Most popular games">
+          <div class="compact-section-head">
+            <div class="featured-mode-tabs" aria-label="Featured market view">
+              <button class="is-active" type="button" data-featured-mode="popular">Most Popular</button>
+              <button type="button" data-featured-mode="live">Live</button>
+            </div>
+            <div>
+              <button type="button" aria-label="Scroll featured markets left">‹</button>
+              <button type="button" aria-label="Scroll featured markets right">›</button>
+            </div>
+          </div>
+          <div class="featured-games" id="featured-games"></div>
+        </section>
+
+        <section class="market-board home-section" id="games-board">
+          <div class="section-head">
+            <div>
+              <span class="status-dot"></span>
+              <h2>⚽ Soccer</h2>
+            </div>
+          </div>
+
+          <div class="market-tabs">
+            <button class="is-active" type="button" data-category="all">All Games</button>
+            <button type="button" data-category="world-cup">World Cup</button>
+            <button type="button" data-category="leagues">Leagues</button>
+            <button type="button" data-category="women-world-cup">Women (World Cup)</button>
+            <button type="button" data-category="players">Player Markets (World Cup)</button>
+            <button type="button" data-category="ufc-men" hidden>UFC Men</button>
+            <button type="button" data-category="ufc-women" hidden>UFC Women</button>
+          </div>
+
+          <div class="match-list" id="games-grid" aria-label="World Cup game cards"></div>
+
+          <div class="league-selector" id="league-selector" hidden>
+            <button class="league-panel is-active" type="button" data-league="premier-league">
+              <span>England</span>
+              <strong>Premier League</strong>
+            </button>
+            <button class="league-panel" type="button" data-league="la-liga">
+              <span>Spain</span>
+              <strong>La Liga</strong>
+            </button>
+            <button class="league-panel" type="button" data-league="serie-a">
+              <span>Italy</span>
+              <strong>Serie A</strong>
+            </button>
+          </div>
+          <div class="league-market-grid" id="league-market-list" aria-label="League club markets" hidden></div>
+
+          <div class="player-filter" id="player-filter" hidden>
+            <label class="search-box compact-search">
+              <span>⌕</span>
+              <input type="search" id="player-search" placeholder="Search player markets" />
+            </label>
+          </div>
+          <div class="player-market-grid" id="player-market-list" aria-label="Player prop markets" hidden></div>
+
+        </section>
+
+      </section>
+
+      <aside class="right-rail">
+        <section class="trade-slip">
+          <div class="slip-tabs">
+            <button class="is-active" type="button">Trade</button>
+            <button class="positions-tab" type="button">
+              Positions
+              <span class="ticket-count-badge" data-ticket-count hidden>0</span>
+            </button>
+          </div>
+          <div class="ticket-view trade-view is-active">
+            <div class="side-toggle" role="group" aria-label="Trade side">
+              <button class="is-active" type="button">YES</button>
+              <button type="button">NO</button>
+            </div>
+          <h2>Brazil to beat Spain</h2>
+            <label>
+              Amount
+              <input type="text" value="100 USDT" aria-label="Trade amount" />
+            </label>
+            <div class="quote-grid">
+              <span>Avg price</span>
+            <strong>47¢</strong>
+              <span>Est. shares</span>
+              <strong>212.8</strong>
+              <span>Max payout</span>
+              <strong>$212.77</strong>
+            </div>
+            <button class="connect-btn full confirm-trade" type="button" data-action="confirm-trade">Confirm ticket</button>
+          </div>
+          <div class="ticket-view positions-view">
+            <h2 class="positions-title">Open Positions</h2>
+            <div class="ticket-stack" id="ticket-stack">
+              <div class="ticket-empty">
+                <strong>No open positions yet</strong>
+                <span>Pick any YES or NO price to create a position.</span>
+              </div>
+            </div>
+            <p class="ticket-note">Preview positions. Backend will replace estimates with live wallet positions.</p>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <button class="floating-ticket-button" type="button" data-action="open-tickets" aria-label="Open tickets" hidden>
+      <span data-ticket-count>0</span>
+    </button>
+
+    <div class="pnl-modal" id="pnl-modal" hidden>
+      <button class="pnl-modal__backdrop" type="button" data-action="close-pnl" aria-label="Close PnL card"></button>
+      <article class="share-pnl-card" role="dialog" aria-modal="true" aria-labelledby="share-pnl-title">
+        <button class="share-pnl-card__close" type="button" data-action="close-pnl" aria-label="Close PnL card">×</button>
+        <div class="share-pnl-card__brand">
+          <span class="brand__mark">X</span>
+          <div>
+            <strong>X Cup Markets</strong>
+            <small>Position on X Layer</small>
+          </div>
+        </div>
+        <div class="share-pnl-card__headline">
+          <span id="share-pnl-status">Open position</span>
+          <h2 id="share-pnl-title">Brazil to win</h2>
+        </div>
+        <div class="share-pnl-card__amount" id="share-pnl-amount">+24.80 USDT</div>
+        <div class="share-pnl-card__meta">
+          <div><span>Side</span><strong id="share-pnl-side">YES</strong></div>
+          <div><span>Entry</span><strong id="share-pnl-entry">47¢</strong></div>
+          <div><span>Stake</span><strong id="share-pnl-stake">100 USDT</strong></div>
+          <div><span>Current</span><strong id="share-pnl-current">65¢</strong></div>
+        </div>
+        <div class="share-pnl-card__bar"><span id="share-pnl-bar"></span></div>
+        <p id="share-pnl-summary">World Cup market snapshot. Final settlement comes from live wallet positions.</p>
+      </article>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a class="brand footer-logo" href="#" aria-label="X Cup Markets home" data-action="home">
+            <span class="brand__mark">X</span>
+            <span>
+              <strong>X Cup</strong>
+              <small>Prediction Market on X Layer</small>
+            </span>
+          </a>
+          <p>World Cup markets for match outcomes and player moments.</p>
+          <div class="footer-socials" aria-label="Social links">
+            <a href="https://x.com/XLayerOfficial" target="_blank" rel="noreferrer" aria-label="X Layer on X">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18.9 2H22l-6.78 7.75L23.2 22h-6.25l-4.9-7.51L5.48 22H2.37l7.25-8.29L1.97 2h6.41l4.43 6.82L18.9 2Zm-1.1 17.84h1.72L7.44 4.05H5.59L17.8 19.84Z" />
+              </svg>
+            </a>
+            <a href="https://t.me/okxofficial_en" target="_blank" rel="noreferrer" aria-label="Telegram">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21.62 3.23c.48-.2.99.21.89.72l-2.9 16.22c-.1.58-.77.86-1.25.53l-4.44-3.24-2.26 2.2c-.39.38-1.05.2-1.18-.33l-.84-3.5-4.46-1.4c-.64-.2-.69-1.08-.08-1.36L21.62 3.23Zm-3.98 4.05-8.76 5.41 3.05.96 5.71-6.37Zm-5.57 7.35.46 1.9 1.2-1.16-1.66-.74Z" />
+              </svg>
+            </a>
+            <a href="https://discord.com" target="_blank" rel="noreferrer" aria-label="Discord">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M19.35 5.16A16.15 16.15 0 0 0 15.4 3.9l-.48 1.01a14.5 14.5 0 0 0-5.8 0L8.6 3.9a16.33 16.33 0 0 0-3.96 1.26C2.14 8.9 1.46 12.55 1.8 16.16a16.18 16.18 0 0 0 4.86 2.45l1.18-1.6a10.31 10.31 0 0 1-1.85-.9l.45-.34c3.56 1.66 7.42 1.66 10.94 0l.46.34c-.6.36-1.22.66-1.86.9l1.18 1.6a16.1 16.1 0 0 0 4.86-2.45c.42-4.18-.72-7.79-2.67-11Zm-10.6 9.06c-1.07 0-1.95-.98-1.95-2.18 0-1.2.86-2.19 1.95-2.19 1.1 0 1.98 1 1.96 2.19 0 1.2-.87 2.18-1.96 2.18Zm6.5 0c-1.08 0-1.95-.98-1.95-2.18 0-1.2.86-2.19 1.95-2.19 1.1 0 1.98 1 1.96 2.19 0 1.2-.86 2.18-1.96 2.18Z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <nav class="footer-links" aria-label="Market links">
+          <h2>Markets</h2>
+          <a href="#games-board" data-action="home">Markets</a>
+          <a href="#" data-footer-action="how">How It Works</a>
+          <a href="#" data-footer-action="terms">Terms &amp; Conditions</a>
+          <a href="#" data-footer-action="privacy">Privacy Policy</a>
+        </nav>
+
+        <nav class="footer-links" aria-label="Help links">
+          <h2>Help</h2>
+          <a href="#" data-footer-action="faq">FAQ</a>
+          <a href="#" data-footer-action="wallet">Wallet Support</a>
+          <a href="https://www.okx.com/xlayer" target="_blank" rel="noreferrer">X Layer Docs</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="app.js?v=20260522-search-left"></script>
+  </body>
+</html>

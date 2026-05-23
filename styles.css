@@ -5635,11 +5635,14 @@ body {
 }
 
 .featured-card,
-.league-panel,
-.position-tabs .ticket-card {
+.league-panel {
   background:
     linear-gradient(135deg, rgba(14, 165, 198, 0.05), transparent 48%),
     var(--panel-raised);
+}
+
+.position-tabs .ticket-card {
+  background: var(--panel-raised);
 }
 
 .market-board,
@@ -5875,12 +5878,32 @@ body {
   box-shadow: 0 10px 22px rgba(20, 32, 51, 0.1);
 }
 
-.player-prop-image,
-.share-pnl-card,
-.share-pnl-card__body {
+.player-prop-image {
   background:
     linear-gradient(145deg, rgba(14, 165, 198, 0.11), rgba(255, 255, 255, 0.12)),
     var(--panel-soft);
+}
+
+.share-pnl-card,
+.share-pnl-card__body {
+  background:
+    radial-gradient(circle at 50% 4%, rgba(255, 255, 255, 0.22), transparent 20%),
+    radial-gradient(circle at 10% 18%, rgba(37, 216, 232, 0.26), transparent 28%),
+    radial-gradient(circle at 90% 22%, rgba(240, 0, 24, 0.22), transparent 30%),
+    linear-gradient(180deg, #1735a8 0%, #101b60 42%, #14103a 100%);
+  color: #f1f5f9;
+}
+
+.share-pnl-card__headline span { color: var(--cyan); }
+.share-pnl-card__headline h2 { color: #f1f5f9; }
+.share-pnl-card__amount { color: #f1f5f9; }
+.share-pnl-card__meta span { color: rgba(255,255,255,0.55); }
+.share-pnl-card__meta strong { color: #f1f5f9; }
+.share-pnl-card p { color: rgba(255,255,255,0.55); }
+.share-pnl-card__close {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.12);
+  color: var(--cyan);
 }
 
 .share-pnl-card__stadium {

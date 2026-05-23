@@ -49,10 +49,10 @@ const gameMarkets = [
   game("f1-austria-norris-piastri", "Lando Norris", "Oscar Piastri", "gb", "au", "NOR", "PIA", "Austrian GP · 28 Jun", "ID:53004", "formula-1"),
   game("f1-silverstone-hamilton-verstappen", "Lewis Hamilton", "Max Verstappen", "gb", "nl", "HAM", "VER", "British GP · 5 Jul", "ID:53005", "formula-1"),
   game("f1-belgium-leclerc-russell", "Charles Leclerc", "George Russell", "mc", "gb", "LEC", "RUS", "Belgian GP · 19 Jul", "ID:53006", "formula-1"),
-  game("ufc-makhachev-volkanovski", "Islam Makhachev", "Alexander Volkanovski", "ru", "au", "ISL", "VOL", "UFC 294 · 21 Oct 2023 · Lightweight", "ID:54001", "ufc", "ufc-men"),
-  game("ufc-pereira-prochazka", "Alex Pereira", "Jiri Prochazka", "br", "cz", "PER", "JIR", "UFC 303 · 29 Jun 2024 · Light Heavyweight", "ID:54002", "ufc", "ufc-men"),
-  game("ufc-nunes-rousey", "Amanda Nunes", "Ronda Rousey", "br", "us", "NUN", "RON", "UFC 207 · 30 Dec 2016 · Bantamweight", "ID:54003", "ufc", "ufc-women"),
-  game("ufc-shevchenko-joanna", "Valentina Shevchenko", "Joanna Jedrzejczyk", "kg", "pl", "VAL", "JOA", "UFC 231 · 8 Dec 2018 · Flyweight", "ID:54004", "ufc", "ufc-women"),
+  game("ufc-makhachev-volkanovski", "Islam Makhachev", "Alexander Volkanovski", "ru", "au", "ISL", "VOL", "UFC 323 · 10 May 2026 · Lightweight Title", "ID:54001", "ufc", "ufc-men"),
+  game("ufc-pereira-prochazka", "Alex Pereira", "Jiri Prochazka", "br", "cz", "PER", "JIR", "UFC 321 · 7 Mar 2026 · Light Heavyweight Title", "ID:54002", "ufc", "ufc-men"),
+  game("ufc-pennington-pena", "Raquel Pennington", "Julianna Pena", "us", "us", "PEN", "PEA", "UFC 322 · 14 Feb 2026 · W Bantamweight Title", "ID:54003", "ufc", "ufc-women"),
+  game("ufc-shevchenko-grasso", "Valentina Shevchenko", "Alexa Grasso", "kg", "mx", "VAL", "GRA", "UFC 320 · 17 Jan 2026 · W Flyweight Title", "ID:54004", "ufc", "ufc-women"),
 ];
 
 const sportLabels = {
@@ -74,13 +74,9 @@ const marketVisuals = {
     homeImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Alex_Pereira_UFC_300.png?width=720",
     awayImage: "https://commons.wikimedia.org/wiki/Special:FilePath/JiriProchazka2022.png?width=720",
   },
-  "ufc-nunes-rousey": {
-    homeImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Amanda_Nunes_UFC_2023.png?width=720",
-    awayImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Ronda_Rousey_%288%29.JPG?width=720",
-  },
-  "ufc-shevchenko-joanna": {
+  "ufc-shevchenko-grasso": {
     homeImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Valentina_Shevchenko.jpg?width=720",
-    awayImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Joanna_J%C4%99drzejczyk.png?width=720",
+    awayImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Alexa_Grasso.jpg?width=720",
   },
   "f1-canada-norris-verstappen": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
   "f1-monaco-leclerc-piastri": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
@@ -392,6 +388,13 @@ function buildUfcOptions(home, away) {
 }
 
 function quickChoices(match) {
+  if (match.sport === "basketball") {
+    return [
+      { label: match.homeCode, price: "2.10", title: `${match.home} to win` },
+      { label: "O/U", price: "3.30", title: "Total points over 169.5" },
+      { label: match.awayCode, price: "2.65", title: `${match.away} to win` },
+    ];
+  }
   if (match.sport === "cricket") {
     return [
       { label: match.homeCode, price: "2.10", title: `${match.home} to win` },
@@ -489,7 +492,7 @@ function renderGameTiles() {
         <span class="fight-event-line">${match.time}</span>
         <div class="ufc-title-stage" aria-label="${match.home} versus ${match.away}">
           <article class="fighter-card is-home">
-            <img class="fighter-image" src="${visual.homeImage}" alt="${match.home}" />
+            ${visual.homeImage ? `<img class="fighter-image" src="${visual.homeImage}" alt="${match.home}" onerror="this.hidden=true" />` : ""}
             <div class="fighter-card-copy">
               <strong>${match.home}</strong>
               <button type="button">${choices[0].label}<span>${choices[0].price}</span></button>
@@ -497,13 +500,14 @@ function renderGameTiles() {
           </article>
           <b class="fight-vs">VS</b>
           <article class="fighter-card is-away">
-            <img class="fighter-image" src="${visual.awayImage}" alt="${match.away}" />
+            ${visual.awayImage ? `<img class="fighter-image" src="${visual.awayImage}" alt="${match.away}" onerror="this.hidden=true" />` : ""}
             <div class="fighter-card-copy">
               <strong>${match.away}</strong>
               <button type="button">${choices[2].label}<span>${choices[2].price}</span></button>
             </div>
           </article>
         </div>
+        <button class="fight-distance-pick" type="button">${choices[1].label}<span>${choices[1].price}</span></button>
       `;
       card.querySelector(".fighter-card.is-home button").addEventListener("click", event => {
         event.stopPropagation();
@@ -512,6 +516,10 @@ function renderGameTiles() {
       card.querySelector(".fighter-card.is-away button").addEventListener("click", event => {
         event.stopPropagation();
         selectMarket(choices[2].title, event.currentTarget);
+      });
+      card.querySelector(".fight-distance-pick").addEventListener("click", event => {
+        event.stopPropagation();
+        selectMarket(choices[1].title, event.currentTarget);
       });
       card.addEventListener("click", () => openMatchPage(match.id));
       gamesGrid.appendChild(card);
@@ -534,6 +542,32 @@ function renderGameTiles() {
       card.querySelector("button").addEventListener("click", event => {
         event.stopPropagation();
         openMatchPage(match.id);
+      });
+      card.addEventListener("click", () => openMatchPage(match.id));
+      gamesGrid.appendChild(card);
+      return;
+    }
+
+    if (match.sport === "esports") {
+      const choices = quickChoices(match);
+      card.innerHTML = `
+        <div class="match-teams">
+          <span class="match-meta-line">${sport.icon} ${match.time} · ${sport.title.toUpperCase()}</span>
+          <div class="matchup-sides esports-matchup" aria-label="${match.home} versus ${match.away}">
+            <strong><span class="team-badge">${match.homeCode}</span> ${match.home}</strong>
+            <b>VS</b>
+            <strong>${match.away} <span class="team-badge">${match.awayCode}</span></strong>
+          </div>
+        </div>
+        <div class="quick-odds">
+          ${choices.map(choice => `<button type="button">${choice.label}<span>${choice.price}</span></button>`).join("")}
+        </div>
+      `;
+      card.querySelectorAll(".quick-odds button").forEach((button, index) => {
+        button.addEventListener("click", event => {
+          event.stopPropagation();
+          selectMarket(choices[index].title, button);
+        });
       });
       card.addEventListener("click", () => openMatchPage(match.id));
       gamesGrid.appendChild(card);

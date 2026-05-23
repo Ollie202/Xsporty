@@ -85,28 +85,28 @@ const marketVisuals = {
   "f1-silverstone-hamilton-verstappen": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
   "f1-belgium-leclerc-russell": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
   "esports-t1-navi": {
-    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/5/53/T1_logo.svg/100px-T1_logo.svg.png",
-    awayImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Natus_Vincere_logo_white.svg/100px-Natus_Vincere_logo_white.svg.png",
+    homeImage: "https://logo.clearbit.com/t1.gg",
+    awayImage: "https://logo.clearbit.com/navi.gg",
   },
   "esports-faze-g2": {
-    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4d/FaZe_Clan_logo.svg/100px-FaZe_Clan_logo.svg.png",
-    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1b/G2_Esports_logo.svg/100px-G2_Esports_logo.svg.png",
+    homeImage: "https://logo.clearbit.com/fazeclan.com",
+    awayImage: "https://logo.clearbit.com/g2esports.com",
   },
   "esports-liquid-fnatic": {
-    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/6/68/Team_Liquid_logo.svg/100px-Team_Liquid_logo.svg.png",
-    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Fnatic_logo.svg/100px-Fnatic_logo.svg.png",
+    homeImage: "https://logo.clearbit.com/teamliquid.com",
+    awayImage: "https://logo.clearbit.com/fnatic.com",
   },
   "esports-cloud9-vitality": {
-    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Cloud9_logo.svg/100px-Cloud9_logo.svg.png",
-    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Team_Vitality_logo.svg/100px-Team_Vitality_logo.svg.png",
+    homeImage: "https://logo.clearbit.com/cloud9.gg",
+    awayImage: "https://logo.clearbit.com/team-vitality.gg",
   },
   "esports-heroic-ence": {
-    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/0/01/Heroic_logo.svg/100px-Heroic_logo.svg.png",
-    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/2/27/ENCE_logo.svg/100px-ENCE_logo.svg.png",
+    homeImage: "https://logo.clearbit.com/heroic.gg",
+    awayImage: "https://logo.clearbit.com/ence.gg",
   },
   "esports-nip-astralis": {
-    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/Ninjas_in_Pyjamas_logo.svg/100px-Ninjas_in_Pyjamas_logo.svg.png",
-    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d7/Astralis_logo.svg/100px-Astralis_logo.svg.png",
+    homeImage: "https://logo.clearbit.com/nip.gl",
+    awayImage: "https://logo.clearbit.com/astralis.gg",
   },
 };
 

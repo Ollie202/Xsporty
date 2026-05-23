@@ -1015,10 +1015,10 @@ a {
 }
 
 .esports-team-logo {
-  width: auto;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+  border-radius: 6px;
 }
 
 .fight-event-line {

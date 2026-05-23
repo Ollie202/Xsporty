@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>X Cup Markets</title>
-    <link rel="stylesheet" href="styles.css?v=20260523-detail-theme" />
+    <link rel="stylesheet" href="styles.css?v=20260523-profile-theme" />
   </head>
   <body>
     <header class="topbar">
@@ -40,28 +40,43 @@
               </span>
             </button>
             <div class="profile-dropdown" hidden>
-              <div class="profile-picture-control">
-                <span class="profile-avatar large" data-profile-avatar>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M20 21a8 8 0 0 0-16 0" />
-                    <circle cx="12" cy="8" r="4" />
-                  </svg>
-                </span>
-                <label class="profile-edit" aria-label="Change profile picture">
-                  ✎
-                  <input type="file" accept="image/*" data-profile-image-input hidden />
-                </label>
-              </div>
-              <div class="profile-wallet" hidden>
-                <div class="profile-wallet__row">
-                  <span>Wallet address</span>
-                  <button type="button" class="copy-wallet" data-action="copy-wallet">Copy</button>
+              <div class="profile-card-head">
+                <div class="profile-picture-control">
+                  <span class="profile-avatar large" data-profile-avatar>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M20 21a8 8 0 0 0-16 0" />
+                      <circle cx="12" cy="8" r="4" />
+                    </svg>
+                  </span>
+                  <label class="profile-edit" aria-label="Change profile picture">
+                    ✎
+                    <input type="file" accept="image/*" data-profile-image-input hidden />
+                  </label>
                 </div>
-                <strong data-wallet-address>0x7A9C...21F8</strong>
-                <small>1,250 USDT</small>
+                <div>
+                  <strong data-wallet-address>0x7A9C...21F8</strong>
+                  <span>1,250 USDT</span>
+                </div>
+                <button type="button" class="copy-wallet" data-action="copy-wallet" aria-label="Copy wallet address">⧉</button>
               </div>
-              <button type="button" data-profile-view="settings">Settings</button>
-              <button type="button" data-profile-view="history">History</button>
+              <div class="profile-action-list">
+                <button type="button" data-profile-view="history">
+                  <span>History</span>
+                  <b>›</b>
+                </button>
+                <button type="button" data-profile-view="support">
+                  <span>Contact support</span>
+                  <b>›</b>
+                </button>
+                <label class="theme-toggle-row">
+                  <span>Dark theme</span>
+                  <input type="checkbox" data-action="theme-toggle" />
+                  <i aria-hidden="true"></i>
+                </label>
+                <button type="button" class="profile-logout" data-profile-view="logout">
+                  <span>Log Out</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -326,7 +341,7 @@
       </div>
     </footer>
 
-    <script src="app.js?v=20260523-detail-theme"></script>
+    <script src="app.js?v=20260523-profile-theme"></script>
   </body>
 </html>
 

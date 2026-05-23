@@ -1206,7 +1206,7 @@ function renderTickets() {
   if (activeTickets.length === 0) {
     ticketStack.innerHTML = `
       <div class="ticket-empty">
-        <strong>No open positions yet</strong>
+        <strong>No positions yet</strong>
       <span>Pick any YES or NO price to create a position.</span>
       </div>
     `;
@@ -1215,7 +1215,7 @@ function renderTickets() {
   }
 
   ticketStack.innerHTML = `
-    <div class="position-tabs" aria-label="Open positions">
+    <div class="position-tabs" aria-label="My positions">
       ${activeTickets.map((ticket, index) => ticketRow(ticket, index)).join("")}
     </div>
   `;

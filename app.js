@@ -752,10 +752,19 @@ function openMatchPage(matchId) {
     : `${match.home} vs ${match.away}`;
   detailMeta.textContent = `${match.time} · Prediction markets available`;
   detailId.textContent = match.marketId;
-  detailHomeFlag.src = flagUrl(match.homeFlag);
-  detailHomeFlag.alt = `${match.home} flag`;
-  detailAwayFlag.src = flagUrl(match.awayFlag);
-  detailAwayFlag.alt = `${match.away} flag`;
+  detailHomeFlag.hidden = match.sport === "formula-1";
+  detailAwayFlag.hidden = match.sport === "formula-1";
+  if (match.sport !== "formula-1") {
+    detailHomeFlag.src = flagUrl(match.homeFlag);
+    detailHomeFlag.alt = `${match.home} flag`;
+    detailAwayFlag.src = flagUrl(match.awayFlag);
+    detailAwayFlag.alt = `${match.away} flag`;
+  } else {
+    detailHomeFlag.removeAttribute("src");
+    detailAwayFlag.removeAttribute("src");
+    detailHomeFlag.alt = "";
+    detailAwayFlag.alt = "";
+  }
   detailHomeCode.textContent = match.homeCode;
   detailAwayCode.textContent = match.awayCode;
   renderMatchInsight(match);
@@ -1127,7 +1136,7 @@ function wireConfirmTrade() {
     state.pendingTicket = null;
     showPositions();
     updateQuote();
-    showToast("Ticket confirmed and moved to Positions");
+    showToast("Ticket confirmed and moved to My Positions");
   });
 }
 
@@ -1198,7 +1207,7 @@ function renderTickets() {
     ticketStack.innerHTML = `
       <div class="ticket-empty">
         <strong>No open positions yet</strong>
-        <span>Pick any YES or NO price to create a ticket.</span>
+      <span>Pick any YES or NO price to create a position.</span>
       </div>
     `;
     updateTicketBadges();

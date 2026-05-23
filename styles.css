@@ -5869,3 +5869,46 @@ body {
     justify-self: center;
   }
 }
+
+/* Detail pages should stay in the softer light theme too. */
+.formula-detail-insight {
+  border-color: var(--line);
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.08), transparent 45%),
+    var(--panel-raised);
+  box-shadow: var(--shadow);
+}
+
+.formula-detail-insight div {
+  color: var(--text);
+  background:
+    linear-gradient(135deg, rgba(248, 250, 251, 0.96), rgba(238, 243, 246, 0.98));
+}
+
+.formula-detail-insight h3,
+.formula-detail-insight strong {
+  color: var(--text);
+}
+
+.formula-detail-insight p {
+  color: var(--muted);
+}
+
+.formula-detail-insight strong {
+  border-color: var(--line);
+  background: rgba(239, 246, 249, 0.92);
+}
+
+.detail-team img[hidden] {
+  display: none;
+}
+
+.detail-team:has(img[hidden]) {
+  min-width: 72px;
+  min-height: 54px;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel-soft);
+  box-shadow: none;
+}

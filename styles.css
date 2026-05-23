@@ -5875,9 +5875,7 @@ body {
   box-shadow: 0 10px 22px rgba(20, 32, 51, 0.1);
 }
 
-.player-prop-image,
-.share-pnl-card,
-.share-pnl-card__body {
+.player-prop-image {
   background:
     linear-gradient(145deg, rgba(14, 165, 198, 0.11), rgba(255, 255, 255, 0.12)),
     var(--panel-soft);
@@ -6074,4 +6072,105 @@ body {
     right: -8px;
     width: min(342px, calc(100vw - 32px));
   }
+}
+
+/* Force the trade rail and position cards dark regardless of page theme. */
+.trade-slip,
+.pnl-card {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.32);
+}
+
+.trade-slip h2,
+.slip-tabs button.is-active,
+.ticket-card strong,
+.trade-slip strong {
+  color: #f1f5f9;
+}
+
+.slip-tabs button {
+  color: #94a3b8;
+}
+
+.trade-slip label,
+.ticket-card small {
+  color: #94a3b8;
+}
+
+.trade-slip input {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.10);
+  color: #f1f5f9;
+}
+
+.trade-slip input::placeholder {
+  color: #4b5563;
+}
+
+.trade-slip .quote-grid {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.trade-slip .quote-grid strong,
+.trade-slip .is-profit,
+.ticket-card .is-profit {
+  color: #34d399;
+}
+
+.ticket-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+}
+
+.ticket-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ticket-card .is-loss {
+  color: #f87171;
+}
+
+.ticket-empty,
+.ticket-note {
+  color: #4b5563;
+}
+
+/* P&L share modal stays dark regardless of theme. */
+.share-pnl-card {
+  background:
+    radial-gradient(circle at 50% 4%, rgba(255, 255, 255, 0.22), transparent 20%),
+    radial-gradient(circle at 10% 18%, rgba(37, 216, 232, 0.26), transparent 28%),
+    radial-gradient(circle at 90% 22%, rgba(240, 0, 24, 0.22), transparent 30%),
+    linear-gradient(180deg, #1735a8 0%, #101b60 42%, #14103a 100%);
+  border-color: rgba(134, 184, 255, 0.48);
+  color: #f1f5f9;
+}
+
+.share-pnl-card__headline span {
+  color: var(--cyan);
+}
+
+.share-pnl-card__headline h2,
+.share-pnl-card__amount {
+  color: #f1f5f9;
+}
+
+.share-pnl-card__meta strong {
+  color: #f1f5f9;
+}
+
+.share-pnl-card__meta span,
+.share-pnl-card p {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.share-pnl-card__close {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--cyan);
+  border-color: rgba(255, 255, 255, 0.12);
 }

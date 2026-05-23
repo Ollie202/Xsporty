@@ -177,7 +177,6 @@ const liveFeaturedMarkets = [
 ];
 
 const PROFILE_IMAGE_KEY = "x-cup-profile-image";
-const THEME_KEY = "x-cup-theme";
 const WALLET_ADDRESS = "0x7A9C7423C3d8F68E4A48B276693F96F0B32B21F8";
 const state = { connected: false, side: "YES", price: 47, sport: "football", tickets: [] };
 const gamesGrid = document.querySelector("#games-grid");
@@ -229,7 +228,6 @@ wireConfirmTrade();
 wirePnlModal();
 updateQuote();
 initializeProfileImage();
-initializeTheme();
 renderTickets();
 
 function game(id, home, away, homeFlag, awayFlag, homeCode, awayCode, time, marketId, sport = "football", group = "world-cup") {
@@ -968,7 +966,6 @@ function wireProfileMenu() {
   const dropdown = document.querySelector(".profile-dropdown");
   const imageInput = document.querySelector("[data-profile-image-input]");
   const copyWalletButton = document.querySelector("[data-action='copy-wallet']");
-  const themeToggle = document.querySelector("[data-action='theme-toggle']");
 
   profileButton?.addEventListener("click", event => {
     event.stopPropagation();
@@ -1015,33 +1012,11 @@ function wireProfileMenu() {
       showToast("Copy unavailable in this browser");
     }
   });
-
-  themeToggle?.addEventListener("click", event => {
-    event.stopPropagation();
-  });
-
-  themeToggle?.addEventListener("change", event => {
-    setTheme(event.target.checked ? "dark" : "light");
-  });
 }
 
 function initializeProfileImage() {
   const savedProfileImage = localStorage.getItem(PROFILE_IMAGE_KEY);
   if (savedProfileImage) applyProfileImage(savedProfileImage);
-}
-
-function initializeTheme() {
-  setTheme(localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light", false);
-}
-
-function setTheme(theme, notify = true) {
-  const isDark = theme === "dark";
-  document.body.classList.toggle("theme-dark", isDark);
-  document.querySelectorAll("[data-action='theme-toggle']").forEach(toggle => {
-    toggle.checked = isDark;
-  });
-  localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
-  if (notify) showToast(`${isDark ? "Dark" : "Light"} theme enabled`);
 }
 
 function applyProfileImage(imageUrl) {

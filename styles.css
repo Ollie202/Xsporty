@@ -5988,8 +5988,7 @@ body {
   border-top: 1px solid var(--line);
 }
 
-.profile-action-list button,
-.theme-toggle-row {
+.profile-action-list button {
   min-height: 46px;
   display: flex;
   align-items: center;
@@ -6003,14 +6002,12 @@ body {
   text-align: left;
 }
 
-.profile-action-list button:hover,
-.theme-toggle-row:hover {
+.profile-action-list button:hover {
   color: var(--text);
   background: var(--panel-soft);
 }
 
-.profile-action-list button span,
-.theme-toggle-row span {
+.profile-action-list button span {
   font-size: 15px;
   font-weight: 900;
 }
@@ -6024,216 +6021,6 @@ body {
 .profile-logout {
   margin-top: 4px;
   color: var(--red) !important;
-}
-
-.theme-toggle-row {
-  cursor: pointer;
-}
-
-.theme-toggle-row input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.theme-toggle-row i {
-  position: relative;
-  width: 38px;
-  height: 22px;
-  flex: 0 0 auto;
-  border-radius: 999px;
-  background: #98a2b3;
-  transition: background 160ms ease;
-}
-
-.theme-toggle-row i::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.22);
-  transition: transform 160ms ease;
-}
-
-.theme-toggle-row input:checked + i {
-  background: var(--cyan);
-}
-
-.theme-toggle-row input:checked + i::after {
-  transform: translateX(16px);
-}
-
-body.theme-dark {
-  --bg: #111827;
-  --bg-deep: #0b111c;
-  --panel: #141c2a;
-  --panel-soft: #1b2535;
-  --panel-raised: #202b3d;
-  --line: #344154;
-  --line-soft: #465466;
-  --text: #f8fafc;
-  --muted: #b7c2d2;
-  --faint: #7c8aa0;
-  --red: #ff4d6d;
-  --red-dark: #cf2444;
-  --cyan: #20d4ee;
-  --yellow: #8df7ce;
-  --green: #25d977;
-  --shadow: 0 18px 46px rgba(0, 0, 0, 0.34);
-  color: var(--text);
-  background:
-    radial-gradient(circle at 12% -5%, rgba(32, 212, 238, 0.16), transparent 28rem),
-    radial-gradient(circle at 96% 4%, rgba(37, 217, 119, 0.1), transparent 24rem),
-    linear-gradient(180deg, #162234 0%, #101827 24rem, #0b111c 100%);
-}
-
-body.theme-dark .topbar,
-body.theme-dark .site-footer {
-  background: rgba(17, 24, 39, 0.92);
-  border-color: rgba(52, 65, 84, 0.92);
-}
-
-body.theme-dark .brand__mark,
-body.theme-dark .profile-button,
-body.theme-dark .profile-dropdown,
-body.theme-dark .trade-slip,
-body.theme-dark .market-board,
-body.theme-dark .match-row,
-body.theme-dark .featured-card,
-body.theme-dark .match-detail-card,
-body.theme-dark .league-panel,
-body.theme-dark .league-match-card,
-body.theme-dark .player-prop-card,
-body.theme-dark .history-hero,
-body.theme-dark .history-card,
-body.theme-dark .history-list,
-body.theme-dark .history-row,
-body.theme-dark .ticket-card {
-  border-color: var(--line);
-  background-color: var(--panel-raised);
-  box-shadow: var(--shadow);
-}
-
-body.theme-dark .brand strong,
-body.theme-dark .hero-banner__copy h1,
-body.theme-dark .detail-title-row h2,
-body.theme-dark .trade-slip h2,
-body.theme-dark .ticket-card strong,
-body.theme-dark .match-row strong,
-body.theme-dark .formula-event-copy strong,
-body.theme-dark .fighter-card-copy strong {
-  color: var(--text);
-}
-
-body.theme-dark .brand small,
-body.theme-dark .hero-banner__copy p,
-body.theme-dark .detail-title-row span,
-body.theme-dark .formula-event-copy p,
-body.theme-dark .ticket-empty span,
-body.theme-dark .ticket-note {
-  color: var(--muted);
-}
-
-body.theme-dark .top-sport-nav,
-body.theme-dark .search-box,
-body.theme-dark .featured-mode-tabs,
-body.theme-dark .side-toggle,
-body.theme-dark .ticket-empty,
-body.theme-dark .ticket-note,
-body.theme-dark .profile-dropdown .copy-wallet,
-body.theme-dark .theme-toggle-row:hover,
-body.theme-dark .profile-action-list button:hover,
-body.theme-dark .match-meta-line,
-body.theme-dark .fight-event-line {
-  border-color: var(--line);
-  background: var(--panel-soft);
-}
-
-body.theme-dark .top-sport-nav button {
-  color: var(--muted);
-}
-
-body.theme-dark .top-sport-nav button:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-body.theme-dark .top-sport-nav .is-active,
-body.theme-dark .connect-btn,
-body.theme-dark .hero-banner__copy button,
-body.theme-dark .formula-event-copy button,
-body.theme-dark .confirm-btn {
-  color: #07111f;
-  background: linear-gradient(135deg, var(--cyan), #8df7ce);
-  box-shadow: 0 12px 24px rgba(32, 212, 238, 0.18);
-}
-
-body.theme-dark .search-box input,
-body.theme-dark .ticket-view input {
-  color: var(--text);
-}
-
-body.theme-dark .hero-banner {
-  border-color: var(--line);
-  background:
-    linear-gradient(135deg, rgba(32, 212, 238, 0.15), transparent 42%),
-    linear-gradient(115deg, #1a2637 0%, #121b2a 52%, #152334 100%);
-}
-
-body.theme-dark .featured-card,
-body.theme-dark .league-panel,
-body.theme-dark .position-tabs .ticket-card {
-  background:
-    linear-gradient(135deg, rgba(32, 212, 238, 0.07), transparent 48%),
-    var(--panel-raised);
-}
-
-body.theme-dark .featured-odds button,
-body.theme-dark .quick-odds button,
-body.theme-dark .league-market-prices .price,
-body.theme-dark .fighter-card button,
-body.theme-dark .option-row .price {
-  border-color: var(--line);
-  color: var(--text);
-  background: #182235;
-}
-
-body.theme-dark .featured-odds button:hover,
-body.theme-dark .quick-odds button:hover,
-body.theme-dark .league-market-prices .price:hover,
-body.theme-dark .fighter-card button:hover,
-body.theme-dark .option-row .price:hover {
-  background: #1d3044;
-  border-color: rgba(32, 212, 238, 0.42);
-}
-
-body.theme-dark .match-row.formula-event-card,
-body.theme-dark .match-row.ufc-title-card,
-body.theme-dark .fighter-card.is-home,
-body.theme-dark .fighter-card.is-away,
-body.theme-dark .formula-event-copy {
-  background:
-    linear-gradient(135deg, rgba(32, 212, 238, 0.08), transparent 46%),
-    var(--panel-raised);
-}
-
-body.theme-dark .formula-detail-insight,
-body.theme-dark .formula-detail-insight div,
-body.theme-dark .player-prop-image,
-body.theme-dark .share-pnl-card,
-body.theme-dark .share-pnl-card__body {
-  background:
-    linear-gradient(135deg, rgba(32, 212, 238, 0.1), transparent 50%),
-    var(--panel-raised);
-}
-
-body.theme-dark .detail-team:has(img[hidden]) {
-  border-color: var(--line);
-  background: var(--panel-soft);
 }
 
 @media (max-width: 640px) {

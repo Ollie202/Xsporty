@@ -649,6 +649,14 @@ function esportsLogoHtml(code) {
   return `<img class="esports-team-logo" src="${url}" alt="${code} logo" />`;
 }
 
+const INSIGHT_CFG = {
+  football:   { midLabel: "Table Position", formLabel: "form",     recentLabel: "Last 5 Matches", allowDraw: true,  scoreGen: (s, i) => `${(s + i * 2) % 4}–${(s + i * 3) % 3}`,                          opponents: ["ARS","BAR","JUV","PSG","BYN","AJA","POR","ATM","ROM","INT"] },
+  basketball: { midLabel: "Conference",     formLabel: "win %",    recentLabel: "Last 5 Games",   allowDraw: false, scoreGen: (s, i) => `${95 + (s + i * 7) % 25}–${78 + (s + i * 5) % 20}`,            opponents: ["LAL","GSW","BOS","MIA","PHX","MIL","NYK","CHI","DEN","DAL"] },
+  cricket:    { midLabel: "ICC Ranking",    formLabel: "form",     recentLabel: "Last 5 Games",   allowDraw: false, scoreGen: (s, i) => `${162 + (s + i * 9) % 78}/${5 + (s + i * 3) % 5}`,              opponents: ["IND","PAK","AUS","ENG","SA","NZ","WI","SL","BAN","AFG"] },
+  tennis:     { midLabel: "ATP Ranking",    formLabel: "win %",    recentLabel: "Last 5 Matches", allowDraw: false, scoreGen: (s, i) => `${1 + (s + i * 2) % 2}–${(s + i * 3) % 2}`,                    opponents: ["DJO","ALC","MED","SIN","RUU","FRI","HUB","ZVE","RUB","BER"] },
+  esports:    { midLabel: "World Ranking",  formLabel: "win rate", recentLabel: "Last 5 Series",  allowDraw: false, scoreGen: (s, i) => `2–${(s + i) % 2}`,                                             opponents: ["NV","SEN","G2","FNC","EG","T1","C9","NIP","NRG","100T"] },
+};
+
 function renderMatchInsight(match) {
   if (match.sport === "formula-1") {
     const visual = marketVisuals[match.id] || {};
@@ -667,13 +675,14 @@ function renderMatchInsight(match) {
     return;
   }
 
+  const cfg = INSIGHT_CFG[match.sport] || INSIGHT_CFG.football;
   const seed = match.id.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const homeForm = 42 + (seed % 36);
   const awayForm = 35 + ((seed * 7) % 42);
   const homeRank = 1 + (seed % 18);
   const awayRank = 1 + ((seed * 3) % 18);
-  const homeRecent = recentResults(match.homeCode, seed);
-  const awayRecent = recentResults(match.awayCode, seed + 9);
+  const homeRecent = recentResults(seed, cfg);
+  const awayRecent = recentResults(seed + 9, cfg);
 
   detailInsight.innerHTML = `
     <div class="insight-topline">
@@ -683,55 +692,50 @@ function renderMatchInsight(match) {
     </div>
     <div class="insight-grid">
       <article class="form-card">
-        <div class="form-ring is-home" style="--form:${homeForm}%"><strong>${homeForm}%</strong><span>form</span></div>
+        <div class="form-ring is-home" style="--form:${homeForm}%"><strong>${homeForm}%</strong><span>${cfg.formLabel}</span></div>
         <h3>${match.home}</h3>
         <p>Rank ${homeRank} · ${homeRecent.filter(item => item.result === "W").length} wins in last 5</p>
       </article>
       <article class="rank-card">
-        <span>Table position</span>
+        <span>${cfg.midLabel}</span>
         <div class="rank-bars">
           <div><b>${homeRank}</b><small>${match.homeCode}</small></div>
           <div><b>${awayRank}</b><small>${match.awayCode}</small></div>
         </div>
       </article>
       <article class="form-card">
-        <div class="form-ring is-away" style="--form:${awayForm}%"><strong>${awayForm}%</strong><span>form</span></div>
+        <div class="form-ring is-away" style="--form:${awayForm}%"><strong>${awayForm}%</strong><span>${cfg.formLabel}</span></div>
         <h3>${match.away}</h3>
         <p>Rank ${awayRank} · ${awayRecent.filter(item => item.result === "W").length} wins in last 5</p>
       </article>
     </div>
     <details class="recent-board">
-      <summary>Last 5 Matches</summary>
+      <summary>${cfg.recentLabel}</summary>
       <div class="recent-columns">
         <article class="recent-team-card">
           <h4>${match.home}</h4>
-          ${homeRecent.map(item => resultRow(item)).join("")}
+          ${homeRecent.map(item => resultRow(item, cfg)).join("")}
         </article>
         <article class="recent-team-card">
           <h4>${match.away}</h4>
-          ${awayRecent.map(item => resultRow(item)).join("")}
+          ${awayRecent.map(item => resultRow(item, cfg)).join("")}
         </article>
       </div>
     </details>
   `;
 }
 
-function recentResults(code, seed) {
-  const opponents = ["COR", "RIV", "PAL", "SAN", "REC", "CUE", "PLA", "RBB", "CAL", "AJA"];
-  const results = ["W", "D", "L", "W", "D"];
-  return Array.from({ length: 5 }, (_, index) => {
-    const result = results[(seed + index) % results.length];
-    return {
-      result,
-      opponent: opponents[(seed + index) % opponents.length],
-      score: `${(seed + index * 2) % 4}:${(seed + index * 3) % 3}`,
-      venue: index % 2 === 0 ? "H" : "A",
-      code,
-    };
-  });
+function recentResults(seed, cfg) {
+  const results = cfg.allowDraw ? ["W", "D", "L", "W", "D"] : ["W", "L", "W", "W", "L"];
+  return Array.from({ length: 5 }, (_, index) => ({
+    result: results[(seed + index) % results.length],
+    opponent: cfg.opponents[(seed + index) % cfg.opponents.length],
+    score: cfg.scoreGen(seed, index),
+    venue: index % 2 === 0 ? "H" : "A",
+  }));
 }
 
-function resultRow(item) {
+function resultRow(item, cfg = INSIGHT_CFG.football) {
   const venue = item.venue === "H" ? "Home" : "Away";
   const resultText = item.result === "W" ? "Win" : item.result === "D" ? "Draw" : "Loss";
   return `
@@ -1145,21 +1149,36 @@ function logOutWallet() {
 }
 
 function wireFooterLinks() {
-  const messages = {
-    about: "About preview: X Cup is a sports prediction market built for X Layer.",
-    terms: "Terms preview: markets settle from official event data and on-chain rules.",
-    privacy: "Privacy preview: wallet addresses and trading activity are handled transparently.",
-    responsible: "Responsible trading preview: use limits and only trade what you can afford to risk.",
-    how: "How it works: pick a match, choose a market, select YES or NO, then confirm with your wallet.",
-    faq: "FAQ preview: markets, settlement, wallet connection, and X Layer deployment details.",
-    wallet: "Wallet support preview: connect an X Layer compatible wallet to trade.",
-    status: "System status preview: frontend online, backend/API wiring pending.",
-  };
-
   document.querySelectorAll("[data-footer-action]").forEach(link => {
     link.addEventListener("click", event => {
       event.preventDefault();
-      showToast(messages[link.dataset.footerAction] || "Footer link opened");
+      const action = link.dataset.footerAction;
+      if (action === "markets") {
+        document.querySelector(".top-sport-nav")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      if (action === "how") {
+        document.querySelector(".hero-banner, .match-list")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        showToast("Pick a match · choose a market · select YES or NO · confirm with wallet");
+        return;
+      }
+      if (action === "wallet") {
+        document.querySelector(".footer-socials")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        showToast("Connect an X Layer compatible wallet to trade");
+        return;
+      }
+      if (action === "faq") {
+        showToast("Markets settle on-chain · X Layer EVM compatible · no KYC required");
+        return;
+      }
+      if (action === "terms") {
+        showToast("Markets settle from official event data and on-chain contract rules");
+        return;
+      }
+      if (action === "privacy") {
+        showToast("Wallet addresses and trading activity are handled transparently on-chain");
+        return;
+      }
     });
   });
 }

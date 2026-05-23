@@ -5906,6 +5906,17 @@ body {
 }
 
 /* Detail pages should stay in the softer light theme too. */
+.match-insight {
+  background: var(--panel-raised);
+  border-color: var(--line);
+}
+
+.form-card,
+.rank-card {
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+}
+
 .formula-detail-insight {
   border-color: var(--line);
   background:

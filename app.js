@@ -84,6 +84,30 @@ const marketVisuals = {
   "f1-austria-norris-piastri": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
   "f1-silverstone-hamilton-verstappen": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
   "f1-belgium-leclerc-russell": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
+  "esports-t1-navi": {
+    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/5/53/T1_logo.svg/100px-T1_logo.svg.png",
+    awayImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Natus_Vincere_logo_white.svg/100px-Natus_Vincere_logo_white.svg.png",
+  },
+  "esports-faze-g2": {
+    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4d/FaZe_Clan_logo.svg/100px-FaZe_Clan_logo.svg.png",
+    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1b/G2_Esports_logo.svg/100px-G2_Esports_logo.svg.png",
+  },
+  "esports-liquid-fnatic": {
+    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/6/68/Team_Liquid_logo.svg/100px-Team_Liquid_logo.svg.png",
+    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Fnatic_logo.svg/100px-Fnatic_logo.svg.png",
+  },
+  "esports-cloud9-vitality": {
+    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Cloud9_logo.svg/100px-Cloud9_logo.svg.png",
+    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Team_Vitality_logo.svg/100px-Team_Vitality_logo.svg.png",
+  },
+  "esports-heroic-ence": {
+    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/0/01/Heroic_logo.svg/100px-Heroic_logo.svg.png",
+    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/2/27/ENCE_logo.svg/100px-ENCE_logo.svg.png",
+  },
+  "esports-nip-astralis": {
+    homeImage: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/Ninjas_in_Pyjamas_logo.svg/100px-Ninjas_in_Pyjamas_logo.svg.png",
+    awayImage: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d7/Astralis_logo.svg/100px-Astralis_logo.svg.png",
+  },
 };
 
 const playerPropMarkets = [
@@ -550,13 +574,14 @@ function renderGameTiles() {
 
     if (match.sport === "esports") {
       const choices = quickChoices(match);
+      const esVis = marketVisuals[match.id] || {};
       card.innerHTML = `
         <div class="match-teams">
           <span class="match-meta-line">${sport.icon} ${match.time} · ${sport.title.toUpperCase()}</span>
           <div class="matchup-sides esports-matchup" aria-label="${match.home} versus ${match.away}">
-            <strong><span class="team-badge">${match.homeCode}</span> ${match.home}</strong>
+            <strong>${esportsLogoHtml(match.homeCode, esVis.homeImage)} ${match.home}</strong>
             <b>VS</b>
-            <strong>${match.away} <span class="team-badge">${match.awayCode}</span></strong>
+            <strong>${match.away} ${esportsLogoHtml(match.awayCode, esVis.awayImage)}</strong>
           </div>
         </div>
         <div class="quick-odds">
@@ -611,16 +636,7 @@ function renderFeaturedMarkets(mode) {
 
   activeMarkets.forEach(match => {
     const sport = sportLabels[match.sport] || sportLabels.football;
-    const featuredChoices = match.sport === "football"
-      ? [
-          { label: match.homeCode, price: "2.10", title: `${match.home} vs ${match.away}: ${match.home} to win` },
-          { label: "Draw", price: "3.30", title: `${match.home} vs ${match.away} to end in a draw` },
-          { label: match.awayCode, price: "2.65", title: `${match.home} vs ${match.away}: ${match.away} to win` },
-        ]
-      : [
-          { label: match.homeCode, price: "2.10", title: `${match.home} vs ${match.away}: ${match.home} to win` },
-          { label: match.awayCode, price: "2.65", title: `${match.home} vs ${match.away}: ${match.away} to win` },
-        ];
+    const featuredChoices = quickChoices(match);
     const featured = document.createElement("article");
     featured.className = "featured-card";
     if (featuredChoices.length === 3) featured.classList.add("featured-card--three-way");
@@ -651,6 +667,16 @@ function renderFeaturedMarkets(mode) {
 
 function flagUrl(code) {
   return `https://flagcdn.com/w160/${code}.png`;
+}
+
+function esportsLogoHtml(code, logoUrl) {
+  if (logoUrl) {
+    return `<span class="esports-logo-wrap">
+      <img class="esports-team-logo" src="${logoUrl}" alt="${code} logo" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'" />
+      <span class="team-badge" style="display:none">${code}</span>
+    </span>`;
+  }
+  return `<span class="team-badge">${code}</span>`;
 }
 
 function renderMatchInsight(match) {

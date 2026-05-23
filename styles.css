@@ -219,7 +219,9 @@ a {
 .wc26-logo {
   width: 100%;
   height: 100%;
+  object-fit: contain;
   display: block;
+  mix-blend-mode: multiply;
 }
 
 /* ── 10 click / idle animations ────────────────────── */

@@ -1444,9 +1444,7 @@ function updateTicketBadges() {
     badge.textContent = count;
     badge.hidden = count === 0;
   });
-  document.querySelectorAll(".floating-ticket-button[data-action='open-tickets']").forEach(button => {
-    button.hidden = count === 0;
-  });
+  // Button always visible; only the count badge hides when empty.
 }
 
 function wirePnlModal() {

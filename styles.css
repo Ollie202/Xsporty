@@ -195,38 +195,56 @@ a {
   right: 26px;
   bottom: 28px;
   z-index: 18;
-  width: 58px;
-  height: 58px;
-  border: 1px solid rgba(37, 216, 232, 0.45);
+  width: 72px;
+  height: 72px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  color: #071015;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 0;
   background:
-    radial-gradient(circle at 32% 28%, #ffffff 0 18%, transparent 19%),
-    linear-gradient(135deg, #25d8e8, #ffffff);
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.42), 0 0 30px rgba(37, 216, 232, 0.22);
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.18), transparent 40%),
+    linear-gradient(145deg, #0c2461 0%, #1a3a8f 48%, #b91c1c 100%);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.46), 0 0 28px rgba(185, 28, 28, 0.32);
+  animation: wc-glow 2.8s ease-in-out infinite;
+}
+
+@keyframes wc-glow {
+  0%, 100% { box-shadow: 0 10px 32px rgba(0, 0, 0, 0.46), 0 0 28px rgba(185, 28, 28, 0.32); }
+  50%       { box-shadow: 0 10px 36px rgba(0, 0, 0, 0.52), 0 0 44px rgba(185, 28, 28, 0.52); }
 }
 
 .floating-ticket-button::before {
-  content: "";
-  position: absolute;
-  inset: 17px 15px;
-  border: 3px solid #071015;
-  border-radius: 6px;
-  transform: rotate(-6deg);
+  content: "⚽";
+  font-size: 28px;
+  line-height: 1;
 }
 
-.floating-ticket-button span {
+.floating-ticket-button::after {
+  content: "2026";
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.floating-ticket-button .ticket-count-badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  min-width: 24px;
-  height: 24px;
+  top: -4px;
+  right: -4px;
+  min-width: 22px;
+  height: 22px;
   display: grid;
   place-items: center;
   border-radius: 999px;
+  border: 2px solid #fff;
   color: #fff;
   background: var(--red);
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .profile-button {
@@ -5641,9 +5659,6 @@ body {
     var(--panel-raised);
 }
 
-.position-tabs .ticket-card {
-  background: var(--panel-raised);
-}
 
 .market-board,
 .trade-slip,

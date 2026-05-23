@@ -1784,6 +1784,10 @@ a {
   background: var(--green);
 }
 
+.side-toggle button:last-child.is-active {
+  background: var(--red);
+}
+
 .ticket-view {
   display: none;
 }
@@ -4869,6 +4873,10 @@ input:focus-visible {
 .side-toggle .is-active {
   color: #fff;
   background: var(--green);
+}
+
+.side-toggle button:last-child.is-active {
+  background: var(--red);
 }
 
 .ticket-view {

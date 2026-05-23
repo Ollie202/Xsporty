@@ -515,8 +515,19 @@ function renderFeaturedMarkets(mode) {
 
   activeMarkets.forEach(match => {
     const sport = sportLabels[match.sport] || sportLabels.football;
+    const featuredChoices = match.sport === "football"
+      ? [
+          { label: match.homeCode, price: "2.10", title: `${match.home} vs ${match.away}: ${match.home} to win` },
+          { label: "Draw", price: "3.30", title: `${match.home} vs ${match.away} to end in a draw` },
+          { label: match.awayCode, price: "2.65", title: `${match.home} vs ${match.away}: ${match.away} to win` },
+        ]
+      : [
+          { label: match.homeCode, price: "2.10", title: `${match.home} vs ${match.away}: ${match.home} to win` },
+          { label: match.awayCode, price: "2.65", title: `${match.home} vs ${match.away}: ${match.away} to win` },
+        ];
     const featured = document.createElement("article");
     featured.className = "featured-card";
+    if (featuredChoices.length === 3) featured.classList.add("featured-card--three-way");
     featured.dataset.search = `${match.home} ${match.away} ${match.homeCode} ${match.awayCode}`.toLowerCase();
     featured.innerHTML = `
       <span class="sport-icon">${sport.icon}</span>
@@ -527,13 +538,14 @@ function renderFeaturedMarkets(mode) {
         <img src="${flagUrl(match.awayFlag)}" alt="${match.away} flag" />
       </div>
       <div class="featured-names"><span>${match.home}</span><span>${match.away}</span></div>
-      <div class="featured-odds"><button>${match.homeCode}<b>2.10</b></button><button>${match.awayCode}<b>2.65</b></button></div>
+      <div class="featured-odds">
+        ${featuredChoices.map(choice => `<button type="button">${choice.label}<b>${choice.price}</b></button>`).join("")}
+      </div>
     `;
     featured.querySelectorAll(".featured-odds button").forEach((button, index) => {
-      const title = index === 0 ? `${match.home} to win` : `${match.away} to win`;
       button.addEventListener("click", event => {
         event.stopPropagation();
-        selectMarket(title, button);
+        selectMarket(featuredChoices[index].title, button);
       });
     });
     if (match.id) featured.addEventListener("click", () => openMatchPage(match.id));

@@ -5242,3 +5242,514 @@ input:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+/* Large hero and rounded controls on the compact light layout. */
+.search-box {
+  border-radius: 999px;
+}
+
+.hero-banner {
+  min-height: 258px;
+  grid-template-columns: minmax(350px, 0.92fr) minmax(320px, 1fr);
+  padding: 22px 26px;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.16), transparent 44%),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.94), transparent 52%),
+    linear-gradient(115deg, #ffffff 0%, #f3fbff 52%, #eef9f1 100%);
+}
+
+.hero-banner__players {
+  justify-content: start;
+  gap: 0;
+}
+
+.hero-player-card {
+  width: min(196px, 46%);
+  min-width: 158px;
+  height: 224px;
+  border-radius: 18px;
+}
+
+.hero-player-card + .hero-player-card {
+  margin-left: -18px;
+}
+
+.hero-player-card--blue {
+  height: 238px;
+}
+
+.hero-banner__copy {
+  gap: 11px;
+  padding: 18px 8px 18px 0;
+}
+
+.hero-banner__copy h1 {
+  font-size: clamp(34px, 3.8vw, 54px);
+}
+
+.hero-banner__copy p {
+  font-size: 15px;
+}
+
+.position-tabs .ticket-card {
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.08), transparent 42%),
+    #fff;
+}
+
+@media (max-width: 760px) {
+  .hero-banner {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .hero-banner__players {
+    min-height: 216px;
+    padding-left: 6px;
+  }
+
+  .hero-player-card {
+    min-width: 132px;
+    height: 196px;
+  }
+
+  .hero-player-card--blue {
+    height: 208px;
+  }
+}
+
+/* Keep each sport card shaped for its own market. */
+.matchup-sides {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+}
+
+.matchup-sides strong {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.matchup-sides strong img {
+  width: 38px;
+  height: 27px;
+}
+
+.matchup-sides b {
+  color: #98a2b3;
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.match-list[data-sport="football"] .match-row,
+.match-list[data-sport="basketball"] .match-row,
+.match-list[data-sport="cricket"] .match-row {
+  align-content: space-between;
+}
+
+.match-list[data-sport="formula-1"] {
+  grid-template-columns: 1fr;
+}
+
+.match-row.formula-event-card {
+  min-height: 254px;
+  grid-template-columns: minmax(0, 1.05fr) minmax(190px, 0.82fr);
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(240, 0, 24, 0.04), transparent 46%),
+    #fff;
+}
+
+.formula-event-art {
+  min-height: 254px;
+  aspect-ratio: auto;
+}
+
+.formula-event-copy {
+  gap: 9px;
+  padding: 20px;
+  border-left: 1px solid #edf1f5;
+  color: #101828;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(240, 0, 24, 0.11), transparent 11rem),
+    linear-gradient(145deg, #fff 0%, #f8fafc 100%);
+}
+
+.formula-event-copy strong {
+  color: #101828;
+  font-size: clamp(21px, 2vw, 30px);
+}
+
+.formula-event-copy p {
+  color: #475467;
+  font-size: 14px;
+}
+
+.formula-event-copy button {
+  min-height: 38px;
+  border-radius: 999px;
+  background: #101828;
+}
+
+.match-list[data-sport="ufc"] {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr));
+}
+
+.match-row.ufc-title-card {
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(240, 0, 24, 0.13), transparent 15rem),
+    linear-gradient(180deg, #fff 0%, #f7f8fb 100%);
+}
+
+.match-row.ufc-title-card .fight-event-line {
+  border-color: #e4e7ec;
+  color: #475467;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+}
+
+.match-row.ufc-title-card .ufc-title-stage {
+  width: min(100%, 680px);
+  min-height: 290px;
+  grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.fighter-card {
+  overflow: hidden;
+  border: 1px solid #e4e7ec;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(16, 24, 40, 0.12);
+}
+
+.fighter-card.is-home {
+  background:
+    linear-gradient(160deg, rgba(240, 0, 24, 0.14), transparent 48%),
+    #fff;
+}
+
+.fighter-card.is-away {
+  background:
+    linear-gradient(205deg, rgba(14, 165, 198, 0.14), transparent 48%),
+    #fff;
+}
+
+.fighter-image {
+  height: 202px;
+}
+
+.fighter-card-copy {
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.fighter-card strong {
+  min-height: 34px;
+  color: #101828;
+  font-size: clamp(16px, 1.5vw, 22px);
+}
+
+.fighter-card button {
+  min-width: min(100%, 168px);
+  min-height: 44px;
+  border-color: #d0d5dd;
+  color: #101828;
+  background: #f8fafc;
+}
+
+.fight-vs {
+  width: 54px;
+  height: 54px;
+  color: #fff;
+  border-color: transparent;
+  background: #101828;
+  box-shadow: 0 16px 28px rgba(16, 24, 40, 0.2);
+}
+
+@media (max-width: 760px) {
+  .matchup-sides {
+    gap: 6px;
+  }
+
+  .matchup-sides strong img {
+    width: 32px;
+    height: 23px;
+  }
+
+  .match-row.formula-event-card {
+    grid-template-columns: 1fr;
+  }
+
+  .formula-event-art {
+    min-height: 184px;
+  }
+
+  .formula-event-copy {
+    border-top: 1px solid #edf1f5;
+    border-left: 0;
+  }
+
+  .match-row.ufc-title-card .ufc-title-stage {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+  }
+
+  .fighter-image {
+    height: 150px;
+  }
+
+  .fighter-card button {
+    min-width: 0;
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .fight-vs {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* Softer light surfaces across the whole market. */
+:root {
+  --bg: #edf2f5;
+  --bg-deep: #e4ebf0;
+  --panel: #f8fafb;
+  --panel-soft: #eef3f6;
+  --panel-raised: #fbfcfd;
+  --line: #d9e2e8;
+  --line-soft: #cbd7df;
+  --text: #152033;
+  --muted: #5d6a7d;
+  --faint: #8592a6;
+  --shadow: 0 16px 36px rgba(20, 32, 51, 0.09);
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% -2%, rgba(14, 165, 198, 0.11), transparent 27rem),
+    radial-gradient(circle at 94% 2%, rgba(25, 155, 81, 0.07), transparent 24rem),
+    linear-gradient(180deg, #f3f6f8 0%, #eaf0f4 22rem, #e6edf2 100%);
+}
+
+.topbar,
+.site-footer {
+  background: rgba(248, 250, 251, 0.92);
+  border-color: rgba(217, 226, 232, 0.96);
+}
+
+.top-sport-nav,
+.search-box,
+.side-toggle,
+.quote-grid,
+.profile-wallet,
+.ticket-note,
+.ticket-empty,
+.match-meta-line,
+.fight-event-line {
+  background: var(--panel-soft);
+  border-color: var(--line);
+}
+
+.featured-card,
+.market-board,
+.match-row,
+.match-detail-card,
+.league-panel,
+.league-match-card,
+.player-prop-card,
+.history-hero,
+.history-summary article,
+.history-card,
+.history-list,
+.history-row,
+.trade-slip,
+.ticket-card,
+.profile-dropdown,
+.profile-button,
+.featured-mode-tabs,
+.compact-section-head > div:last-child button,
+.back-button,
+.detail-meta button {
+  border-color: var(--line);
+  background-color: var(--panel-raised);
+  box-shadow: var(--shadow);
+}
+
+.hero-banner {
+  border-color: var(--line);
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.13), transparent 44%),
+    linear-gradient(120deg, rgba(251, 252, 253, 0.86), transparent 54%),
+    linear-gradient(115deg, #f8fbfc 0%, #eef6fa 52%, #edf6f0 100%);
+}
+
+.featured-card,
+.league-panel,
+.position-tabs .ticket-card {
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.05), transparent 48%),
+    var(--panel-raised);
+}
+
+.market-board,
+.trade-slip,
+.match-detail-card,
+.history-page {
+  background-color: var(--panel);
+}
+
+.featured-odds button,
+.quick-odds button,
+.league-market-prices .price,
+.ticket-view input,
+.fighter-card button {
+  border-color: var(--line);
+  background: #f1f5f7;
+}
+
+.featured-odds button:hover,
+.quick-odds button:hover,
+.league-market-prices .price:hover,
+.fighter-card button:hover {
+  background: #e7f4f8;
+}
+
+.match-row.formula-event-card {
+  background:
+    linear-gradient(180deg, rgba(240, 0, 24, 0.035), transparent 46%),
+    var(--panel-raised);
+}
+
+.formula-event-copy {
+  border-left-color: var(--line);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(240, 0, 24, 0.09), transparent 11rem),
+    linear-gradient(145deg, #f8fafb 0%, #eef3f6 100%);
+}
+
+.match-row.ufc-title-card {
+  background:
+    radial-gradient(circle at 50% -20%, rgba(240, 0, 24, 0.1), transparent 15rem),
+    linear-gradient(180deg, #f8fafb 0%, #eef3f6 100%);
+}
+
+.fighter-card.is-home {
+  background:
+    linear-gradient(160deg, rgba(240, 0, 24, 0.1), transparent 48%),
+    var(--panel-raised);
+}
+
+.fighter-card.is-away {
+  background:
+    linear-gradient(205deg, rgba(14, 165, 198, 0.11), transparent 48%),
+    var(--panel-raised);
+}
+
+.fighter-card-copy {
+  background: rgba(248, 250, 251, 0.94);
+}
+
+@media (max-width: 760px) {
+  .formula-event-copy {
+    border-top-color: var(--line);
+  }
+}
+
+/* Keep sport switching stable under the pointer. */
+.top-sport-nav button {
+  transition: color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.top-sport-nav button.is-active,
+.top-sport-nav button.is-active:hover,
+.top-sport-nav button.is-active:focus-visible {
+  color: #fff;
+  background: #101828;
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.16);
+}
+
+/* Modern market choice buttons without clashing colors. */
+.featured-odds button,
+.quick-odds button,
+.league-market-prices .price,
+.player-prop-prices .price {
+  position: relative;
+  min-height: 48px;
+  border: 1px solid rgba(14, 165, 198, 0.18);
+  color: #142033;
+  background: rgba(239, 246, 249, 0.92);
+  box-shadow: none;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.quick-odds button {
+  min-height: 56px;
+  padding: 9px 10px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.featured-odds button {
+  min-height: 42px;
+  border-radius: 11px;
+}
+
+.featured-card--three-way .featured-odds {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.featured-card--three-way .featured-odds button {
+  min-width: 0;
+  padding-inline: 7px;
+}
+
+.featured-odds b,
+.quick-odds span {
+  color: #087e9b;
+  font-size: 14px;
+  font-weight: 1000;
+}
+
+.featured-odds button:hover,
+.quick-odds button:hover,
+.league-market-prices .price:hover,
+.player-prop-prices .price:hover {
+  transform: translateY(-2px);
+  border-color: rgba(14, 165, 198, 0.48);
+  background: rgba(223, 244, 249, 0.98);
+  box-shadow: 0 12px 24px rgba(14, 116, 144, 0.14);
+}
+
+.quick-odds button:active,
+.featured-odds button:active,
+.league-market-prices .price:active,
+.player-prop-prices .price:active {
+  transform: translateY(0);
+}
+
+.option-row .price,
+.fighter-card button,
+.fight-distance-pick {
+  box-shadow: 0 11px 22px rgba(20, 32, 51, 0.13);
+}

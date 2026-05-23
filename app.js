@@ -934,15 +934,31 @@ function wireNavigation() {
   document.querySelectorAll("[data-action='back-home']").forEach(button => {
     button.addEventListener("click", showHome);
   });
-  const WC_ANIMS = ["wc-anim-bounce", "wc-anim-spin", "wc-anim-roll", "wc-anim-wobble"];
-  document.getElementById("wc26-orb")?.addEventListener("click", event => {
+  const WC_ANIMS = [
+    "wc-anim-bounce", "wc-anim-spin",   "wc-anim-roll",   "wc-anim-wobble",
+    "wc-anim-pulse",  "wc-anim-shake",  "wc-anim-swing",  "wc-anim-rubber",
+    "wc-anim-flip",   "wc-anim-tada",
+  ];
+  const wcBtn = document.getElementById("wc26-orb");
+  function wcPlayRandom() {
+    if (!wcBtn) return;
+    wcBtn.classList.remove(...WC_ANIMS);
+    void wcBtn.offsetWidth;
+    wcBtn.classList.add(WC_ANIMS[Math.floor(Math.random() * WC_ANIMS.length)]);
+    wcBtn.addEventListener("animationend", () => wcBtn.classList.remove(...WC_ANIMS), { once: true });
+  }
+  wcBtn?.addEventListener("click", event => {
     event.stopPropagation();
-    const btn = event.currentTarget;
-    btn.classList.remove(...WC_ANIMS);
-    void btn.offsetWidth;
-    btn.classList.add(WC_ANIMS[Math.floor(Math.random() * WC_ANIMS.length)]);
-    btn.addEventListener("animationend", () => btn.classList.remove(...WC_ANIMS), { once: true });
+    wcPlayRandom();
   });
+  function scheduleIdleAnim() {
+    const delay = 14000 + Math.random() * 20000;
+    setTimeout(() => {
+      if (Math.random() < 0.55) wcPlayRandom();
+      scheduleIdleAnim();
+    }, delay);
+  }
+  scheduleIdleAnim();
   document.querySelectorAll("[data-hero-market]").forEach(button => {
     button.addEventListener("click", () => openMatchPage(button.dataset.heroMarket));
   });

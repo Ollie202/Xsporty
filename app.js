@@ -1079,8 +1079,8 @@ function wireProfileMenu() {
         return;
       }
       if (button.dataset.profileView === "support") {
-        window.location.href = "mailto:support@xcup.market?subject=X%20Cup%20support";
-        showToast("Opening contact support");
+        document.querySelector(".footer-socials")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        showToast("Scrolled to support socials");
         return;
       }
       if (button.dataset.profileView === "logout") {

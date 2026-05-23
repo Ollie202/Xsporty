@@ -2287,7 +2287,7 @@ a {
 
 .site-footer {
   border-top: 1px solid var(--line);
-  background: #fff5f6;
+  background: #111827;
   color: var(--text);
 }
 
@@ -2964,7 +2964,7 @@ body {
 
 .is-profit,
 .share-pnl-card__amount.is-profit {
-  color: #18d66b;
+  color: #34d399;
 }
 
 .is-loss,
@@ -3116,7 +3116,7 @@ body {
 .is-profit,
 .ticket-card .is-profit,
 .share-pnl-card__amount.is-profit {
-  color: #18d66b;
+  color: #34d399;
 }
 
 .is-loss,
@@ -3268,7 +3268,7 @@ body {
 }
 
 .share-pnl-card__bar span {
-  background: linear-gradient(90deg, #18d66b, var(--cyan));
+  background: linear-gradient(90deg, #34d399, var(--cyan));
 }
 
 @media (max-width: 760px) {
@@ -3928,6 +3928,10 @@ body {
 .match-row.ufc-title-card .ufc-title-stage {
   order: 1;
   margin: 0 auto;
+}
+
+.match-row.ufc-title-card .fight-distance-pick {
+  order: 2;
 }
 
 .match-row.ufc-title-card .fighter-card {
@@ -4927,9 +4931,9 @@ input:focus-visible {
 }
 
 .site-footer {
-  color: #475467;
-  border-top-color: #e4e7ec;
-  background: #fff;
+  color: #94a3b8;
+  border-top-color: rgba(255, 255, 255, 0.08);
+  background: #111827;
 }
 
 .footer-links button:hover {
@@ -5579,8 +5583,7 @@ body {
     linear-gradient(180deg, #f3f6f8 0%, #eaf0f4 22rem, #e6edf2 100%);
 }
 
-.topbar,
-.site-footer {
+.topbar {
   background: rgba(248, 250, 251, 0.92);
   border-color: rgba(217, 226, 232, 0.96);
 }

@@ -19,14 +19,18 @@ const gameMarkets = [
   game("brazil-argentina", "Brazil", "Argentina", "br", "ar", "BRA", "ARG", "3 Jun · 20:00", "ID:42027", "football"),
   game("germany-netherlands", "Germany", "Netherlands", "de", "nl", "GER", "NED", "4 Jun · 18:00", "ID:42028", "football"),
   game("england-usa", "England", "USA", "gb-eng", "us", "ENG", "USA", "4 Jun · 21:00", "ID:42029", "football"),
-  game("women-spain-japan", "Spain Women", "Japan Women", "es", "jp", "ESP", "JPN", "22 May · 17:00", "ID:42501", "football", "women-world-cup"),
-  game("women-usa-brazil", "USA Women", "Brazil Women", "us", "br", "USA", "BRA", "22 May · 20:30", "ID:42502", "football", "women-world-cup"),
-  game("women-england-france", "England Women", "France Women", "gb-eng", "fr", "ENG", "FRA", "23 May · 18:00", "ID:42503", "football", "women-world-cup"),
-  game("women-germany-nigeria", "Germany Women", "Nigeria Women", "de", "ng", "GER", "NGA", "23 May · 21:00", "ID:42504", "football", "women-world-cup"),
-  game("women-canada-australia", "Canada Women", "Australia Women", "ca", "au", "CAN", "AUS", "29 May · 16:30", "ID:42505", "football", "women-world-cup"),
-  game("women-netherlands-sweden", "Netherlands Women", "Sweden Women", "nl", "se", "NED", "SWE", "29 May · 19:00", "ID:42506", "football", "women-world-cup"),
-  game("women-colombia-morocco", "Colombia Women", "Morocco Women", "co", "ma", "COL", "MAR", "30 May · 15:00", "ID:42507", "football", "women-world-cup"),
-  game("women-norway-korea", "Norway Women", "South Korea Women", "no", "kr", "NOR", "KOR", "30 May · 18:30", "ID:42508", "football", "women-world-cup"),
+  game("tennis-sinner-alcaraz", "Jannik Sinner", "Carlos Alcaraz", "it", "es", "SIN", "ALC", "Roland Garros · SF · 6 Jun", "ID:61001", "tennis"),
+  game("tennis-djokovic-zverev", "Novak Djokovic", "Alexander Zverev", "rs", "de", "DJO", "ZVE", "Roland Garros · QF · 4 Jun", "ID:61002", "tennis"),
+  game("tennis-swiatek-gauff", "Iga Swiatek", "Coco Gauff", "pl", "us", "SWI", "GAU", "Roland Garros · W SF · 6 Jun", "ID:61003", "tennis"),
+  game("tennis-raducanu-sabalenka", "Emma Raducanu", "Aryna Sabalenka", "gb", "by", "RAD", "SAB", "Roland Garros · W QF · 4 Jun", "ID:61004", "tennis"),
+  game("tennis-medvedev-rune", "Daniil Medvedev", "Holger Rune", "ru", "dk", "MED", "RUN", "Roland Garros · R4 · 2 Jun", "ID:61005", "tennis"),
+  game("tennis-swiatek-keys", "Iga Swiatek", "Madison Keys", "pl", "us", "SWI", "KEY", "Roland Garros · W R4 · 2 Jun", "ID:61006", "tennis"),
+  game("esports-t1-navi", "T1", "NAVI", "kr", "ua", "T1", "NVI", "VCT Masters · Group A · 25 May", "ID:62001", "esports"),
+  game("esports-faze-g2", "FaZe Clan", "G2 Esports", "us", "de", "FZC", "G2E", "ESL Pro League S22 · QF · 26 May", "ID:62002", "esports"),
+  game("esports-liquid-fnatic", "Team Liquid", "Fnatic", "us", "gb", "TL", "FNC", "ESL Pro League S22 · QF · 27 May", "ID:62003", "esports"),
+  game("esports-cloud9-vitality", "Cloud9", "Team Vitality", "us", "fr", "C9", "VIT", "ESL Pro League S22 · R16 · 24 May", "ID:62004", "esports"),
+  game("esports-heroic-ence", "Heroic", "ENCE", "dk", "fi", "HRC", "ENC", "ESL Pro League S22 · R16 · 24 May", "ID:62005", "esports"),
+  game("esports-nip-astralis", "NIP", "Astralis", "se", "dk", "NIP", "AST", "ESL Pro League S22 · R16 · 25 May", "ID:62006", "esports"),
   game("usa-serbia-hoops", "USA", "Serbia", "us", "rs", "USA", "SRB", "22 May · 21:30", "ID:51001", "basketball"),
   game("canada-france-hoops", "Canada", "France", "ca", "fr", "CAN", "FRA", "23 May · 19:00", "ID:51002", "basketball"),
   game("spain-australia-hoops", "Spain", "Australia", "es", "au", "ESP", "AUS", "29 May · 17:30", "ID:51003", "basketball"),
@@ -55,8 +59,10 @@ const sportLabels = {
   football: { title: "Football", icon: "⚽" },
   basketball: { title: "Basketball", icon: "🏀" },
   cricket: { title: "Cricket", icon: "🏏" },
+  tennis: { title: "Tennis", icon: "🎾" },
   "formula-1": { title: "Formula 1", icon: "🏎" },
   ufc: { title: "UFC", icon: "🥊" },
+  esports: { title: "Esports", icon: "🎮" },
 };
 
 const marketVisuals = {
@@ -263,8 +269,10 @@ function featuredMarket(home, away, homeFlag, awayFlag, homeCode, awayCode, time
 function buildGameOptions(home, away, sport) {
   if (sport === "basketball") return buildBasketballOptions(home, away);
   if (sport === "cricket") return buildCricketOptions(home, away);
+  if (sport === "tennis") return buildTennisOptions(home, away);
   if (sport === "formula-1") return buildFormulaOneOptions(home, away);
   if (sport === "ufc") return buildUfcOptions(home, away);
+  if (sport === "esports") return buildEsportsOptions(home, away);
 
   const keyHomePlayer = home === "Argentina" ? "Messi" : home === "France" ? "Mbappé" : home === "Portugal" ? "Ronaldo" : `${home} striker`;
   const keyAwayPlayer = away === "Argentina" ? "Messi" : away === "France" ? "Mbappé" : away === "Portugal" ? "Ronaldo" : `${away} winger`;
@@ -328,6 +336,40 @@ function buildCricketOptions(home, away) {
   ];
 }
 
+function buildTennisOptions(home, away) {
+  return [
+    [`${home} to win the match`, "Winner", 52, 48],
+    [`${away} to win the match`, "Winner", 48, 52],
+    [`Match decided in straight sets`, "Sets", 44, 56],
+    [`Match goes to 3+ sets`, "Sets", 56, 44],
+    [`${home} wins first set`, "Sets", 54, 46],
+    [`${away} wins first set`, "Sets", 46, 54],
+    [`Total games over 22.5`, "Games", 51, 49],
+    [`Total games under 22.5`, "Games", 49, 51],
+    [`${home} holds serve 80%+ of games`, "Serve", 47, 53],
+    [`A tiebreak is played`, "Games", 38, 62],
+    [`${home} wins in 2 sets`, "Combo", 39, 61],
+    [`${away} comeback after losing first set`, "Combo", 22, 78],
+  ];
+}
+
+function buildEsportsOptions(home, away) {
+  return [
+    [`${home} to win the series`, "Winner", 55, 45],
+    [`${away} to win the series`, "Winner", 45, 55],
+    [`${home} wins map 1`, "Maps", 53, 47],
+    [`${away} wins map 1`, "Maps", 47, 53],
+    [`Series goes to map 3`, "Maps", 49, 51],
+    [`${home} wins 2-0`, "Series", 34, 66],
+    [`${away} wins 2-0`, "Series", 28, 72],
+    [`${home} wins 2-1`, "Series", 21, 79],
+    [`${home} total rounds over 25.5`, "Rounds", 52, 48],
+    [`${away} opens pistol round`, "Rounds", 50, 50],
+    [`${home} first blood on map 1`, "First", 36, 64],
+    [`Overtime played on any map`, "Combo", 31, 69],
+  ];
+}
+
 function buildFormulaOneOptions(home, away) {
   return [
     [`${home} to win the Grand Prix`, "Winner", 41, 59],
@@ -357,6 +399,13 @@ function quickChoices(match) {
       { label: match.awayCode, price: "2.65", title: `${match.away} to win` },
     ];
   }
+  if (match.sport === "tennis") {
+    return [
+      { label: match.homeCode, price: "2.10", title: `${match.home} to win the match` },
+      { label: "Sets", price: "3.30", title: "Match goes to 3+ sets" },
+      { label: match.awayCode, price: "2.65", title: `${match.away} to win the match` },
+    ];
+  }
   if (match.sport === "formula-1") {
     return [
       { label: match.homeCode, price: "2.10", title: `${match.home} finishes ahead of ${match.away}` },
@@ -369,6 +418,13 @@ function quickChoices(match) {
       { label: match.homeCode, price: "2.10", title: `${match.home} to win` },
       { label: "Distance", price: "3.30", title: "Fight goes the distance" },
       { label: match.awayCode, price: "2.65", title: `${match.away} to win` },
+    ];
+  }
+  if (match.sport === "esports") {
+    return [
+      { label: match.homeCode, price: "2.10", title: `${match.home} to win the series` },
+      { label: "Map 3", price: "3.30", title: "Series goes to map 3" },
+      { label: match.awayCode, price: "2.65", title: `${match.away} to win the series` },
     ];
   }
   return [
@@ -393,7 +449,7 @@ function renderGameTiles() {
   const activeMarkets = gameMarkets.filter(match => match.sport === state.sport);
   const sport = sportLabels[state.sport];
   const footballTabs = document.querySelectorAll(
-    "#games-board [data-category='world-cup'], #games-board [data-category='leagues'], #games-board [data-category='women-world-cup'], #games-board [data-category='players']"
+    "#games-board [data-category='world-cup'], #games-board [data-category='leagues'], #games-board [data-category='players']"
   );
   const ufcTabs = document.querySelectorAll(
     "#games-board [data-category='ufc-men'], #games-board [data-category='ufc-women']"
@@ -416,7 +472,7 @@ function renderGameTiles() {
   activeMarkets.forEach(match => {
     const categories = ["all"];
     if (match.time.toLowerCase().includes("live")) categories.push("live");
-    if (state.sport === "football") categories.push(match.group === "women-world-cup" ? "women-world-cup" : "world-cup");
+    if (state.sport === "football") categories.push("world-cup");
     if (state.sport === "ufc") categories.push(match.group);
     const card = document.createElement("article");
     card.className = "match-row game-tile";
@@ -783,7 +839,7 @@ function showHome() {
 }
 
 function syncSportHero() {
-  const useCompactLanding = state.sport === "formula-1" || state.sport === "ufc";
+  const useCompactLanding = state.sport === "formula-1" || state.sport === "ufc" || state.sport === "esports";
   if (heroBanner) heroBanner.hidden = useCompactLanding;
   if (featuredStrip) featuredStrip.hidden = useCompactLanding;
 }

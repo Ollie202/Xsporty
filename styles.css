@@ -5753,3 +5753,119 @@ body {
 .fight-distance-pick {
   box-shadow: 0 11px 22px rgba(20, 32, 51, 0.13);
 }
+
+/* Final sport structure pass: races and fights are showcase rows, not cramped tiles. */
+.match-list[data-sport="formula-1"],
+.match-list[data-sport="ufc"] {
+  grid-template-columns: 1fr;
+}
+
+.match-list[data-sport="formula-1"] .formula-event-card,
+.match-list[data-sport="ufc"] .ufc-title-card {
+  width: 100%;
+}
+
+.match-list[data-sport="formula-1"] .formula-event-card {
+  min-height: 236px;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.08), transparent 42%),
+    var(--panel-raised);
+}
+
+.formula-event-copy {
+  background:
+    linear-gradient(135deg, rgba(248, 250, 251, 0.94), rgba(238, 243, 246, 0.98));
+}
+
+.formula-event-copy small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.match-list[data-sport="ufc"] .ufc-title-card {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.07), transparent 42%),
+    var(--panel-raised);
+}
+
+.match-list[data-sport="ufc"] .ufc-title-stage {
+  width: min(100%, 920px);
+  grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+}
+
+.match-list[data-sport="ufc"] .fighter-card {
+  grid-template-columns: minmax(150px, 0.72fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  align-items: stretch;
+}
+
+.match-list[data-sport="ufc"] .fighter-image {
+  height: 100%;
+  min-height: 220px;
+}
+
+.match-list[data-sport="ufc"] .fighter-card-copy {
+  align-content: center;
+  justify-items: start;
+  padding: 18px;
+  text-align: left;
+}
+
+.match-list[data-sport="ufc"] .fighter-card strong {
+  min-height: 0;
+  text-align: left;
+}
+
+.match-list[data-sport="ufc"] .fighter-card button {
+  width: min(100%, 190px);
+}
+
+.match-list[data-sport="ufc"] .fighter-card.is-home,
+.match-list[data-sport="ufc"] .fighter-card.is-away {
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.06), transparent 48%),
+    var(--panel-raised);
+}
+
+.match-list[data-sport="ufc"] .fight-vs {
+  background: #101828;
+}
+
+/* Remove the accidental red/pink wash from neutral light surfaces. */
+.brand__mark {
+  border-color: var(--line);
+  color: #101828;
+  box-shadow: 0 10px 22px rgba(20, 32, 51, 0.1);
+}
+
+.player-prop-image,
+.share-pnl-card,
+.share-pnl-card__body {
+  background:
+    linear-gradient(145deg, rgba(14, 165, 198, 0.11), rgba(255, 255, 255, 0.12)),
+    var(--panel-soft);
+}
+
+.share-pnl-card__stadium {
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255, 246, 166, 0.72), transparent 13%),
+    radial-gradient(circle at 50% 36%, rgba(255, 255, 255, 0.42), transparent 32%),
+    linear-gradient(180deg, rgba(14, 165, 198, 0.18), rgba(16, 24, 40, 0.28)),
+    #121a27;
+}
+
+@media (max-width: 760px) {
+  .match-list[data-sport="ufc"] .ufc-title-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .match-list[data-sport="ufc"] .fighter-card {
+    grid-template-columns: 1fr;
+  }
+
+  .match-list[data-sport="ufc"] .fight-vs {
+    justify-self: center;
+  }
+}

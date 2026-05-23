@@ -389,6 +389,7 @@ function renderGameTiles() {
   playerFilter.hidden = true;
   if (playerSearch) playerSearch.value = "";
   gamesGrid.hidden = false;
+  gamesGrid.dataset.sport = state.sport;
   const activeMarkets = gameMarkets.filter(match => match.sport === state.sport);
   const sport = sportLabels[state.sport];
   const footballTabs = document.querySelectorAll(
@@ -462,14 +463,16 @@ function renderGameTiles() {
     }
 
     if (match.sport === "formula-1") {
+      const [eventName, eventDate] = match.time.split(" · ");
       card.className += " formula-event-card";
       card.innerHTML = `
-        <img class="formula-event-art" src="${visual.eventImage}" alt="${match.time.split(" · ")[0]} Formula 1 event art" />
+        <img class="formula-event-art" src="${visual.eventImage}" alt="${eventName} Formula 1 race car" />
         <div class="formula-event-copy">
-          <span>${match.time}</span>
-          <strong>${match.time.split(" · ")[0]}</strong>
-          <p>Winner market: ${match.home}</p>
-          <button type="button">Open winner market</button>
+          <span>${eventName} · ${eventDate}</span>
+          <strong>${eventName}</strong>
+          <p>Driver winner market: ${match.home}</p>
+          <small>${match.home} vs ${match.away} headline picks</small>
+          <button type="button">Open race market</button>
         </div>
       `;
       card.querySelector("button").addEventListener("click", event => {
@@ -485,8 +488,11 @@ function renderGameTiles() {
     card.innerHTML = `
       <div class="match-teams">
         <span class="match-meta-line">${sport.icon} ${match.time} · ${sport.title.toUpperCase()}</span>
-        <strong><img src="${flagUrl(match.homeFlag)}" alt="${match.home} flag" /> ${match.home}</strong>
-        <strong><img src="${flagUrl(match.awayFlag)}" alt="${match.away} flag" /> ${match.away}</strong>
+        <div class="matchup-sides" aria-label="${match.home} versus ${match.away}">
+          <strong><img src="${flagUrl(match.homeFlag)}" alt="${match.home} flag" /> ${match.home}</strong>
+          <b>VS</b>
+          <strong><img src="${flagUrl(match.awayFlag)}" alt="${match.away} flag" /> ${match.away}</strong>
+        </div>
       </div>
       <div class="quick-odds">
         ${choices.map(choice => `<button type="button">${choice.label}<span>${choice.price}</span></button>`).join("")}

@@ -1008,17 +1008,12 @@ a {
   vertical-align: middle;
 }
 
-.esports-logo-wrap {
-  display: inline-flex;
-  align-items: center;
-  vertical-align: middle;
-}
-
 .esports-team-logo {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: 8px;
+  vertical-align: middle;
 }
 
 .fight-event-line {

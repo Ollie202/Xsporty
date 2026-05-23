@@ -84,30 +84,6 @@ const marketVisuals = {
   "f1-austria-norris-piastri": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
   "f1-silverstone-hamilton-verstappen": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
   "f1-belgium-leclerc-russell": { eventImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg/1920px-2024_British_Grand_Prix%2C_Verstappen_%283%29.jpg" },
-  "esports-t1-navi": {
-    homeImage: "https://logo.clearbit.com/t1.gg",
-    awayImage: "https://logo.clearbit.com/navi.gg",
-  },
-  "esports-faze-g2": {
-    homeImage: "https://logo.clearbit.com/fazeclan.com",
-    awayImage: "https://logo.clearbit.com/g2esports.com",
-  },
-  "esports-liquid-fnatic": {
-    homeImage: "https://logo.clearbit.com/teamliquid.com",
-    awayImage: "https://logo.clearbit.com/fnatic.com",
-  },
-  "esports-cloud9-vitality": {
-    homeImage: "https://logo.clearbit.com/cloud9.gg",
-    awayImage: "https://logo.clearbit.com/team-vitality.gg",
-  },
-  "esports-heroic-ence": {
-    homeImage: "https://logo.clearbit.com/heroic.gg",
-    awayImage: "https://logo.clearbit.com/ence.gg",
-  },
-  "esports-nip-astralis": {
-    homeImage: "https://logo.clearbit.com/nip.gl",
-    awayImage: "https://logo.clearbit.com/astralis.gg",
-  },
 };
 
 const playerPropMarkets = [
@@ -574,14 +550,13 @@ function renderGameTiles() {
 
     if (match.sport === "esports") {
       const choices = quickChoices(match);
-      const esVis = marketVisuals[match.id] || {};
       card.innerHTML = `
         <div class="match-teams">
           <span class="match-meta-line">${sport.icon} ${match.time} · ${sport.title.toUpperCase()}</span>
           <div class="matchup-sides esports-matchup" aria-label="${match.home} versus ${match.away}">
-            <strong>${esportsLogoHtml(match.homeCode, esVis.homeImage)} ${match.home}</strong>
+            <strong>${esportsLogoHtml(match.homeCode)} ${match.home}</strong>
             <b>VS</b>
-            <strong>${match.away} ${esportsLogoHtml(match.awayCode, esVis.awayImage)}</strong>
+            <strong>${match.away} ${esportsLogoHtml(match.awayCode)}</strong>
           </div>
         </div>
         <div class="quick-odds">
@@ -669,14 +644,9 @@ function flagUrl(code) {
   return `https://flagcdn.com/w160/${code}.png`;
 }
 
-function esportsLogoHtml(code, logoUrl) {
-  if (logoUrl) {
-    return `<span class="esports-logo-wrap">
-      <img class="esports-team-logo" src="${logoUrl}" alt="${code} logo" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'" />
-      <span class="team-badge" style="display:none">${code}</span>
-    </span>`;
-  }
-  return `<span class="team-badge">${code}</span>`;
+function esportsLogoHtml(code) {
+  const url = `https://placehold.co/36x36/0f172a/25d8e8?text=${encodeURIComponent(code)}&font=roboto`;
+  return `<img class="esports-team-logo" src="${url}" alt="${code} logo" />`;
 }
 
 function renderMatchInsight(match) {

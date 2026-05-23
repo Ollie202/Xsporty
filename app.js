@@ -934,13 +934,14 @@ function wireNavigation() {
   document.querySelectorAll("[data-action='back-home']").forEach(button => {
     button.addEventListener("click", showHome);
   });
-  document.querySelectorAll("[data-action='open-tickets']").forEach(button => {
-    button.addEventListener("click", event => {
-      event.preventDefault();
-      event.stopPropagation();
-      showPositions();
-      document.querySelector(".right-rail")?.classList.add("is-open");
-    });
+  const WC_ANIMS = ["wc-anim-bounce", "wc-anim-spin", "wc-anim-roll", "wc-anim-wobble"];
+  document.getElementById("wc26-orb")?.addEventListener("click", event => {
+    event.stopPropagation();
+    const btn = event.currentTarget;
+    btn.classList.remove(...WC_ANIMS);
+    void btn.offsetWidth;
+    btn.classList.add(WC_ANIMS[Math.floor(Math.random() * WC_ANIMS.length)]);
+    btn.addEventListener("animationend", () => btn.classList.remove(...WC_ANIMS), { once: true });
   });
   document.querySelectorAll("[data-hero-market]").forEach(button => {
     button.addEventListener("click", () => openMatchPage(button.dataset.heroMarket));

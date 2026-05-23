@@ -195,40 +195,34 @@ a {
   right: 26px;
   bottom: 28px;
   z-index: 18;
-  width: 72px;
-  height: 72px;
-  border: 2px solid rgba(255, 255, 255, 0.18);
+  width: 76px;
+  height: 76px;
+  border: none;
   border-radius: 999px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  padding: 0;
-  background:
-    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.18), transparent 40%),
-    linear-gradient(145deg, #0c2461 0%, #1a3a8f 48%, #b91c1c 100%);
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.46), 0 0 28px rgba(185, 28, 28, 0.32);
-  animation: wc-glow 2.8s ease-in-out infinite;
+  padding: 6px;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.24), 0 2px 8px rgba(0, 0, 0, 0.12);
+  overflow: visible;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-@keyframes wc-glow {
-  0%, 100% { box-shadow: 0 10px 32px rgba(0, 0, 0, 0.46), 0 0 28px rgba(185, 28, 28, 0.32); }
-  50%       { box-shadow: 0 10px 36px rgba(0, 0, 0, 0.52), 0 0 44px rgba(185, 28, 28, 0.52); }
+.floating-ticket-button:hover {
+  transform: scale(1.07);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.3);
 }
 
-.floating-ticket-button::before {
-  content: "⚽";
-  font-size: 28px;
-  line-height: 1;
-}
-
+.floating-ticket-button::before,
 .floating-ticket-button::after {
-  content: "2026";
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.88);
+  content: none;
+}
+
+.wc26-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 999px;
+  mix-blend-mode: multiply;
+  display: block;
 }
 
 .floating-ticket-button .ticket-count-badge {
@@ -245,7 +239,43 @@ a {
   background: var(--red);
   font-size: 11px;
   font-weight: 700;
+  line-height: 1;
 }
+
+@keyframes wc-bounce {
+  0%        { transform: translateY(0)    scale(1);    }
+  28%       { transform: translateY(-26px) scale(1.1); }
+  55%       { transform: translateY(-8px)  scale(1.04); }
+  75%       { transform: translateY(-16px) scale(1.07); }
+  90%       { transform: translateY(-4px)  scale(1.01); }
+  100%      { transform: translateY(0)    scale(1);    }
+}
+
+@keyframes wc-spin {
+  0%   { transform: rotate(0deg)   scale(1);    }
+  40%  { transform: rotate(200deg) scale(1.18); }
+  100% { transform: rotate(360deg) scale(1);    }
+}
+
+@keyframes wc-roll {
+  0%   { transform: translateX(0)    rotate(0deg);    }
+  25%  { transform: translateX(-22px) rotate(-100deg); }
+  75%  { transform: translateX(22px)  rotate(100deg);  }
+  100% { transform: translateX(0)    rotate(0deg);    }
+}
+
+@keyframes wc-wobble {
+  0%, 100% { transform: rotate(0deg)   scale(1);    }
+  20%       { transform: rotate(-12deg) scale(1.1);  }
+  40%       { transform: rotate(10deg)  scale(1.08); }
+  60%       { transform: rotate(-7deg)  scale(1.05); }
+  80%       { transform: rotate(4deg)   scale(1.02); }
+}
+
+.wc-anim-bounce { animation: wc-bounce 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+.wc-anim-spin   { animation: wc-spin   0.7s ease-in-out both; }
+.wc-anim-roll   { animation: wc-roll   0.7s ease-in-out both; }
+.wc-anim-wobble { animation: wc-wobble 0.6s ease-in-out both; }
 
 .profile-button {
   width: 44px;

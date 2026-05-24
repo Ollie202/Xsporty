@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-runtime-config.mjs",
-    "start": "npx serve ."
+    "start": "node scripts/local-static-server.mjs"
   },
   "engines": {
     "node": ">=18"

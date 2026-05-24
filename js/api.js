@@ -1,0 +1,503 @@
+import { state } from './state.js';
+import { API_BASE_URL } from './constants.js';
+import { replaceGameMarkets, replaceLiveFeaturedMarkets, replacePlayerPropMarkets, game } from './data.js';
+import { countryCodeFromUrl, humanMarketLabel, teamCode } from './utils.js';
+import { describeWalletProvider, getWalletProvider } from './provider.js';
+
+export async function apiGet(path) {
+  return apiRequest(path, { method: 'GET' });
+}
+
+export async function apiRequest(path, options = {}) {
+  const response = await fetch(API_BASE_URL + path, { headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error || response.status + ' ' + response.statusText);
+  return payload;
+}
+
+export async function hydrateFromBackend() {
+  try {
+    const results = await Promise.all([
+      apiGet('/wallet/config'),
+      apiGet('/markets/cards?limit=250&sort=kickoff_time'),
+      apiGet('/markets/cards?category=player_future&status=open&limit=100&sort=newest_activity')
+    ]);
+    state.walletConfig = results[0];
+    const backendMarkets = mapBackendCards(results[1].cards || []).filter(match => {
+      if (!match.fixture?.kickoffTime) return true;
+      return Date.now() - new Date(match.fixture.kickoffTime).valueOf() < 3 * 60 * 60 * 1000;
+    });
+    if (backendMarkets.length > 0) {
+      replaceGameMarkets(backendMarkets);
+      replaceLiveFeaturedMarkets(backendMarkets.filter(match => match.isLive).slice(0, 8));
+      const backendPlayerFutures = mapBackendPlayerFutureCards(results[2].cards || []);
+      replacePlayerPropMarkets(backendPlayerFutures.length > 0 ? backendPlayerFutures : buildTournamentPlayerFutures(backendMarkets));
+      state.apiOnline = true;
+      if (!backendMarkets.some(match => match.sport === state.sport)) state.sport = backendMarkets[0].sport;
+      return true;
+    }
+    state.apiOnline = false;
+    return true;
+  } catch (error) {
+    console.warn('Using static market fallback:', error);
+    state.apiOnline = false;
+  }
+  return false;
+}
+
+function mapBackendPlayerFutureCards(cards) {
+  return cards.flatMap(card => {
+    const summary = card.summaries?.[0];
+    const market = summary?.market;
+    const future = market?.template?.category === 'PLAYER_FUTURE' ? market.template : null;
+    const player = future?.player || card.player;
+    if (!market || !future || !player?.playerName) return [];
+    const [yesCents, noCents] = outcomePairCents(
+      summary?.summary?.prices?.YES,
+      summary?.summary?.prices?.NO
+    );
+    return [{
+      name: player.playerName,
+      country: player.teamName || future.competition?.name || 'World Cup',
+      image: player.imageUrl || (player.playerId ? `https://media.api-sports.io/football/players/${player.playerId}.png` : ''),
+      title: market.title,
+      label: `${future.competition?.name || 'World Cup'} ${future.competition?.season || '2026'}`,
+      yes: yesCents,
+      no: noCents,
+      marketId: market.conditionId ? market.id : undefined,
+      backendMarketId: market.id,
+      marketScope: 'tournament'
+    }];
+  });
+}
+
+function buildTournamentPlayerFutures(markets) {
+  const hasWorldCup = markets.some(match =>
+    match.sport === 'football' &&
+    String(match.fixture?.competition?.name || '').toLowerCase().includes('world cup')
+  );
+  if (!hasWorldCup) return [];
+
+  return [
+    tournamentFuture('Lionel Messi', 'Argentina', '154', 'Tournament goals over 3.5', 'Goals', 46, 54),
+    tournamentFuture('Kylian Mbappe', 'France', '278', 'Tournament goals over 4.5', 'Goals', 49, 51),
+    tournamentFuture('Cristiano Ronaldo', 'Portugal', '874', 'Tournament goals over 2.5', 'Goals', 41, 59),
+    tournamentFuture('Neymar Jr', 'Brazil', '276', 'To score from a free kick', 'Free kicks', 18, 82),
+    tournamentFuture('Jude Bellingham', 'England', '', 'Tournament fouls committed over 8.5', 'Fouls', 52, 48),
+    tournamentFuture('Vinicius Jr', 'Brazil', '', 'Tournament yellow cards over 1.5', 'Cards', 36, 64),
+    tournamentFuture('Lamine Yamal', 'Spain', '', 'Tournament assists over 2.5', 'Assists', 43, 57),
+    tournamentFuture('Achraf Hakimi', 'Morocco', '', 'Tournament cards over 1.5', 'Cards', 39, 61)
+  ];
+}
+
+function tournamentFuture(name, country, playerId, title, label, yes, no) {
+  return {
+    name,
+    country,
+    image: playerId ? `https://media.api-sports.io/football/players/${playerId}.png` : '',
+    title,
+    label: `World Cup 2026 - ${label}`,
+    yes,
+    no,
+    marketScope: 'tournament'
+  };
+}
+
+export function mapBackendCards(cards) {
+  return cards.flatMap((card, index) => {
+    const fixture = card.fixture || (card.summaries && card.summaries[0] && card.summaries[0].fixture);
+    const summaries = card.summaries || [];
+    if (!fixture || summaries.length === 0) return [];
+    const sport = mapBackendSport(fixture.sport);
+    const options = summaries.map(summary => marketOptionFromSummary(summary)).filter(Boolean);
+    if (options.length === 0) return [];
+    const home = fixture.homeCompetitor || 'Home';
+    const away = fixture.awayCompetitor || 'Away';
+    const match = game(fixture.id || 'backend-' + index, home, away, countryCodeFromUrl(fixture.homeLogoUrl) || 'un', countryCodeFromUrl(fixture.awayLogoUrl) || 'un', teamCode(home), teamCode(away), fixtureLabel(fixture), 'ID:' + summaries[0].market.id, sport, backendGroupForFixture(fixture, sport));
+    match.backend = true;
+    match.fixture = fixture;
+    match.leagueName = fixture.competition?.name || '';
+    match.leagueKey = leagueKeyForFixture(fixture);
+    if (fixture.homeLogoUrl) match.homeLogoUrl = fixture.homeLogoUrl;
+    if (fixture.awayLogoUrl) match.awayLogoUrl = fixture.awayLogoUrl;
+    match.isLive = fixture.status === 'live';
+    if (match.isLive && fixture.kickoffTime) {
+      const age = Date.now() - new Date(fixture.kickoffTime).valueOf();
+      if (age > 6 * 60 * 60 * 1000) match.isLive = false;
+    }
+    const fixedOptions = options.map(option => {
+      const fixedUp = relevantLabel(option[0], option[5], option[6], home, away);
+      const fixedDown = relevantLabel(option[0], option[7], option[8], home, away);
+      return [option[0], option[1], option[2], option[3], option[4], option[5], fixedUp, option[7], fixedDown];
+    });
+    match.options = sport === 'esports' ? collapseMirroredWinnerOptions(fixedOptions, home, away) : fixedOptions;
+    match.quick = sport === 'esports' ? binaryWinnerButtons(match.options[0], match) : mainMatchButtons(match.options, home, away);
+    return [match];
+  });
+}
+
+function marketOptionFromSummary(summary) {
+  const market = summary.market;
+  if (!market) return null;
+  if (market.status !== 'open' || market.tradingStatus !== 'open' || !market.conditionId) return null;
+  const outcomes = market.outcomes || [];
+  const up = outcomes.find(outcome => outcome.side === 'YES' || outcome.side === 'OVER') || outcomes[1];
+  const down = outcomes.find(outcome => outcome.side === 'NO' || outcome.side === 'UNDER') || outcomes[0];
+  if (!up || !down) return null;
+  const prices = (summary.summary && summary.summary.prices) || {};
+  const [upCents, downCents] = outcomePairCents(prices[up.side], prices[down.side]);
+  return [market.title, (market.template && market.template.category) || market.type || 'Market', upCents, downCents, market.id, up.side, up.label || up.side, down.side, down.label || down.side];
+}
+
+function outcomePairCents(upPriceData, downPriceData) {
+  const upCents = centsForOutcome(upPriceData);
+  const downCents = centsForOutcome(downPriceData);
+
+  if (upCents != null && downCents != null) return [upCents, downCents];
+  if (upCents != null) return [upCents, complementCents(upCents)];
+  if (downCents != null) return [complementCents(downCents), downCents];
+  return [50, 50];
+}
+
+function centsForOutcome(priceData) {
+  if (!priceData) return null;
+  const value = priceData.bestAsk
+    ?? priceData.midpoint
+    ?? priceData.lastTradePrice
+    ?? priceData.bestBid;
+  return normalizePriceCents(value);
+}
+
+function normalizePriceCents(value) {
+  if (value == null || value === '') return null;
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric <= 0) return null;
+  return clampCents(Math.round(numeric <= 1 ? numeric * 100 : numeric));
+}
+
+function complementCents(cents) {
+  return clampCents(100 - cents);
+}
+
+function clampCents(cents) {
+  return Math.max(1, Math.min(99, cents));
+}
+
+function mapBackendSport(sport) {
+  if (sport === 'mma') return 'ufc';
+  if (sport === 'american_football') return 'football';
+  return sport || 'football';
+}
+
+function backendGroupForFixture(fixture, sport) {
+  if (sport === 'ufc') return 'ufc-men';
+  if (sport !== 'football') return 'all';
+  const competition = fixture.competition || {};
+  const kind = String(competition.kind || '').toLowerCase();
+  const name = String(competition.name || '').toLowerCase();
+  if (kind === 'league' && !name.includes('world cup')) return 'leagues';
+  return 'world-cup';
+}
+
+function leagueKeyForFixture(fixture) {
+  const name = fixture?.competition?.name || 'other-leagues';
+  return String(name)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'other-leagues';
+}
+
+function fixtureLabel(fixture) {
+  const when = fixture.kickoffTime ? new Date(fixture.kickoffTime) : null;
+  const date = when && !Number.isNaN(when.valueOf()) ? when.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Scheduled';
+  return date;
+}
+
+function relevantLabel(title, side, original, home, away) {
+  if (original !== 'Yes' && original !== 'No') return original;
+  if (title.includes(' to beat ')) {
+    const teams = title.split(' to beat ');
+    const first = teams[0].trim();
+    const second = teams[1] ? teams[1].trim() : '';
+    if (side === 'YES') return first;
+    if (side === 'NO') return second;
+  }
+  if (title.includes(' to win ')) {
+    const team = title.split(' to win ')[0].trim();
+    if (side === 'YES') return team;
+    if (side === 'NO') return team === home ? away : home;
+  }
+  if (title.includes(' to score first')) {
+    const team = title.split(' to score first')[0].trim();
+    if (side === 'YES') return team;
+  }
+  if (title.includes('Total Goals') || title.includes('to end in a draw') || title.includes('to be tied')) {
+    return side === 'YES' ? 'Yes' : 'No';
+  }
+  return original;
+}
+
+function collapseMirroredWinnerOptions(options, home, away) {
+  const homeTitle = `${home} to beat ${away}`;
+  const awayTitle = `${away} to beat ${home}`;
+  const homeWinner = options.find(option => option[0] === homeTitle);
+  const awayWinner = options.find(option => option[0] === awayTitle);
+  if (!homeWinner || !awayWinner) return options;
+  return [
+    homeWinner,
+    ...options.filter(option => option !== homeWinner && option !== awayWinner)
+  ];
+}
+
+function binaryWinnerButtons(option, match) {
+  if (!option) return [];
+  return [
+    {
+      label: match.homeCode,
+      price: option[2] + 'c',
+      title: option[0],
+      marketId: option[4],
+      outcomeSide: option[5],
+      cssClass: 'up'
+    },
+    {
+      label: match.awayCode,
+      price: option[3] + 'c',
+      title: option[0],
+      marketId: option[4],
+      outcomeSide: option[7],
+      cssClass: 'down'
+    }
+  ];
+}
+function mainMatchButtons(options, home, away) {
+  let homeBtn, drawBtn, awayBtn;
+  for (const opt of options) {
+    const title = opt[0] || '';
+    const side = opt[5];
+    const label = opt[6];
+    if (side !== 'YES') continue;
+    if (label === home && title.includes(' to beat ')) {
+      if (!homeBtn) homeBtn = opt;
+    } else if (label === away && title.includes(' to beat ')) {
+      if (!awayBtn) awayBtn = opt;
+    } else if (title.includes('to end in a draw') || title.includes('to be tied')) {
+      if (!drawBtn) drawBtn = opt;
+    }
+  }
+  const picks = [homeBtn, drawBtn, awayBtn];
+  if (picks.every(p => !p)) return options.slice(0, 3).map(opt => mkQuickBtn(opt));
+  return picks.filter(Boolean).map(opt => mkQuickBtn(opt, opt === drawBtn ? 'Draw' : undefined));
+}
+
+function mkQuickBtn(opt, labelOverride) {
+  const label = labelOverride || opt[6];
+  return { label, price: opt[2] + 'c', title: opt[0], marketId: opt[4], outcomeSide: opt[5], cssClass: opt[5] === 'NO' || opt[5] === 'UNDER' ? 'down' : 'up' };
+}
+
+export async function refreshPortfolio() {
+  if (!state.connected || !state.account) return;
+  try {
+    const portfolio = await apiGet('/portfolio/' + state.account);
+    state.portfolio = portfolio;
+    const raw = portfolio.collateral?.balance ?? portfolio.collateral;
+    state.balance = raw != null ? Number(raw) / 1000000 : null;
+    state.tickets = portfolioTickets(portfolio);
+  } catch (error) {
+    console.warn('Portfolio unavailable:', error);
+  }
+}
+
+export async function refreshPortfolioActivity() {
+  if (!state.connected || !state.account) return;
+  const account = state.account;
+  const [orders, trades] = await Promise.all([
+    apiGet('/portfolio/' + account + '/orders'),
+    apiGet('/portfolio/' + account + '/trades')
+  ]);
+  state.portfolio = {
+    ...(state.portfolio || {}),
+    account,
+    orders: orders.orders,
+    trades: trades.trades,
+    fills: trades.fills
+  };
+}
+
+export async function refreshPortfolioPositions() {
+  if (!state.connected || !state.account) return;
+  const account = state.account;
+  const positions = await apiGet('/portfolio/' + account + '/positions');
+  state.portfolio = {
+    ...(state.portfolio || {}),
+    account,
+    collateral: positions.collateral,
+    positions: positions.positions
+  };
+  const raw = positions.collateral?.balance ?? positions.collateral;
+  state.balance = raw != null ? Number(raw) / 1000000 : null;
+  state.tickets = portfolioTickets(positions);
+}
+
+function portfolioTickets(portfolio) {
+  return (portfolio.positions || []).flatMap((position, positionIndex) => {
+    const market = position.market || {};
+    const outcomes = position.outcomes || [];
+    return outcomes
+      .filter(outcome => Number(outcome.balance || 0) > 0)
+      .map((outcome, outcomeIndex) => ({
+        id: `${market.id || position.marketId || 'position'}-${outcome.outcome?.side || outcomeIndex}`,
+        title: market.title || position.title || humanMarketLabel(position.marketId) || 'Open position',
+        side: outcome.outcome?.side || position.outcomeSide || position.side || 'YES',
+        price: priceToCents(outcome.averagePrice ?? position.averagePrice ?? position.entryPrice),
+        amount: Number(outcome.balance || 0) / 1000000,
+        pnl: Number(outcome.unrealizedPnl ?? outcome.realizedPnl ?? position.unrealizedPnl ?? position.realizedPnl ?? 0) / 1000000 || 0,
+        currentPrice: priceToCents(outcome.currentPrice),
+        costBasis: Number(outcome.costBasis || 0) / 1000000 || 0,
+        currentValue: Number(outcome.currentValue || 0) / 1000000 || 0,
+        redeemable: Boolean(outcome.redeemable),
+        winning: Boolean(outcome.winning),
+        marketId: market.id || position.marketId,
+        updatedAt: new Date(position.updatedAt || Date.now()),
+        tokenId: outcome.tokenId,
+        positionIndex
+      }));
+  });
+}
+
+function priceToCents(value) {
+  if (value == null || value === '') return 50;
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 50;
+  return Math.max(0, Math.min(100, Math.round(numeric <= 1 ? numeric * 100 : numeric)));
+}
+
+export async function ensureCorrectChain() {
+  const provider = getWalletProvider();
+  if (!provider) throw new Error('No browser wallet found');
+  const hexId = state.walletConfig?.chain?.hexId || '0x7a0';
+  let currentId;
+  try {
+    currentId = await provider.request({ method: 'eth_chainId' });
+  } catch {
+    return;
+  }
+  if (currentId === hexId) return;
+  const chainConfig = state.walletConfig?.walletAddEthereumChain;
+  if (chainConfig) {
+    try {
+      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: hexId }] });
+      return;
+    } catch (switchError) {
+      if (switchError.code !== 4902) throw switchError;
+    }
+    await provider.request({ method: 'wallet_addEthereumChain', params: [chainConfig] });
+  } else {
+    await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: hexId }] });
+  }
+}
+
+async function syncActiveWalletAccount() {
+  const provider = getWalletProvider();
+  if (!provider) throw new Error('No browser wallet found');
+  let accounts = await provider.request({ method: 'eth_requestAccounts' });
+  if (!accounts?.length) accounts = await provider.request({ method: 'eth_accounts' });
+  const activeAccount = accounts?.[0];
+  if (!activeAccount) throw new Error('No wallet account selected');
+  if (state.account?.toLowerCase() !== activeAccount.toLowerCase()) {
+    state.account = activeAccount;
+    state.balance = null;
+  }
+  return activeAccount;
+}
+
+function normalizeV(sig) {
+  if (sig.length !== 132) return sig;
+  const v = parseInt(sig.slice(130, 132), 16);
+  if (v < 27) {
+    const r = sig.slice(2, 66);
+    const s = sig.slice(66, 130);
+    return '0x' + r + s + (v + 27).toString(16).padStart(2, '0');
+  }
+  return sig;
+}
+
+function typedDataForWallet(typedData) {
+  const uint256Fields = ['salt', 'tokenId', 'makerAmount', 'takerAmount', 'expiration', 'nonce', 'feeRateBps'];
+  const message = { ...typedData.message };
+  uint256Fields.forEach(field => {
+    if (message[field] != null) message[field] = '0x' + BigInt(message[field]).toString(16);
+  });
+  return {
+    ...typedData,
+    types: {
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      ...typedData.types,
+    },
+    message,
+  };
+}
+
+export async function submitBackendOrder(pending, amount) {
+  const activeAccount = await syncActiveWalletAccount();
+  const makerAmount = Math.max(1, Math.round(amount * 1000000)).toString();
+  const takerAmount = Math.max(1, Math.round((amount / (pending.price / 100)) * 1000000)).toString();
+  const prepared = await apiRequest('/clob/orders/prepare', { method: 'POST', body: JSON.stringify({ marketId: pending.marketId, outcomeSide: pending.outcomeSide, maker: activeAccount, side: 'BUY', makerAmount, takerAmount }) });
+
+  const approvalTx = prepared.readiness?.approval?.transaction;
+  await ensureCorrectChain();
+
+  if (approvalTx) {
+    const provider = getWalletProvider();
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [{ from: activeAccount, to: approvalTx.to, data: approvalTx.data, gas: '100000' }]
+    });
+    await waitForTransaction(txHash);
+  }
+
+  const provider = getWalletProvider();
+  const signingTypedData = typedDataForWallet(prepared.typedData);
+  const rawSig = await provider.request({ method: 'eth_signTypedData_v4', params: [activeAccount, JSON.stringify(signingTypedData)] });
+  const signature = normalizeV(rawSig);
+
+  const order = { ...prepared.order, signature };
+  const submitted = await apiRequest('/clob/orders', { method: 'POST', body: JSON.stringify({ marketId: pending.marketId, outcomeSide: pending.outcomeSide, order }) });
+  return submitted.order && submitted.order.id;
+}
+
+export async function claimWinnings(marketId) {
+  if (!marketId) throw new Error('Missing market id for claim');
+  const activeAccount = await syncActiveWalletAccount();
+  await ensureCorrectChain();
+  const redemption = await apiRequest('/markets/' + encodeURIComponent(marketId) + '/redeem-transaction', {
+    method: 'POST',
+    body: JSON.stringify({})
+  });
+  const transaction = redemption.transaction;
+  if (!transaction?.to || !transaction?.data) throw new Error('Redeem transaction is unavailable');
+  const provider = getWalletProvider();
+  const txHash = await provider.request({
+    method: 'eth_sendTransaction',
+    params: [{ from: activeAccount, to: transaction.to, data: transaction.data, gas: '150000' }]
+  });
+  await waitForTransaction(txHash);
+  return txHash;
+}
+
+async function waitForTransaction(txHash) {
+  for (let i = 0; i < 60; i++) {
+    const provider = getWalletProvider();
+    const tx = await provider.request({ method: 'eth_getTransactionReceipt', params: [txHash] });
+    if (tx?.blockNumber) return;
+    await new Promise(r => setTimeout(r, 2000));
+  }
+  throw new Error('Approval transaction did not confirm within 2 minutes');
+}

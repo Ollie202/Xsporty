@@ -1,0 +1,2346 @@
+/* markets.css
+   Active stylesheet split. */
+
+.featured-strip {
+  margin-bottom: 30px;
+}
+
+.featured-mode-tabs {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.featured-mode-tabs button {
+  min-height: 36px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: var(--muted);
+  background: transparent;
+}
+
+.featured-mode-tabs .is-active {
+  color: #111;
+  background: var(--cyan);
+}
+
+.compact-section-head .featured-mode-tabs {
+  display: inline-grid;
+}
+
+.compact-section-head .featured-mode-tabs button {
+  width: auto;
+  height: auto;
+  white-space: nowrap;
+}
+
+.featured-games {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(292px, 1fr);
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+}
+
+.featured-card {
+  position: relative;
+  min-height: 208px;
+  padding: 16px 14px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent),
+    var(--panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.sport-icon,
+.feature-time {
+  position: absolute;
+  top: 18px;
+}
+
+.sport-icon {
+  left: 16px;
+}
+
+.feature-time {
+  right: 18px;
+  color: #7b4b52;
+  font-size: 12px;
+  letter-spacing: 1.1px;
+}
+
+.featured-flags {
+  display: grid;
+  grid-template-columns: 1fr 54px 1fr;
+  align-items: center;
+  gap: 14px;
+  margin: 54px 22px 20px;
+}
+
+.featured-flags img {
+  width: 62px;
+  height: 44px;
+  object-fit: cover;
+  justify-self: center;
+  border-radius: 6px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+}
+
+.featured-flags strong {
+  color: var(--faint);
+  font-size: 24px;
+  font-style: italic;
+  text-align: center;
+}
+
+.featured-names,
+.featured-odds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  text-align: center;
+}
+
+.featured-names {
+  margin-bottom: 14px;
+}
+.featured-names span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(11px, 1.4vw, 14px);
+}
+
+.featured-odds button,
+.quick-odds button {
+  min-width: 0;
+  border: 0;
+  border-radius: 8px;
+  color: #5d2b32;
+  background: var(--panel-soft);
+}
+
+.featured-odds button {
+  min-height: 58px;
+}
+
+.featured-odds b,
+.quick-odds span {
+  display: block;
+  color: var(--cyan);
+  margin-top: 4px;
+}
+
+.market-board,
+.match-detail-card {
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  background: rgba(18, 15, 20, 0.72);
+  box-shadow: var(--shadow);
+}
+
+.market-board {
+  padding: 16px;
+  margin-bottom: 18px;
+}
+
+.market-tabs,
+.option-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+
+.market-tabs button,
+.option-tabs button {
+  min-height: 42px;
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+  padding: 0 14px;
+  border-bottom: 3px solid transparent;
+}
+
+.market-tabs .is-active,
+.option-tabs .is-active {
+  color: var(--text);
+  border-bottom-color: var(--cyan);
+}
+
+.league-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -2px 0 14px;
+}
+
+.league-filter-tabs button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+  padding: 0 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.league-filter-tabs button b {
+  min-width: 22px;
+  border-radius: 999px;
+  background: rgba(37, 216, 232, 0.12);
+  color: var(--cyan);
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.league-filter-tabs button.is-active,
+.league-filter-tabs button:hover {
+  border-color: rgba(37, 216, 232, 0.48);
+  color: var(--text);
+}
+
+.match-list {
+  display: grid;
+  gap: 14px;
+}
+
+.league-selector {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.league-panel {
+  min-height: 94px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 14px;
+  color: var(--text);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.1)),
+    var(--panel);
+  text-align: left;
+}
+
+.league-panel span {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.league-panel strong {
+  font-size: 18px;
+}
+
+.league-panel.is-active,
+.league-panel:hover {
+  border-color: rgba(37, 216, 232, 0.48);
+  background:
+    linear-gradient(145deg, rgba(37, 216, 232, 0.14), rgba(255, 255, 255, 0.06)),
+    var(--panel);
+}
+
+.league-market-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.league-match-card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.league-clubs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.league-clubs div {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.league-clubs img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+}
+
+.league-clubs strong {
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.league-clubs b {
+  color: var(--faint);
+}
+
+.league-market-prices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.player-market-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.player-prop-card {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.player-prop-image {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background:
+    linear-gradient(145deg, rgba(230, 0, 18, 0.38), rgba(37, 216, 232, 0.12)),
+    #fff1f2;
+}
+
+.player-prop-image::before,
+.player-prop-image::after {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.player-prop-image::before {
+  content: attr(data-initials);
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 58px;
+  font-weight: 1000;
+  background:
+    linear-gradient(135deg, rgba(230, 0, 18, 0.72), rgba(228, 0, 27, 0.3)),
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 38%),
+    var(--cyan);
+}
+
+.player-prop-image::after {
+  content: attr(data-fallback-name);
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.player-prop-image.image-failed::before,
+.player-prop-image.image-failed::after {
+  opacity: 1;
+}
+
+.player-prop-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  transition: transform 180ms ease;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.12), transparent 36%),
+    linear-gradient(145deg, rgba(230, 0, 18, 0.24), rgba(37, 216, 232, 0.1)),
+    #fff1f2;
+}
+
+.player-prop-card:hover img {
+  transform: scale(1.04);
+}
+
+.player-prop-card[data-player="cristiano-ronaldo"] img {
+  object-position: 50% 10%;
+}
+
+.player-prop-card[data-player="lionel-messi"] img {
+  object-position: 50% 12%;
+}
+
+.player-prop-card[data-player="ousmane-dembele"] img,
+.player-prop-card[data-player="neymar-jr"] img {
+  object-position: 50% 22%;
+}
+
+.player-prop-copy {
+  display: grid;
+  gap: 5px;
+  padding: 11px 12px 0;
+}
+
+.player-prop-copy span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.player-prop-copy h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.player-prop-copy small {
+  color: var(--faint);
+}
+
+.player-prop-prices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  padding: 12px;
+}
+
+.match-row {
+  display: grid;
+  grid-template-columns: minmax(270px, 0.82fr) minmax(380px, 1fr);
+  gap: 24px;
+  align-items: center;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.035);
+  border-radius: 8px;
+  background: var(--panel);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.match-row:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37, 216, 232, 0.35);
+  background: var(--panel-soft);
+}
+
+.match-teams {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.match-teams strong {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: clamp(12px, 1.8vw, 17px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  max-width: 100%;
+}
+.match-teams strong img {
+  flex-shrink: 0;
+}
+
+.match-teams img {
+  width: 34px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+.match-meta-line,
+.card-kicker,
+.match-clock,
+.option-row span,
+.ticket-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.quick-odds {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quick-odds button {
+  min-height: 50px;
+  padding: 8px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.esports-team-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 8px;
+  vertical-align: middle;
+}
+
+.fight-event-line {
+  justify-self: center;
+  display: inline-flex;
+  justify-content: center;
+  max-width: min(100%, 860px);
+  padding: 9px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 999px;
+  color: #f7c7cc;
+  background: rgba(255, 255, 255, 0.045);
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.fighter-card {
+  min-width: 0;
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(210px, 1fr) auto;
+  justify-items: center;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.08), transparent 36%),
+    rgba(9, 7, 12, 0.94);
+}
+
+.fighter-card.is-home {
+  background:
+    linear-gradient(160deg, rgba(230, 0, 18, 0.28), transparent 46%),
+    rgba(9, 7, 12, 0.94);
+}
+
+.fighter-card.is-away {
+  background:
+    linear-gradient(205deg, rgba(37, 216, 232, 0.22), transparent 46%),
+    rgba(9, 7, 12, 0.94);
+}
+
+.fighter-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  object-position: center top;
+  filter: saturate(1.08);
+}
+
+.fighter-card-copy {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 11px;
+  padding: 12px 14px;
+  text-align: center;
+  background: rgba(7, 6, 11, 0.88);
+}
+
+.fighter-card strong {
+  display: grid;
+  align-items: center;
+  min-height: 42px;
+  font-size: clamp(18px, 2vw, 28px);
+  line-height: 1.08;
+  text-align: center;
+}
+
+.fighter-card button,
+.fight-distance-pick {
+  min-width: min(100%, 178px);
+  min-height: 54px;
+  border: 1px solid rgba(37, 216, 232, 0.24);
+  border-radius: 9px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.fighter-card button span,
+.fight-distance-pick span {
+  display: block;
+  margin-top: 3px;
+  color: var(--cyan);
+  font-weight: 900;
+}
+
+.fight-vs {
+  position: relative;
+  z-index: 1;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--red);
+  box-shadow: 0 16px 30px rgba(230, 0, 18, 0.36);
+}
+
+.fight-distance-pick {
+  justify-self: center;
+  padding: 8px 18px;
+}
+
+.formula-event-card {
+  grid-template-columns: minmax(270px, 0.95fr) minmax(250px, 0.72fr);
+  min-height: 260px;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.formula-event-art {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  object-fit: cover;
+}
+
+.formula-event-copy {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  padding: 24px;
+  background:
+    linear-gradient(145deg, rgba(230, 0, 18, 0.12), rgba(37, 216, 232, 0.08)),
+    rgba(20, 16, 23, 0.96);
+}
+
+.formula-event-copy span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.formula-event-copy strong {
+  font-size: clamp(22px, 2.3vw, 34px);
+  line-height: 1.08;
+}
+
+.formula-event-copy p {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.formula-event-copy button {
+  justify-self: start;
+  min-height: 42px;
+  padding: 0 16px;
+  color: #fff;
+  background: var(--red);
+  border: 0;
+  border-radius: 8px;
+}
+
+.match-page {
+  padding-top: 2px;
+}
+
+.history-page {
+  display: grid;
+  gap: 18px;
+  padding-top: 2px;
+}
+
+.history-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.history-summary article,
+.history-list {
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.history-summary article {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+}
+
+.history-summary span {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.history-summary strong {
+  color: var(--text);
+  font-size: 26px;
+}
+
+.history-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.history-list {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.history-list h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.history-row {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.positions-dashboard {
+  display: grid;
+  gap: 18px;
+  padding-top: 2px;
+}
+
+.positions-dashboard__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.positions-dashboard__history {
+  grid-column: 1 / -1;
+}
+
+.dashboard-list {
+  display: grid;
+  gap: 10px;
+  max-height: min(420px, 52vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+  scrollbar-gutter: stable;
+}
+
+.dashboard-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+}
+
+.dashboard-list::-webkit-scrollbar-thumb {
+  background: rgba(37, 216, 232, 0.32);
+  border-radius: 999px;
+}
+
+.dashboard-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(37, 216, 232, 0.48);
+}
+
+.dashboard-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 78px;
+  padding: 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.dashboard-row > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.dashboard-row strong,
+.dashboard-row small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-row strong {
+  color: var(--text);
+}
+
+.dashboard-row small {
+  color: var(--muted);
+}
+
+.dashboard-row > b,
+.dashboard-row__actions > b,
+.dashboard-row .tx-link {
+  color: var(--text);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.dashboard-row__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: max-content;
+}
+
+.dashboard-row .tx-link {
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 7px 9px;
+  color: var(--cyan);
+  background: rgba(37, 216, 232, 0.08);
+  font-weight: 900;
+}
+
+.dashboard-row .tx-link:hover {
+  border-color: rgba(37, 216, 232, 0.5);
+  background: rgba(37, 216, 232, 0.14);
+}
+
+.match-detail-card {
+  padding: 24px 28px 30px;
+}
+
+.detail-matchup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-width: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.stats-toggle-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0 0;
+}
+.stats-toggle {
+  padding: 10px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(37, 216, 232, 0.12), rgba(120, 80, 255, 0.08));
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.25s, box-shadow 0.25s;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.stats-toggle:hover {
+  background: linear-gradient(135deg, rgba(37, 216, 232, 0.18), rgba(120, 80, 255, 0.14));
+  box-shadow: 0 0 16px rgba(37, 216, 232, 0.12);
+}
+
+.match-insight {
+  display: grid;
+  gap: 14px;
+  margin: 22px 0 18px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(37, 216, 232, 0.07), transparent),
+    rgba(255, 255, 255, 0.025);
+}
+
+.formula-detail-insight {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.92fr) minmax(260px, 1fr);
+  align-items: stretch;
+  gap: 0;
+  overflow: hidden;
+  min-height: 220px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(230, 0, 18, 0.16), rgba(37, 216, 232, 0.08)),
+    rgba(12, 10, 16, 0.9);
+}
+
+.formula-detail-insight img {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  object-fit: cover;
+}
+
+.formula-detail-insight div {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  padding: 24px;
+}
+
+.formula-detail-insight span {
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.formula-detail-insight h3 {
+  margin: 0;
+  font-size: clamp(24px, 2.5vw, 38px);
+  line-height: 1.08;
+}
+
+.formula-detail-insight p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.formula-detail-insight strong {
+  justify-self: start;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.option-list {
+  display: grid;
+  gap: 12px;
+}
+
+.option-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 180px 180px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.option-row > div {
+  display: grid;
+  gap: 5px;
+}
+
+.option-row.is-selected,
+.player-prop-card.is-selected {
+  background: rgba(37, 216, 232, 0.08);
+}
+
+.options-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.options-head h3 {
+  margin: 4px 0 0;
+  font-size: 26px;
+}
+
+.options-liquidity {
+  color: var(--cyan);
+}
+
+.featured-strip {
+  margin-bottom: 24px;
+}
+
+.featured-games {
+  grid-auto-columns: minmax(254px, 1fr);
+  gap: 12px;
+}
+
+.featured-card {
+  min-height: 184px;
+  padding: 14px 12px 10px;
+}
+
+.featured-flags {
+  margin: 48px 18px 16px;
+}
+
+.featured-flags img {
+  width: 54px;
+  height: 38px;
+}
+
+.featured-flags strong {
+  font-size: 21px;
+}
+
+.featured-odds button {
+  min-height: 50px;
+}
+
+.market-board {
+  padding: 18px 20px;
+}
+
+.match-list {
+  gap: 12px;
+}
+
+.match-row {
+  min-height: 112px;
+  grid-template-columns: minmax(245px, 0.8fr) minmax(360px, 1fr);
+  padding: 18px 22px;
+}
+
+.match-teams {
+  gap: 8px;
+}
+
+.match-teams strong {
+  font-size: 18px;
+}
+
+.match-teams img {
+  width: 40px;
+  height: 28px;
+}
+
+.quick-odds button {
+  min-height: 60px;
+  font-size: 16px;
+}
+
+.quick-odds span {
+  font-size: 18px;
+}
+
+.featured-strip {
+  margin-bottom: 20px;
+}
+
+.featured-games {
+  grid-auto-columns: minmax(232px, 1fr);
+}
+
+.featured-card {
+  min-height: 166px;
+}
+
+.featured-flags {
+  margin: 42px 16px 12px;
+}
+
+.featured-flags img {
+  width: 48px;
+  height: 34px;
+}
+
+.featured-flags strong {
+  font-size: 18px;
+}
+
+.featured-names {
+  margin-bottom: 10px;
+}
+
+.featured-odds button {
+  min-height: 46px;
+}
+
+.market-board {
+  padding: 16px 18px;
+}
+
+.market-tabs {
+  margin-bottom: 14px;
+}
+
+.market-tabs button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.match-list {
+  gap: 10px;
+}
+
+.match-row {
+  min-height: 96px;
+  grid-template-columns: minmax(220px, 0.74fr) minmax(330px, 1fr);
+  gap: 18px;
+  padding: 14px 18px;
+}
+
+.match-teams {
+  gap: 6px;
+}
+
+.match-teams strong {
+  gap: 10px;
+  font-size: 16px;
+}
+
+.match-teams img {
+  width: 34px;
+  height: 24px;
+}
+
+.match-meta-line {
+  font-size: 12px;
+}
+
+.quick-odds {
+  gap: 10px;
+}
+
+.quick-odds button {
+  min-height: 50px;
+  padding: 7px 10px;
+  font-size: 14px;
+}
+
+.quick-odds span {
+  font-size: 16px;
+}
+
+/* Dense market board pass. */
+
+.market-board {
+  padding: 14px 16px;
+}
+
+.market-tabs {
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.market-tabs button {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.match-list {
+  gap: 8px;
+}
+
+.match-row {
+  min-height: 78px;
+  grid-template-columns: minmax(190px, 0.62fr) minmax(300px, 1fr);
+  gap: 14px;
+  padding: 11px 14px;
+}
+
+.match-meta-line {
+  font-size: 11px;
+}
+
+.match-teams {
+  gap: 5px;
+}
+
+.match-teams strong {
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+.match-teams img {
+  width: 30px;
+  height: 21px;
+}
+
+.quick-odds {
+  gap: 8px;
+}
+
+.quick-odds button {
+  min-height: 42px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.quick-odds span {
+  margin-top: 2px;
+  font-size: 15px;
+}
+
+.league-selector {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.league-panel {
+  min-height: 70px;
+  padding: 12px;
+}
+
+.league-panel span {
+  font-size: 11px;
+}
+
+.league-panel strong {
+  font-size: 16px;
+}
+
+.league-market-grid {
+  gap: 10px;
+}
+
+.league-match-card {
+  min-height: 0;
+  padding: 14px;
+}
+
+.league-clubs {
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.league-clubs img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.league-clubs strong {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.league-market-prices {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.league-market-prices .price,
+.option-row .price,
+.player-prop-prices .price {
+  min-height: 42px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.league-match-card .quick-odds button {
+  min-height: 48px;
+  font-size: 14px;
+}
+
+.league-match-card .quick-odds span {
+  font-size: 16px;
+}
+
+/* UFC title cards must stay centered after the shared match-row density overrides. */
+
+.match-row.ufc-title-card {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  min-height: 0;
+  gap: 14px;
+  padding: clamp(16px, 2vw, 24px);
+}
+
+.match-row.ufc-title-card .fight-event-line {
+  order: 0;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.match-row.ufc-title-card .ufc-title-stage {
+  order: 1;
+  margin: 0 auto;
+}
+
+.match-row.ufc-title-card .fight-distance-pick {
+  order: 2;
+}
+
+.match-row.ufc-title-card .fighter-card {
+  width: 100%;
+}
+
+.search-box,
+.featured-card,
+.match-row,
+.market-board,
+.trade-slip,
+.match-detail-card {
+  border-color: rgba(255, 255, 255, 0.055);
+}
+
+.featured-mode-tabs {
+  background: rgba(22, 17, 24, 0.72);
+  border-color: var(--line);
+}
+
+.featured-mode-tabs .is-active {
+  color: #071015;
+  background: var(--cyan);
+}
+
+.featured-card {
+  min-height: 208px;
+}
+
+.featured-odds button,
+.quick-odds button {
+  color: var(--text);
+  background: #231d27;
+}
+
+.featured-odds button:hover,
+.quick-odds button:hover {
+  background: #2c2530;
+}
+
+.feature-time,
+.match-meta-line,
+.market-tabs button {
+  color: var(--muted);
+}
+
+.market-board {
+  padding: 20px 22px;
+}
+
+.match-row {
+  min-height: 132px;
+  grid-template-columns: minmax(260px, 0.82fr) minmax(420px, 1fr);
+  padding: 22px 28px;
+}
+
+.match-teams strong {
+  font-size: 21px;
+}
+
+.match-teams img {
+  width: 46px;
+  height: 32px;
+}
+
+.quick-odds {
+  gap: 14px;
+}
+
+.quick-odds button {
+  min-height: 72px;
+  font-size: 18px;
+}
+
+.quick-odds span {
+  color: var(--cyan);
+  font-size: 20px;
+}
+
+/* Final board density override. Keep this last. */
+
+.market-board {
+  padding: 14px 16px;
+}
+
+.market-tabs {
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.market-tabs button {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.match-list {
+  gap: 8px;
+}
+
+.match-row {
+  min-height: 78px;
+  grid-template-columns: minmax(190px, 0.62fr) minmax(300px, 1fr);
+  gap: 14px;
+  padding: 11px 14px;
+}
+
+.match-meta-line {
+  font-size: 11px;
+}
+
+.match-teams {
+  gap: 5px;
+}
+
+.match-teams strong {
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+.match-teams img {
+  width: 30px;
+  height: 21px;
+}
+
+.quick-odds {
+  gap: 8px;
+}
+
+.quick-odds button {
+  min-height: 42px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.quick-odds span {
+  margin-top: 2px;
+  font-size: 15px;
+}
+
+.league-selector {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.league-panel {
+  min-height: 70px;
+  padding: 12px;
+}
+
+.league-panel span {
+  font-size: 11px;
+}
+
+.league-panel strong {
+  font-size: 16px;
+}
+
+.league-market-grid {
+  gap: 10px;
+}
+
+.league-match-card {
+  min-height: 0;
+  padding: 14px;
+}
+
+.league-clubs {
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.league-clubs img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.league-clubs strong {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.league-market-prices {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.league-market-prices .price,
+.option-row .price,
+.player-prop-prices .price {
+  min-height: 42px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.league-match-card .quick-odds button {
+  min-height: 48px;
+  font-size: 14px;
+}
+
+.league-match-card .quick-odds span {
+  font-size: 16px;
+}
+
+.featured-strip {
+  margin-bottom: 14px;
+}
+
+.featured-mode-tabs {
+  gap: 3px;
+  padding: 3px;
+  border-color: #e4e7ec;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.05);
+}
+
+.featured-mode-tabs button {
+  min-height: 32px;
+  color: #667085;
+  font-size: 14px;
+}
+
+.featured-mode-tabs .is-active {
+  color: #fff;
+  background: #101828;
+}
+
+.featured-games {
+  grid-auto-columns: minmax(260px, 1fr);
+  gap: 10px;
+  padding-bottom: 6px;
+  scrollbar-color: #cbd5e1 #eef2f6;
+}
+
+.featured-card {
+  min-height: 172px;
+  padding: 13px 12px 11px;
+  border-radius: 11px;
+  background:
+    linear-gradient(180deg, rgba(14, 165, 198, 0.05), transparent 50%),
+    #fff;
+}
+
+.featured-flags {
+  margin: 40px 12px 10px;
+}
+
+.featured-flags img {
+  width: 48px;
+  height: 34px;
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.12);
+}
+
+.featured-flags strong,
+.league-clubs b {
+  color: #98a2b3;
+}
+
+.feature-time,
+.match-meta-line,
+.player-prop-copy span,
+.ticket-view label,
+.position-row {
+  color: var(--muted);
+}
+
+.featured-names {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.featured-odds,
+.featured-names {
+  gap: 8px;
+}
+
+.featured-odds button,
+.quick-odds button,
+.league-market-prices .price {
+  min-height: 42px;
+  border: 1px solid #e4e7ec;
+  color: #344054;
+  background: #f8fafc;
+}
+
+.featured-odds button:hover,
+.quick-odds button:hover,
+.league-market-prices .price:hover {
+  border-color: #b9e6fe;
+  background: #f0f9ff;
+}
+
+.featured-odds b,
+.quick-odds span,
+.options-liquidity {
+  color: #0e7490;
+}
+
+.market-board,
+.match-detail-card {
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: #fff;
+}
+
+.market-tabs,
+.option-tabs,
+.slip-tabs {
+  border-bottom-color: #e4e7ec;
+}
+
+.market-tabs {
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.market-tabs button,
+.option-tabs button {
+  min-height: 34px;
+  padding: 0 11px;
+  border-radius: 8px 8px 0 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.market-tabs .is-active,
+.option-tabs .is-active,
+.slip-tabs .is-active {
+  color: #101828;
+  border-bottom-color: var(--cyan);
+}
+
+.match-list {
+  gap: 9px;
+}
+
+.match-row {
+  min-height: 88px;
+  grid-template-columns: minmax(205px, 0.7fr) minmax(300px, 1fr);
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 11px;
+}
+
+.match-row:hover,
+.player-prop-card:hover,
+.league-match-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 18px 40px rgba(16, 24, 40, 0.11);
+}
+
+.match-teams strong,
+.player-prop-copy strong,
+.league-clubs strong,
+.option-row strong {
+  color: #101828;
+}
+
+.quick-odds {
+  gap: 7px;
+}
+
+.option-row {
+  border-top-color: #edf1f5;
+}
+
+.option-row.is-selected,
+.player-prop-card.is-selected {
+  background: #effbff;
+}
+
+.league-panel {
+  border-radius: 11px;
+  background: linear-gradient(135deg, #fff 0%, #f7fbff 100%);
+}
+
+.league-panel.is-active,
+.league-panel:hover {
+  border-color: #7dd3fc;
+  background: #f0f9ff;
+}
+
+.featured-games {
+  grid-auto-columns: minmax(226px, 1fr);
+  gap: 8px;
+}
+
+.featured-card {
+  min-height: 146px;
+  padding: 11px;
+  border-radius: 12px;
+}
+
+.sport-icon,
+.feature-time {
+  top: 12px;
+}
+
+.sport-icon {
+  left: 12px;
+  font-size: 13px;
+}
+
+.feature-time {
+  right: 12px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.featured-flags {
+  grid-template-columns: 1fr 30px 1fr;
+  gap: 8px;
+  margin: 32px 8px 7px;
+}
+
+.featured-flags img {
+  width: 40px;
+  height: 28px;
+}
+
+.featured-flags strong {
+  font-size: 16px;
+}
+
+.featured-names {
+  gap: 6px;
+  margin-bottom: 7px;
+  font-size: 12px;
+}
+
+.featured-odds {
+  gap: 6px;
+}
+
+.featured-odds button,
+.quick-odds button {
+  border-radius: 9px;
+}
+
+.featured-odds button {
+  min-height: 34px;
+  font-size: 12px;
+}
+
+.featured-odds b,
+.quick-odds span {
+  margin-top: 1px;
+  font-size: 12px;
+}
+
+.market-board {
+  padding: 12px;
+}
+
+.market-tabs {
+  margin-bottom: 10px;
+}
+
+.market-tabs button,
+.option-tabs button {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.match-list {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 8px;
+}
+
+.match-row {
+  min-height: 0;
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.match-teams {
+  gap: 5px;
+}
+
+.match-meta-line {
+  width: fit-content;
+  margin-bottom: 2px;
+  border: 1px solid #e4e7ec;
+  border-radius: 999px;
+  padding: 3px 7px;
+  color: #667085;
+  background: #f8fafc;
+  font-size: 10px;
+}
+
+.match-teams strong {
+  gap: 7px;
+  font-size: 14px;
+}
+
+.match-teams img {
+  width: 25px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.quick-odds {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.quick-odds button {
+  min-height: 38px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.league-selector,
+.league-market-grid,
+.player-market-grid {
+  gap: 8px;
+}
+
+.league-panel,
+.league-match-card {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.league-panel {
+  min-height: 74px;
+}
+
+.league-panel strong {
+  font-size: 15px;
+}
+
+.player-prop-copy {
+  padding: 9px 10px 0;
+}
+
+.player-prop-copy strong {
+  font-size: 14px;
+}
+
+/* Keep each sport card shaped for its own market. */
+
+.matchup-sides {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+}
+
+.matchup-sides strong {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-align: center;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.matchup-sides strong img {
+  width: 38px;
+  height: 27px;
+}
+
+.matchup-sides b {
+  color: #98a2b3;
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.match-list[data-sport="football"] .match-row,
+.match-list[data-sport="basketball"] .match-row,
+.match-list[data-sport="cricket"] .match-row {
+  align-content: space-between;
+}
+
+.match-list[data-sport="formula-1"] {
+  grid-template-columns: 1fr;
+}
+
+.match-row.formula-event-card {
+  min-height: 254px;
+  grid-template-columns: minmax(0, 1.05fr) minmax(190px, 0.82fr);
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(240, 0, 24, 0.04), transparent 46%),
+    #fff;
+}
+
+.formula-event-art {
+  min-height: 254px;
+  aspect-ratio: auto;
+}
+
+.formula-event-copy {
+  gap: 9px;
+  padding: 20px;
+  border-left: 1px solid #edf1f5;
+  color: #101828;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(240, 0, 24, 0.11), transparent 11rem),
+    linear-gradient(145deg, #fff 0%, #f8fafc 100%);
+}
+
+.formula-event-copy strong {
+  color: #101828;
+  font-size: clamp(21px, 2vw, 30px);
+}
+
+.formula-event-copy p {
+  color: #475467;
+  font-size: 14px;
+}
+
+.formula-event-copy button {
+  min-height: 38px;
+  border-radius: 999px;
+  background: #101828;
+}
+
+.match-list[data-sport="ufc"] {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr));
+}
+
+.match-row.ufc-title-card {
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(240, 0, 24, 0.13), transparent 15rem),
+    linear-gradient(180deg, #fff 0%, #f7f8fb 100%);
+}
+
+.match-row.ufc-title-card .fight-event-line {
+  border-color: #e4e7ec;
+  color: #475467;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+}
+
+.match-row.ufc-title-card .ufc-title-stage {
+  width: min(100%, 680px);
+  min-height: 290px;
+  grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.fighter-card {
+  overflow: hidden;
+  border: 1px solid #e4e7ec;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(16, 24, 40, 0.12);
+}
+
+.fighter-card.is-home {
+  background:
+    linear-gradient(160deg, rgba(240, 0, 24, 0.14), transparent 48%),
+    #fff;
+}
+
+.fighter-card.is-away {
+  background:
+    linear-gradient(205deg, rgba(14, 165, 198, 0.14), transparent 48%),
+    #fff;
+}
+
+.fighter-image {
+  height: 202px;
+}
+
+.fighter-card-copy {
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.fighter-card strong {
+  min-height: 34px;
+  color: #101828;
+  font-size: clamp(16px, 1.5vw, 22px);
+}
+
+.fighter-card button {
+  min-width: min(100%, 168px);
+  min-height: 44px;
+  border-color: #d0d5dd;
+  color: #101828;
+  background: #f8fafc;
+}
+
+.fight-vs {
+  width: 54px;
+  height: 54px;
+  color: #fff;
+  border-color: transparent;
+  background: #101828;
+  box-shadow: 0 16px 28px rgba(16, 24, 40, 0.2);
+}
+
+.top-sport-nav,
+.search-box,
+.side-toggle,
+.quote-grid,
+.profile-wallet,
+.ticket-note,
+.ticket-empty,
+.match-meta-line,
+.fight-event-line {
+  background: var(--panel-soft);
+  border-color: var(--line);
+}
+
+.featured-card,
+.league-panel {
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.05), transparent 48%),
+    var(--panel-raised);
+}
+
+.market-board,
+.trade-slip,
+.match-detail-card,
+.history-page {
+  background-color: var(--panel);
+}
+
+.featured-odds button,
+.quick-odds button,
+.league-market-prices .price,
+.ticket-view input,
+.fighter-card button {
+  border-color: var(--line);
+  background: #f1f5f7;
+}
+
+.featured-odds button:hover,
+.quick-odds button:hover,
+.league-market-prices .price:hover,
+.fighter-card button:hover {
+  background: #e7f4f8;
+}
+
+.match-row.formula-event-card {
+  background:
+    linear-gradient(180deg, rgba(240, 0, 24, 0.035), transparent 46%),
+    var(--panel-raised);
+}
+
+.formula-event-copy {
+  border-left-color: var(--line);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(240, 0, 24, 0.09), transparent 11rem),
+    linear-gradient(145deg, #f8fafb 0%, #eef3f6 100%);
+}
+
+.match-row.ufc-title-card {
+  background:
+    radial-gradient(circle at 50% -20%, rgba(240, 0, 24, 0.1), transparent 15rem),
+    linear-gradient(180deg, #f8fafb 0%, #eef3f6 100%);
+}
+
+.fighter-card.is-home {
+  background:
+    linear-gradient(160deg, rgba(240, 0, 24, 0.1), transparent 48%),
+    var(--panel-raised);
+}
+
+.fighter-card.is-away {
+  background:
+    linear-gradient(205deg, rgba(14, 165, 198, 0.11), transparent 48%),
+    var(--panel-raised);
+}
+
+.fighter-card-copy {
+  background: rgba(248, 250, 251, 0.94);
+}
+
+/* Modern market choice buttons without clashing colors. */
+
+.featured-odds button,
+.quick-odds button,
+.league-market-prices .price,
+.player-prop-prices .price {
+  position: relative;
+  min-height: 48px;
+  border: 1px solid rgba(14, 165, 198, 0.18);
+  color: #142033;
+  background: rgba(239, 246, 249, 0.92);
+  box-shadow: none;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.quick-odds button {
+  min-height: 56px;
+  padding: 9px 10px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.featured-odds button {
+  min-height: 42px;
+  border-radius: 11px;
+}
+
+.featured-card--three-way .featured-odds {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.featured-card--three-way .featured-odds button {
+  min-width: 0;
+  padding-inline: 7px;
+}
+
+.featured-odds b,
+.quick-odds span {
+  color: #087e9b;
+  font-size: 14px;
+  font-weight: 1000;
+}
+
+.featured-odds button:hover,
+.quick-odds button:hover,
+.league-market-prices .price:hover,
+.player-prop-prices .price:hover {
+  transform: translateY(-2px);
+  border-color: rgba(14, 165, 198, 0.48);
+  background: rgba(223, 244, 249, 0.98);
+  box-shadow: 0 12px 24px rgba(14, 116, 144, 0.14);
+}
+
+.quick-odds button:active,
+.featured-odds button:active,
+.league-market-prices .price:active,
+.player-prop-prices .price:active {
+  transform: translateY(0);
+}
+
+.option-row .price,
+.fighter-card button,
+.fight-distance-pick {
+  box-shadow: 0 11px 22px rgba(20, 32, 51, 0.13);
+}
+
+/* Final sport structure pass: races and fights are showcase rows, not cramped tiles. */
+
+.match-list[data-sport="formula-1"],
+.match-list[data-sport="ufc"] {
+  grid-template-columns: 1fr;
+}
+
+.match-list[data-sport="formula-1"] .formula-event-card,
+.match-list[data-sport="ufc"] .ufc-title-card {
+  width: 100%;
+}
+
+.match-list[data-sport="formula-1"] .formula-event-card {
+  min-height: 236px;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.08), transparent 42%),
+    var(--panel-raised);
+}
+
+.formula-event-copy {
+  background:
+    linear-gradient(135deg, rgba(248, 250, 251, 0.94), rgba(238, 243, 246, 0.98));
+}
+
+.formula-event-copy small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.match-list[data-sport="ufc"] .ufc-title-card {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.07), transparent 42%),
+    var(--panel-raised);
+}
+
+.match-list[data-sport="ufc"] .ufc-title-stage {
+  width: min(100%, 920px);
+  grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+}
+
+.match-list[data-sport="ufc"] .fighter-card {
+  grid-template-columns: minmax(150px, 0.72fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  align-items: stretch;
+}
+
+.match-list[data-sport="ufc"] .fighter-image {
+  height: 100%;
+  min-height: 220px;
+}
+
+.match-list[data-sport="ufc"] .fighter-card-copy {
+  align-content: center;
+  justify-items: start;
+  padding: 18px;
+  text-align: left;
+}
+
+.match-list[data-sport="ufc"] .fighter-card strong {
+  min-height: 0;
+  text-align: left;
+}
+
+.match-list[data-sport="ufc"] .fighter-card button {
+  width: min(100%, 190px);
+}
+
+.match-list[data-sport="ufc"] .fighter-card.is-home,
+.match-list[data-sport="ufc"] .fighter-card.is-away {
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.06), transparent 48%),
+    var(--panel-raised);
+}
+
+.match-list[data-sport="ufc"] .fight-vs {
+  background: #101828;
+}
+
+.player-prop-image {
+  background:
+    linear-gradient(145deg, rgba(14, 165, 198, 0.11), rgba(255, 255, 255, 0.12)),
+    var(--panel-soft);
+}
+
+/* Detail pages should stay in the softer light theme too. */
+
+.match-insight {
+  background: var(--panel-raised);
+  border-color: var(--line);
+}
+
+.formula-detail-insight {
+  border-color: var(--line);
+  background:
+    linear-gradient(135deg, rgba(14, 165, 198, 0.08), transparent 45%),
+    var(--panel-raised);
+  box-shadow: var(--shadow);
+}
+
+.formula-detail-insight div {
+  color: var(--text);
+  background:
+    linear-gradient(135deg, rgba(248, 250, 251, 0.96), rgba(238, 243, 246, 0.98));
+}
+
+.formula-detail-insight h3,
+.formula-detail-insight strong {
+  color: var(--text);
+}
+
+.formula-detail-insight p {
+  color: var(--muted);
+}
+
+.formula-detail-insight strong {
+  border-color: var(--line);
+  background: rgba(239, 246, 249, 0.92);
+}
+
+.market-empty-state {
+  grid-column: 1 / -1;
+  min-height: 112px;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
+}
+
+.match-row.esports-event-card {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.match-row.esports-event-card .match-teams {
+  display: grid;
+  gap: 10px;
+}
+
+.match-row.esports-event-card .esports-matchup,
+.match-row.esports-event-card .esports-odds {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.match-row.esports-event-card .esports-matchup {
+  position: relative;
+  align-items: center;
+}
+
+.match-row.esports-event-card .esports-matchup strong {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  text-align: center;
+}
+
+.match-row.esports-event-card .esports-matchup b {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--panel-raised);
+  color: var(--muted);
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.12);
+}
+
+.match-row.esports-event-card .esports-odds button {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .match-row.esports-event-card .esports-matchup,
+  .match-row.esports-event-card .esports-odds {
+    gap: 8px;
+  }
+}

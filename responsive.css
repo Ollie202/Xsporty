@@ -1,0 +1,837 @@
+/* responsive.css
+   Active stylesheet split. */
+
+/* --- breakpoints besides 760px --- */
+
+@media (max-width: 860px) {
+  .formula-event-card {
+    grid-template-columns: 1fr;
+  }
+
+  .formula-event-art {
+    min-height: 190px;
+    aspect-ratio: 16 / 9;
+  }
+
+  .ufc-title-stage {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) 52px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .fighter-image {
+    height: 180px;
+  }
+
+  .fighter-card {
+    grid-template-rows: minmax(150px, 1fr) auto;
+  }
+
+  .fighter-card-copy {
+    padding-inline: 8px;
+  }
+
+  .fighter-card strong {
+    min-height: 42px;
+    font-size: 15px;
+  }
+
+  .fighter-card button,
+  .fight-distance-pick {
+    min-width: 0;
+    width: 100%;
+    min-height: 48px;
+    font-size: 13px;
+  }
+
+  .fight-vs {
+    width: 48px;
+    height: 48px;
+    font-size: 13px;
+  }
+
+  .formula-detail-insight {
+    grid-template-columns: 1fr;
+  }
+
+  .formula-detail-insight img {
+    min-height: 180px;
+  }
+}
+
+@media (max-width: 1320px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .right-rail {
+    position: static;
+    padding: 0 24px 50px 0;
+  }
+}
+
+@media (max-width: 1320px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .right-rail {
+    position: static;
+    padding: 0 0 46px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .topbar__inner,
+  .dashboard-shell {
+    width: min(100% - 24px, 1480px);
+  }
+
+  .header-search {
+    max-width: 310px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .right-rail {
+    position: static;
+  }
+}
+
+@media (max-width: 1120px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .right-rail {
+    position: static;
+    padding: 0 0 46px;
+  }
+
+  .header-search {
+    order: 3;
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .hero-banner {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-banner__players {
+    min-height: 210px;
+  }
+
+  .hero-banner__copy {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 980px) {
+  .topbar {
+    height: auto;
+  }
+
+  .topbar__inner {
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+
+  .brand__mark {
+    width: 52px;
+    height: 46px;
+  }
+
+  .brand strong {
+    font-size: 22px;
+  }
+
+  .top-sport-nav {
+    order: 3;
+    width: 100%;
+    margin: 0;
+  }
+
+  .dashboard-shell {
+    display: block;
+    padding-left: 0;
+  }
+
+  .main-column,
+  .right-rail {
+    padding: 16px;
+  }
+
+  .dashboard-tools,
+  .match-row,
+  .player-prop-card,
+  .option-row,
+  .insight-grid,
+  .recent-columns,
+  .history-summary,
+  .history-columns,
+  .positions-dashboard__grid,
+  .league-selector,
+  .league-market-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .positions-dashboard__history {
+    grid-column: auto;
+  }
+
+  .history-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .history-hero p {
+    text-align: left;
+  }
+
+  .dashboard-list {
+    max-height: min(360px, 58vh);
+  }
+
+  .footer-main {
+    grid-template-columns: 1fr 1fr;
+    padding: 38px 24px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer-bottom {
+    grid-template-columns: auto 1fr;
+    padding: 22px 24px;
+  }
+
+  .footer-bottom span {
+    grid-column: 2;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-dropdown {
+    right: -8px;
+    width: min(342px, calc(100vw - 32px));
+  }
+}
+
+@media (max-width: 620px) {
+  .options-head,
+  .detail-meta,
+  .detail-title-row,
+  .detail-matchup {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .detail-matchup {
+    align-items: flex-start;
+  }
+
+  .wallet-panel {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .topbar__inner {
+    gap: 10px;
+  }
+
+  .featured-games {
+    grid-auto-columns: minmax(270px, 88vw);
+  }
+
+  .quick-odds,
+  .player-prop-prices,
+  .featured-odds,
+  .featured-names,
+  .share-pnl-card__meta {
+    grid-template-columns: 1fr;
+  }
+
+  .share-pnl-card {
+    padding: 20px;
+  }
+
+  .share-pnl-card__headline h2 {
+    font-size: 24px;
+  }
+
+  .share-pnl-card__amount {
+    font-size: 36px;
+  }
+
+  .detail-title-row h2 {
+    font-size: 28px;
+  }
+
+  .footer-main,
+  .footer-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom span {
+    grid-column: auto;
+  }
+
+  .age-badge {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+@media (max-width: 374px) {
+  .wallet-panel {
+    left: 214px !important;
+  }
+}
+
+
+/* --- smokescreen fixes --- */
+
+.hero-player-card img:not([src]),
+.hero-player-card img[hidden] {
+  display: none;
+}
+
+
+/* --- consolidated 760px breakpoint --- */
+
+@media (max-width: 760px) {
+
+  /* block 1 - general layout, topbar, hero, board, footer, pnl */
+  body {
+    font-size: 13px;
+  }
+
+  .topbar {
+    position: static;
+  }
+
+  .topbar__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .brand__mark {
+    width: 42px;
+    height: 38px;
+    font-size: 22px;
+  }
+
+  .brand strong {
+    font-size: 18px;
+  }
+
+  .brand small {
+    font-size: 11px;
+  }
+
+  .wallet-panel {
+    justify-content: end;
+  }
+
+  .balance-pill {
+    display: none !important;
+  }
+
+  .connect-btn {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .profile-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .top-sport-nav,
+  .header-search {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin: 0;
+  }
+
+  .top-sport-nav {
+    overflow-x: auto;
+  }
+
+  .top-sport-nav button {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .header-search {
+    max-width: none;
+    min-height: 40px;
+  }
+
+  .dashboard-shell {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .main-column,
+  .right-rail {
+    width: 100%;
+    padding: 0;
+  }
+
+  .hero-banner {
+    min-height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .hero-banner__players {
+    min-height: 158px;
+    padding: 16px 0 0 18px;
+  }
+
+  .hero-player-card {
+    height: 158px;
+    min-width: 120px;
+  }
+
+  .hero-player-card--blue {
+    height: 170px;
+  }
+
+  .hero-banner__copy {
+    padding: 18px;
+  }
+
+  .hero-banner__copy h1 {
+    font-size: 30px;
+  }
+
+  .featured-games {
+    grid-auto-columns: minmax(220px, 78vw);
+  }
+
+  .market-board,
+  .trade-slip,
+  .match-detail-card {
+    padding: 14px;
+  }
+
+  .market-tabs,
+  .option-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .market-tabs::-webkit-scrollbar,
+  .option-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .match-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    min-height: 0;
+  }
+
+  .quick-odds {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .quick-odds button {
+    min-height: 46px;
+    font-size: 12px;
+  }
+
+  .right-rail {
+    order: 3;
+  }
+
+  .site-footer {
+    margin-top: 22px;
+  }
+
+  .footer-main,
+  .footer-bottom {
+    grid-template-columns: 1fr;
+    padding: 24px 18px;
+  }
+
+  .share-pnl-card {
+    width: min(94vw, 94vh);
+    padding: 0 14px 14px;
+    border-radius: 18px;
+  }
+
+  .share-pnl-card__stadium {
+    min-height: 92px;
+    margin: 0 -14px 8px;
+  }
+
+  .position-pulse-card {
+    width: 108px;
+    height: 76px;
+  }
+
+  .position-pulse-card strong {
+    font-size: 24px;
+  }
+
+  .share-pnl-card__headline h2 {
+    font-size: 24px;
+  }
+
+  .share-pnl-card__teams {
+    gap: 6px;
+  }
+
+  .share-pnl-card__teams span {
+    padding: 8px;
+  }
+
+  .share-pnl-card__amount {
+    margin: 10px 0;
+    font-size: 34px;
+  }
+
+  .share-pnl-card__meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .share-pnl-card p {
+    display: none;
+  }
+
+  /* block 2 - recent layout */
+  .recent-columns {
+    grid-template-columns: 1fr;
+  }
+
+  #share-pnl-summary {
+    display: none;
+  }
+
+  /* block 3 - pnl modal overrides */
+  .share-pnl-card {
+    width: min(94vw, 94vh);
+    padding: 18px;
+    gap: 10px;
+  }
+
+  .share-pnl-card__headline h2 {
+    font-size: 26px;
+  }
+
+  .share-pnl-card__amount {
+    font-size: 36px;
+  }
+
+  .share-pnl-card__meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #share-pnl-summary {
+    display: grid;
+  }
+
+  /* block 4 - footer grid */
+  .footer-main {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 18px;
+    padding: 24px 16px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  /* block 5 - league selectors */
+  .league-selector,
+  .league-market-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* block 6 - ufc title card padding */
+  .match-row.ufc-title-card {
+    padding: 14px;
+  }
+
+  .match-row.ufc-title-card .ufc-title-stage {
+    width: 100%;
+  }
+
+  /* block 7 (duplicate of block 5 kept for cascade) */
+  .match-row {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .quick-odds {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .league-selector,
+  .league-market-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* block 8 - topbar/dashboard width */
+  .topbar {
+    height: auto;
+  }
+
+  .dashboard-shell,
+  .topbar__inner {
+    width: calc(100% - 20px);
+  }
+
+  .hero-banner {
+    grid-template-columns: 1fr;
+  }
+
+  .match-list {
+    grid-template-columns: 1fr;
+  }
+
+  /* block 9 - hero banner sizing */
+  .hero-banner {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .hero-banner__players {
+    min-height: 216px;
+    padding-left: 6px;
+  }
+
+  .hero-player-card {
+    min-width: 132px;
+    height: 196px;
+  }
+
+  .hero-player-card--blue {
+    height: 208px;
+  }
+
+  /* block 10 - matchup / formula / ufc detail */
+  .matchup-sides {
+    gap: 6px;
+  }
+
+  .matchup-sides strong img {
+    width: 32px;
+    height: 23px;
+  }
+
+  .match-row.formula-event-card {
+    grid-template-columns: 1fr;
+  }
+
+  .formula-event-art {
+    min-height: 184px;
+  }
+
+  .formula-event-copy {
+    border-top: 1px solid #edf1f5;
+    border-left: 0;
+  }
+
+  .match-row.ufc-title-card .ufc-title-stage {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+  }
+
+  .fighter-image {
+    height: 150px;
+  }
+
+  .fighter-card button {
+    min-width: 0;
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .fight-vs {
+    width: 42px;
+    height: 42px;
+  }
+
+  /* block 11 - formula event copy border color */
+  .formula-event-copy {
+    border-top-color: var(--line);
+  }
+
+  /* block 12 - ufc match list layout */
+  .match-list[data-sport="ufc"] .ufc-title-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .match-list[data-sport="ufc"] .fighter-card {
+    grid-template-columns: 1fr;
+  }
+
+  .match-list[data-sport="ufc"] .fight-vs {
+    justify-self: center;
+  }
+
+  /* block 13 - overflow & wallet panel basics */
+  body {
+    overflow-x: hidden;
+  }
+
+  .topbar__inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .wallet-panel {
+    max-width: 148px;
+    justify-self: end;
+  }
+
+  .connect-btn {
+    max-width: 148px;
+    padding: 0 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* block 14 - mobile header grid refinement */
+  .topbar__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    width: 100%;
+    padding: 12px 16px;
+    gap: 10px;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .wallet-panel {
+    max-width: 136px;
+    min-width: 0;
+  }
+
+  .wallet-panel .connect-btn {
+    max-width: 136px;
+    min-height: 38px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .top-sport-nav,
+  .header-search {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /* block 15 - wallet pinned anchor */
+  .topbar__inner {
+    position: relative;
+    padding-right: 112px;
+  }
+
+  .wallet-panel {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 92px;
+    max-width: 92px;
+  }
+
+  .wallet-panel .connect-btn {
+    width: 92px;
+    max-width: 92px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
+  /* block 16 - wallet fixed viewport pin */
+  .wallet-panel {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 60;
+    width: 92px;
+    max-width: 92px;
+  }
+
+  /* block 17 - dynamic viewport placement */
+  .wallet-panel {
+    right: auto;
+    left: calc(100vw - 106px);
+    left: calc(100dvw - 106px);
+  }
+
+  /* block 18 - explicit mobile wallet positions */
+  .wallet-panel {
+    right: auto !important;
+    left: 284px !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .wc-hero-content {
+    gap: 22px;
+    padding: 28px;
+  }
+
+  .wc-hero-mid {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .wc-hero-banner {
+    min-height: auto;
+    padding: 0;
+  }
+
+  .wc-hero-content {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px 20px;
+  }
+
+  .wc-hero-title {
+    font-size: clamp(38px, 14vw, 58px);
+  }
+
+  .wc-hero-subtitle {
+    max-width: 100%;
+  }
+
+  .wc-hero-right {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  .wc-hero-logo {
+    width: 62px;
+  }
+
+  .wc-hero-hosts {
+    text-align: right;
+  }
+}

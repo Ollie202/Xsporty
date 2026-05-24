@@ -1202,10 +1202,18 @@
 
 .history-row__actions {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 4px;
   min-width: max-content;
+}
+
+.history-row__settlement {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .claim-button {
@@ -2765,7 +2773,13 @@
 
 .connect-btn:disabled,
 .price:disabled,
+.quick-odds button:disabled,
+.featured-odds button:disabled,
 .confirm-trade:disabled {
-  cursor: wait;
+  cursor: not-allowed;
   opacity: 0.66;
+}
+
+.option-row.is-disabled {
+  opacity: 0.78;
 }

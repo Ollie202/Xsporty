@@ -24,6 +24,7 @@ export async function hydrateFromBackend() {
     ]);
     state.walletConfig = results[0];
     const backendMarkets = mapBackendCards(results[1].cards || []).filter(match => {
+      if (isFinishedHomepageMatch(match)) return false;
       if (!match.fixture?.kickoffTime) return true;
       return Date.now() - new Date(match.fixture.kickoffTime).valueOf() < 3 * 60 * 60 * 1000;
     });
@@ -43,6 +44,16 @@ export async function hydrateFromBackend() {
     state.apiOnline = false;
   }
   return false;
+}
+
+function isFinishedHomepageMatch(match) {
+  const fixtureStatus = match.fixture?.status;
+  if (fixtureStatus === 'finished' || fixtureStatus === 'cancelled' || fixtureStatus === 'abandoned' || fixtureStatus === 'postponed') {
+    return true;
+  }
+  const options = match.options || [];
+  if (!options.length) return false;
+  return options.every(option => option[9]);
 }
 
 function mapBackendPlayerFutureCards(cards) {
@@ -128,7 +139,7 @@ export function mapBackendCards(cards) {
     const fixedOptions = options.map(option => {
       const fixedUp = relevantLabel(option[0], option[5], option[6], home, away);
       const fixedDown = relevantLabel(option[0], option[7], option[8], home, away);
-      return [option[0], option[1], option[2], option[3], option[4], option[5], fixedUp, option[7], fixedDown];
+      return [option[0], option[1], option[2], option[3], option[4], option[5], fixedUp, option[7], fixedDown, option[9]];
     });
     match.options = sport === 'esports' ? collapseMirroredWinnerOptions(fixedOptions, home, away) : fixedOptions;
     match.quick = sport === 'esports' ? binaryWinnerButtons(match.options[0], match) : mainMatchButtons(match.options, home, away);
@@ -139,14 +150,23 @@ export function mapBackendCards(cards) {
 function marketOptionFromSummary(summary) {
   const market = summary.market;
   if (!market) return null;
-  if (market.status !== 'open' || market.tradingStatus !== 'open' || !market.conditionId) return null;
   const outcomes = market.outcomes || [];
   const up = outcomes.find(outcome => outcome.side === 'YES' || outcome.side === 'OVER') || outcomes[1];
   const down = outcomes.find(outcome => outcome.side === 'NO' || outcome.side === 'UNDER') || outcomes[0];
   if (!up || !down) return null;
   const prices = (summary.summary && summary.summary.prices) || {};
   const [upCents, downCents] = outcomePairCents(prices[up.side], prices[down.side]);
-  return [market.title, (market.template && market.template.category) || market.type || 'Market', upCents, downCents, market.id, up.side, up.label || up.side, down.side, down.label || down.side];
+  const disabledReason = marketDisabledReason(market);
+  return [market.title, (market.template && market.template.category) || market.type || 'Market', upCents, downCents, market.id, up.side, up.label || up.side, down.side, down.label || down.side, disabledReason];
+}
+
+function marketDisabledReason(market) {
+  if (market.status === 'resolved') return 'Market resolved';
+  if (market.status === 'cancelled') return 'Market cancelled';
+  if (market.status !== 'open') return 'Market closed';
+  if (market.tradingStatus !== 'open') return market.tradingStatusReason || 'Trading closed';
+  if (!market.conditionId) return 'Market not on-chain';
+  return '';
 }
 
 function outcomePairCents(upPriceData, downPriceData) {
@@ -260,7 +280,9 @@ function binaryWinnerButtons(option, match) {
       title: option[0],
       marketId: option[4],
       outcomeSide: option[5],
-      cssClass: 'up'
+      cssClass: 'up',
+      disabled: Boolean(option[9]),
+      disabledReason: option[9] || ''
     },
     {
       label: match.awayCode,
@@ -268,7 +290,9 @@ function binaryWinnerButtons(option, match) {
       title: option[0],
       marketId: option[4],
       outcomeSide: option[7],
-      cssClass: 'down'
+      cssClass: 'down',
+      disabled: Boolean(option[9]),
+      disabledReason: option[9] || ''
     }
   ];
 }
@@ -294,7 +318,16 @@ function mainMatchButtons(options, home, away) {
 
 function mkQuickBtn(opt, labelOverride) {
   const label = labelOverride || opt[6];
-  return { label, price: opt[2] + 'c', title: opt[0], marketId: opt[4], outcomeSide: opt[5], cssClass: opt[5] === 'NO' || opt[5] === 'UNDER' ? 'down' : 'up' };
+  return {
+    label,
+    price: opt[2] + 'c',
+    title: opt[0],
+    marketId: opt[4],
+    outcomeSide: opt[5],
+    cssClass: opt[5] === 'NO' || opt[5] === 'UNDER' ? 'down' : 'up',
+    disabled: Boolean(opt[9]),
+    disabledReason: opt[9] || ''
+  };
 }
 
 export async function refreshPortfolio() {
@@ -344,7 +377,7 @@ export async function refreshPortfolioPositions() {
 function portfolioTickets(portfolio) {
   return (portfolio.positions || []).flatMap((position, positionIndex) => {
     const market = position.market || {};
-    const outcomes = position.outcomes || [];
+    const outcomes = displayOutcomesForPosition(position);
     return outcomes
       .filter(outcome => Number(outcome.balance || 0) > 0)
       .map((outcome, outcomeIndex) => ({
@@ -365,6 +398,35 @@ function portfolioTickets(portfolio) {
         positionIndex
       }));
   });
+}
+
+function displayOutcomesForPosition(position) {
+  const outcomes = position.outcomes || [];
+  if (position.resolution?.status === 'submitted' && position.resolution?.outcome !== 'VOID') {
+    const winning = outcomes.filter(outcome =>
+      outcome.winning || outcome.outcome?.side === position.resolution?.outcome
+    );
+    if (winning.some(outcome => Number(outcome.balance || 0) > 0)) return winning;
+    return outcomes.filter(outcome => Number(outcome.balance || 0) > 0 && !outcome.winning);
+  }
+  return netDisplayOutcomes(outcomes);
+}
+
+function netDisplayOutcomes(outcomes) {
+  const positive = outcomes.filter(outcome => Number(outcome.balance || 0) > 0);
+  if (positive.length !== 2) return positive;
+
+  const yes = positive.find(outcome => outcome.outcome?.side === 'YES');
+  const no = positive.find(outcome => outcome.outcome?.side === 'NO');
+  if (!yes || !no) return positive;
+
+  const yesBalance = Number(yes.balance || 0);
+  const noBalance = Number(no.balance || 0);
+  if (yesBalance === noBalance) return positive;
+
+  const netSide = yesBalance > noBalance ? yes : no;
+  const netBalance = Math.abs(yesBalance - noBalance);
+  return [{ ...netSide, balance: String(netBalance) }];
 }
 
 function priceToCents(value) {

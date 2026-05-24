@@ -252,7 +252,7 @@ export function renderGameTiles() {
           </div>
         </div>
         <div class="quick-odds esports-odds">
-          ${teamChoices.map(choice => `<button class="${choice.cssClass || ""}" type="button" data-market-id="${choice.marketId || ""}" data-outcome-side="${choice.outcomeSide || ""}">${choice.label}<span>${choice.price}</span></button>`).join("")}
+          ${teamChoices.map(choice => `<button class="${choice.cssClass || ""}" type="button" data-market-id="${choice.marketId || ""}" data-outcome-side="${choice.outcomeSide || ""}" data-disabled-reason="${escapeHtml(choice.disabledReason || "")}" ${choice.disabled ? "disabled aria-disabled=\"true\"" : ""}>${choice.label}<span>${choice.disabled ? "Closed" : choice.price}</span></button>`).join("")}
         </div>
       `;
       card.querySelectorAll(".quick-odds button").forEach((button, index) => {
@@ -279,7 +279,7 @@ export function renderGameTiles() {
         </div>
       </div>
       <div class="quick-odds">
-        ${choices.map(choice => `<button class="${escapeHtml(choice.cssClass || "")}" type="button" data-market-id="${escapeHtml(choice.marketId || "")}" data-outcome-side="${escapeHtml(choice.outcomeSide || "")}">${escapeHtml(choice.label)}<span>${escapeHtml(choice.price)}</span></button>`).join("")}
+        ${choices.map(choice => `<button class="${escapeHtml(choice.cssClass || "")}" type="button" data-market-id="${escapeHtml(choice.marketId || "")}" data-outcome-side="${escapeHtml(choice.outcomeSide || "")}" data-disabled-reason="${escapeHtml(choice.disabledReason || "")}" ${choice.disabled ? "disabled aria-disabled=\"true\"" : ""}>${escapeHtml(choice.label)}<span>${escapeHtml(choice.disabled ? "Closed" : choice.price)}</span></button>`).join("")}
       </div>
     `;
     card.querySelectorAll(".quick-odds button").forEach((button, index) => {
@@ -383,7 +383,7 @@ export function renderFeaturedMarkets(mode) {
       </div>
       <div class="featured-names"><span>${match.home}</span><span>${match.away}</span></div>
       <div class="featured-odds">
-        ${featuredChoices.map(choice => `<button class="${choice.cssClass || ""}" type="button" data-market-id="${choice.marketId || ""}" data-outcome-side="${choice.outcomeSide || ""}">${choice.label}<b>${choice.price}</b></button>`).join("")}
+        ${featuredChoices.map(choice => `<button class="${choice.cssClass || ""}" type="button" data-market-id="${choice.marketId || ""}" data-outcome-side="${choice.outcomeSide || ""}" data-disabled-reason="${escapeHtml(choice.disabledReason || "")}" ${choice.disabled ? "disabled aria-disabled=\"true\"" : ""}>${choice.label}<b>${choice.disabled ? "Closed" : choice.price}</b></button>`).join("")}
       </div>
     `;
     featured.querySelectorAll(".featured-odds button").forEach((button, index) => {
@@ -661,7 +661,7 @@ export async function openMatchPage(matchId) {
   };
   renderDetailTabs(match);
   renderDetailOptions(match, "All");
-  const firstBtn = detailOptions.querySelector(".option-row .price");
+  const firstBtn = detailOptions.querySelector(".option-row .price:not(:disabled)");
   if (firstBtn) firstBtn.click();
   scrollDetailToTop();
 
@@ -703,8 +703,8 @@ export function renderDetailOptions(match, group) {
   detailOptions.innerHTML = "";
   match.options
     .filter(option => group === "All" || option[1] === group)
-    .forEach(([title, label, yes, no, marketId, upSide, upLabel, downSide, downLabel]) =>
-      detailOptions.appendChild(optionRow(title, label, yes, no, marketId, upSide, upLabel, downSide, downLabel))
+    .forEach(([title, label, yes, no, marketId, upSide, upLabel, downSide, downLabel, disabledReason]) =>
+      detailOptions.appendChild(optionRow(title, label, yes, no, marketId, upSide, upLabel, downSide, downLabel, disabledReason))
     );
 }
 

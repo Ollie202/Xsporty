@@ -60,15 +60,17 @@ export function applyProfileImage(imageUrl) {
   });
 }
 
-export function optionRow(title, label, yes, no, marketId, upSide = "YES", upLabel = "Yes", downSide = "NO", downLabel = "No") {
+export function optionRow(title, label, yes, no, marketId, upSide = "YES", upLabel = "Yes", downSide = "NO", downLabel = "No", disabledReason = "") {
   const row = document.createElement("article");
   row.className = "option-row";
+  const disabled = Boolean(disabledReason);
+  if (disabled) row.classList.add("is-disabled");
   row.innerHTML = `
         <div><strong>${escapeHtml(title)}</strong><span>${escapeHtml(label)}</span></div>
-    <button class="price up" type="button" data-market-id="${escapeHtml(marketId || "")}" data-outcome-side="${escapeHtml(upSide)}">${escapeHtml(upLabel)} ${Number(yes)}c</button>
-    <button class="price down" type="button" data-market-id="${escapeHtml(marketId || "")}" data-outcome-side="${escapeHtml(downSide)}">${escapeHtml(downLabel)} ${Number(no)}c</button>
+    <button class="price up" type="button" data-market-id="${escapeHtml(marketId || "")}" data-outcome-side="${escapeHtml(upSide)}" data-disabled-reason="${escapeHtml(disabledReason)}" ${disabled ? "disabled aria-disabled=\"true\"" : ""}>${escapeHtml(upLabel)} ${Number(yes)}c</button>
+    <button class="price down" type="button" data-market-id="${escapeHtml(marketId || "")}" data-outcome-side="${escapeHtml(downSide)}" data-disabled-reason="${escapeHtml(disabledReason)}" ${disabled ? "disabled aria-disabled=\"true\"" : ""}>${escapeHtml(downLabel)} ${Number(no)}c</button>
   `;
-  row.querySelectorAll(".price").forEach(button => button.addEventListener("click", () => selectMarket(title, button)));
+  row.querySelectorAll(".price").forEach(button => button.addEventListener("click", () => selectMarket(title, button, { disabled, disabledReason })));
   return row;
 }
 
@@ -103,6 +105,9 @@ export function ticketRow(ticket, index) {
 
 export function historyRow(item, index) {
   const details = item.details || `${item.status} - ${item.price}c entry - ${item.amount.toFixed(0)} ${SYMBOL}`;
+  const settlementAmount = typeof item.settlementAmount === "number"
+    ? `<span class="history-row__settlement">${escapeHtml(item.settlementLabel || "Amount")} ${item.settlementAmount.toFixed(2)} ${SYMBOL}</span>`
+    : "";
   return `
     <button class="ticket-card history-row" type="button" data-history-pnl="${index}">
       <div>
@@ -111,6 +116,7 @@ export function historyRow(item, index) {
         <small>${escapeHtml(details)}</small>
       </div>
       <span class="history-row__actions">
+        ${settlementAmount}
         <b class="${item.pnl >= 0 ? "is-profit" : "is-loss"}">${formatSigned(item.pnl)} ${SYMBOL}</b>
         ${item.redeemable && item.marketId ? `<span class="claim-button" role="button" tabindex="0" data-claim-market="${escapeHtml(item.marketId)}">Claim winnings</span>` : ''}
       </span>

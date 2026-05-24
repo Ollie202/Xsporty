@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { getPrice, getTradeAmount, estimatePnl, formatSigned } from './utils.js';
+import { getPrice, getTradeAmount, estimatePnl, formatSigned, humanMarketLabel } from './utils.js';
 import { showToast, showTrade, showPositions, setSideButton, setActive, openPnlCard, ticketRow, historyRow } from './ui.js';
 import { applyConnectedWallet } from './wallet.js';
 import { claimWinnings, submitBackendOrder, refreshPortfolio } from './api.js';
@@ -13,6 +13,10 @@ const ticketStack = document.querySelector("#ticket-stack");
 const confirmTradeButton = document.querySelector("[data-action='confirm-trade']");
 
 export function selectMarket(title, button, choice = {}) {
+  if (choice.disabled || button?.disabled || button?.getAttribute("aria-disabled") === "true") {
+    showToast(choice.disabledReason || button?.dataset.disabledReason || "Market is closed");
+    return;
+  }
   const price = getPrice(button.textContent);
   if (!title || !price) return;
   const side = choice.outcomeSide || button.dataset.outcomeSide || (button.classList.contains("down") ? "NO" : "YES");
@@ -171,7 +175,9 @@ export function renderHistoryPage() {
   const historyLossCount = document.querySelector("#history-loss-count");
   const historyNetPnl = document.querySelector("#history-net-pnl");
   if (!historyColumns) return;
-  const settled = getHistoryRows();
+  const rows = getHistoryRows();
+  const settled = rows.filter(item => item.kind !== "activity");
+  const activity = rows.filter(item => item.kind === "activity");
   const wins = settled.filter(item => item.pnl >= 0);
   const losses = settled.filter(item => item.pnl < 0);
   const net = settled.reduce((sum, item) => sum + item.pnl, 0);
@@ -183,16 +189,20 @@ export function renderHistoryPage() {
   historyColumns.innerHTML = `
     <article class="history-list">
       <h3>Wins</h3>
-      ${wins.map(item => historyRow(item, settled.indexOf(item))).join("") || `<div class="ticket-empty"><strong>No wins yet</strong><span>Settled winning positions will show here.</span></div>`}
+      ${wins.map(item => historyRow(item, rows.indexOf(item))).join("") || `<div class="ticket-empty"><strong>No wins yet</strong><span>Settled winning positions will show here.</span></div>`}
     </article>
     <article class="history-list">
       <h3>Losses</h3>
-      ${losses.map(item => historyRow(item, settled.indexOf(item))).join("") || `<div class="ticket-empty"><strong>No losses yet</strong><span>Settled losing positions will show here.</span></div>`}
+      ${losses.map(item => historyRow(item, rows.indexOf(item))).join("") || `<div class="ticket-empty"><strong>No losses yet</strong><span>Settled losing positions will show here.</span></div>`}
+    </article>
+    <article class="history-list">
+      <h3>Activity</h3>
+      ${activity.map(item => historyRow(item, rows.indexOf(item))).join("") || `<div class="ticket-empty"><strong>No activity yet</strong><span>Filled and cancelled orders will show here.</span></div>`}
     </article>
   `;
   historyColumns.querySelectorAll("[data-history-pnl]").forEach(button => {
     button.addEventListener("click", () => {
-      const ticket = settled[Number(button.dataset.historyPnl)];
+      const ticket = rows[Number(button.dataset.historyPnl)];
       openPnlCard(ticket);
     });
   });
@@ -207,27 +217,179 @@ export function renderHistoryPage() {
 }
 
 export function getHistoryRows() {
-  return (state.portfolio?.positions || []).flatMap(position => {
+  const portfolio = state.portfolio || {};
+  const activityByOutcome = outcomeActivity(portfolio);
+  const marketTitles = marketTitleMap(portfolio);
+  const settledRows = (portfolio.positions || []).flatMap(position => {
     if (position.resolution?.status !== "submitted" || position.resolution?.outcome === "VOID") return [];
-    return (position.outcomes || [])
-      .filter(outcome => Number(outcome.balance || 0) > 0)
+    return netSettledOutcomes(position, activityByOutcome)
       .map(outcome => {
-        const amount = Number(outcome.balance || 0) / 1000000;
+        const side = outcome.outcome?.side || "YES";
+        const key = historyKey(position.market?.id || position.marketId, side);
+        const activity = activityByOutcome.get(key);
+        const balanceMicro = Number(outcome.balance || 0);
+        const activitySharesMicro = activity?.sharesMicro || 0;
+        const amountMicro = balanceMicro > 0 ? balanceMicro : activitySharesMicro;
+        if (amountMicro <= 0) return null;
+        const amount = amountMicro / 1000000;
         const winning = Boolean(outcome.winning);
+        const claimed = winning && balanceMicro <= 0 && activitySharesMicro > 0;
+        const marketCostMicro = marketActivityCost(position.market?.id || position.marketId, activityByOutcome);
+        const pnl = settledPnl(outcome, activity, winning, amountMicro, marketCostMicro);
+        const settlementAmount = winning
+          ? amount
+          : (marketCostMicro || Number(outcome.costBasis || activity?.costMicro || amountMicro)) / 1000000;
         return {
           id: `${position.market?.id || "market"}-${outcome.outcome?.side || "outcome"}`,
+          kind: "settled",
           title: position.market?.title || "Settled market",
-          side: outcome.outcome?.side || "YES",
+          side,
           price: 0,
           amount,
-          pnl: Number(outcome.unrealizedPnl ?? (winning ? outcome.currentValue : `-${outcome.costBasis || outcome.balance}`)) / 1000000 || (winning ? amount : -amount),
-          status: winning ? "Settled win" : "Settled loss",
-          details: `${winning ? "Winning outcome" : "Losing outcome"} - ${amount.toFixed(2)} shares`,
+          pnl,
+          status: winning ? (claimed ? "Claimed win" : "Settled win") : "Settled loss",
+          details: historyOutcomeDetails(winning, amount, settlementAmount, claimed),
+          settlementLabel: winning ? "Payout" : "Lost",
+          settlementAmount,
           redeemable: Boolean(outcome.redeemable),
           marketId: position.market?.id || position.marketId
         };
-      });
+      })
+      .filter(Boolean);
   });
+  const activityRows = orderActivityRows(portfolio, marketTitles);
+  return [...settledRows, ...activityRows];
+}
+
+function netSettledOutcomes(position, activityByOutcome) {
+  const outcomes = position.outcomes || [];
+  const winning = outcomes.filter(outcome =>
+    outcome.winning || outcome.outcome?.side === position.resolution?.outcome
+  );
+  const winningWithAmount = winning
+    .map(outcome => outcomeWithHistoryBalance(position, outcome, activityByOutcome))
+    .filter(outcome => Number(outcome.balance || 0) > 0);
+  if (winningWithAmount.length) return winningWithAmount;
+
+  const losingWithAmount = outcomes
+    .filter(outcome => !outcome.winning && outcome.outcome?.side !== position.resolution?.outcome)
+    .map(outcome => outcomeWithHistoryBalance(position, outcome, activityByOutcome))
+    .filter(outcome => Number(outcome.balance || 0) > 0);
+  if (losingWithAmount.length === 1) return losingWithAmount;
+
+  const yes = outcomes.find(outcome => outcome.outcome?.side === "YES");
+  const no = outcomes.find(outcome => outcome.outcome?.side === "NO");
+  if (!yes || !no) return outcomes;
+
+  const marketId = position.market?.id || position.marketId;
+  const yesAmount = historyOutcomeAmountMicro(marketId, yes, activityByOutcome);
+  const noAmount = historyOutcomeAmountMicro(marketId, no, activityByOutcome);
+  if (yesAmount <= 0 && noAmount <= 0) return [];
+  if (yesAmount === noAmount) return [];
+
+  const netOutcome = yesAmount > noAmount ? yes : no;
+  return [{ ...netOutcome, balance: String(Math.abs(yesAmount - noAmount)) }];
+}
+
+function outcomeWithHistoryBalance(position, outcome, activityByOutcome) {
+  const marketId = position.market?.id || position.marketId;
+  return {
+    ...outcome,
+    balance: String(historyOutcomeAmountMicro(marketId, outcome, activityByOutcome))
+  };
+}
+
+function historyOutcomeAmountMicro(marketId, outcome, activityByOutcome) {
+  const side = outcome.outcome?.side || "YES";
+  const balanceMicro = Number(outcome.balance || 0);
+  if (balanceMicro > 0) return balanceMicro;
+  return activityByOutcome.get(historyKey(marketId, side))?.sharesMicro || 0;
+}
+
+function outcomeActivity(portfolio) {
+  const ordersById = new Map((portfolio.orders?.history || []).map(order => [order.id, order]));
+  const activity = new Map();
+  for (const fill of portfolio.fills || []) {
+    const order = ordersById.get(fill.orderId);
+    if (!order) continue;
+    const key = historyKey(order.marketId, order.outcomeSide);
+    const current = activity.get(key) || { sharesMicro: 0, costMicro: 0 };
+    current.sharesMicro += Number(fill.takerAmountFilled || 0);
+    current.costMicro += Number(fill.makerAmountFilled || 0);
+    activity.set(key, current);
+  }
+  for (const order of portfolio.orders?.history || []) {
+    const key = historyKey(order.marketId, order.outcomeSide);
+    if (activity.has(key)) continue;
+    const filled = order.status === "filled";
+    activity.set(key, {
+      sharesMicro: filled ? Number(order.order?.takerAmount || 0) : 0,
+      costMicro: filled ? Number(order.order?.makerAmount || 0) : 0
+    });
+  }
+  return activity;
+}
+
+function settledPnl(outcome, activity, winning, amountMicro, marketCostMicro = 0) {
+  const direct = Number(outcome.unrealizedPnl);
+  if (Number.isFinite(direct) && Number(outcome.balance || 0) > 0 && !marketCostMicro) return direct / 1000000;
+  const costMicro = Number(outcome.costBasis || activity?.costMicro || 0);
+  const totalCostMicro = marketCostMicro || costMicro;
+  const currentMicro = winning ? amountMicro : 0;
+  if (totalCostMicro > 0) return (currentMicro - totalCostMicro) / 1000000;
+  return winning ? amountMicro / 1000000 : -(amountMicro / 1000000);
+}
+
+function historyOutcomeDetails(winning, amount, settlementAmount, claimed) {
+  if (winning) {
+    return `Winning outcome - payout ${settlementAmount.toFixed(2)} ${SYMBOL} - ${amount.toFixed(2)} shares${claimed ? " - claimed" : ""}`;
+  }
+  return `Losing outcome - lost ${settlementAmount.toFixed(2)} ${SYMBOL} - ${amount.toFixed(2)} shares`;
+}
+
+function marketActivityCost(marketId, activityByOutcome) {
+  if (!marketId) return 0;
+  return [...activityByOutcome.entries()]
+    .filter(([key]) => key.startsWith(`${marketId}::`))
+    .reduce((sum, [, activity]) => sum + Number(activity.costMicro || 0), 0);
+}
+
+function orderActivityRows(portfolio, marketTitles) {
+  const fillsByOrder = new Map((portfolio.fills || []).map(fill => [fill.orderId, fill]));
+  return (portfolio.orders?.history || []).map(order => {
+    const fill = fillsByOrder.get(order.id);
+    const filled = order.status === "filled";
+    const amountMicro = filled
+      ? Number(fill?.takerAmountFilled || order.order?.takerAmount || 0)
+      : Math.max(0, Number(order.order?.makerAmount || 0) - Number(order.remainingMaker || 0));
+    const amount = amountMicro / 1000000;
+    const marketId = order.marketId;
+    const title = order.market?.title || marketTitles.get(marketId) || humanMarketLabel(marketId) || "Market order";
+    const status = filled ? "Filled order" : "Cancelled order";
+    return {
+      id: `activity-${order.id}`,
+      kind: "activity",
+      title,
+      side: order.outcomeSide || order.side || "ORDER",
+      price: 0,
+      amount,
+      pnl: 0,
+      status,
+      details: `${status} - ${amount.toFixed(2)} ${filled ? "shares" : SYMBOL}`,
+      marketId
+    };
+  });
+}
+
+function marketTitleMap(portfolio) {
+  return new Map((portfolio.positions || []).map(position => [
+    position.market?.id || position.marketId,
+    position.market?.title
+  ]).filter(([id, title]) => id && title));
+}
+
+function historyKey(marketId, side) {
+  return `${marketId || "market"}::${side || "YES"}`;
 }
 
 async function handleHistoryClaimClick(event) {

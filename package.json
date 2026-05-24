@@ -1,0 +1,14 @@
+{
+  "name": "x-cup-markets-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static frontend for X Cup Markets.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-runtime-config.mjs",
+    "start": "npx serve ."
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,5 +1,6 @@
 export const FALLBACK_WALLET_ADDRESS = "0x7A9C7423C3d8F68E4A48B276693F96F0B32B21F8";
-export const API_BASE_URL = (window.XCUP_API_BASE_URL || localStorage.getItem("x-cup-api-base-url") || "http://127.0.0.1:3000").replace(/\/$/, "");
+export const DEFAULT_API_BASE_URL = "https://x-cup-backend-production.up.railway.app";
+export const API_BASE_URL = (window.XCUP_API_BASE_URL || localStorage.getItem("x-cup-api-base-url") || DEFAULT_API_BASE_URL).replace(/\/$/, "");
 
 export const sportLabels = {
   football: { title: "Football", icon: "\u26BD" },

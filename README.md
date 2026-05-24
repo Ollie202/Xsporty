@@ -12,11 +12,40 @@ Static-first frontend for a World Cup-themed prediction market on X Layer. The a
 
 ## Runtime config
 
-By default the frontend calls `http://127.0.0.1:3000`. To point it elsewhere, set either:
+By default the frontend calls the Railway backend:
+
+`https://x-cup-backend-production.up.railway.app`
+
+For local testing, you can override it in the browser with:
 
 `localStorage.setItem("x-cup-api-base-url", "http://localhost:3000")`
 
 or define `window.XCUP_API_BASE_URL` before `js/main.js` loads.
+
+## Vercel Deploy
+
+This repo is ready to deploy as a static Vercel site.
+
+Use these Vercel project settings:
+
+- Framework Preset: `Other`
+- Build Command: `npm run build`
+- Output Directory: `.`
+- Install Command: `npm install`
+
+The frontend backend URL is set in `js/constants.js`:
+
+`https://x-cup-backend-production.up.railway.app`
+
+You can override it on Vercel with this public environment variable:
+
+`XCUP_API_BASE_URL=https://x-cup-backend-production.up.railway.app`
+
+After deploy, make sure the Railway backend allows the Vercel frontend origin in CORS. The first Vercel preview URL will look like:
+
+`https://your-project-name.vercel.app`
+
+The backend should allow both the preview URL and the final production domain.
 
 ## Backend integration
 
@@ -46,3 +75,15 @@ The active page loads CSS in this order:
 5. `responsive.css` for all media-query overrides.
 
 Keep new styles in the narrowest matching file.
+
+## WhatsApp Bot
+
+The WhatsApp bot lives in `whatsapp-bot/`. It uses the official WhatsApp Cloud API webhook shape and keeps trading outside WhatsApp for compliance. The bot answers World Cup fixture/update/market-discovery prompts, then redirects eligible users to the website.
+
+Run it with:
+
+```bash
+cd whatsapp-bot
+copy .env.example .env
+npm start
+```

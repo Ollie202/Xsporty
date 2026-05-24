@@ -25,8 +25,7 @@ export async function hydrateFromBackend() {
     state.walletConfig = results[0];
     const backendMarkets = mapBackendCards(results[1].cards || []).filter(match => {
       if (isFinishedHomepageMatch(match)) return false;
-      if (!match.fixture?.kickoffTime) return true;
-      return Date.now() - new Date(match.fixture.kickoffTime).valueOf() < 3 * 60 * 60 * 1000;
+      return true;
     });
     if (backendMarkets.length > 0) {
       replaceGameMarkets(backendMarkets);

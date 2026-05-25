@@ -3,7 +3,7 @@ import { renderGameTiles, syncSportHero, initializeImageFallbacks, openMatchPage
 import { updateQuote, renderTickets, wireConfirmTrade } from './trading.js';
 import { hydrateFromBackend } from './api.js';
 import { state } from './state.js';
-import { wireConnectButtons, wireProfileMenu, initializeProfileImage } from './wallet.js';
+import { wireConnectButtons, wireProfileMenu, initializeProfileImage, restoreWalletSession } from './wallet.js';
 import { wireNavigation, wireTopSportNav, wireBoardTabs, wireDashboardTools, wireFooterLinks, wireSlipTabs, wireSideToggle, wireOutsideClose, wirePnlModal } from './navigation.js';
 import { wirePortfolioDashboard } from './portfolio.js';
 
@@ -37,6 +37,7 @@ async function bootApp() {
 
   const loaded = await hydrateFromBackend();
   if (loaded) {
+    await restoreWalletSession();
     renderGameTiles();
     updateQuote();
     renderTickets();

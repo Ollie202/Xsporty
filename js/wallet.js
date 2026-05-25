@@ -7,6 +7,9 @@ import { showHome } from './rendering.js';
 import { renderTickets, openHistoryPage } from './trading.js';
 import { describeWalletProvider, getWalletProvider } from './provider.js';
 
+const WALLET_CONNECTED_KEY = "x-cup-wallet-connected";
+const WALLET_DISCONNECTED_KEY = "x-cup-wallet-disconnected";
+
 export function wireConnectButtons() {
   const provider = getWalletProvider();
   provider?.on?.('accountsChanged', accounts => {
@@ -15,6 +18,7 @@ export function wireConnectButtons() {
     state.balance = null;
     state.portfolio = null;
     if (state.connected) {
+      rememberWalletSession();
       applyConnectedWallet();
       refreshPortfolio().then(() => { applyConnectedWallet(); renderTickets(); });
     } else {
@@ -44,6 +48,7 @@ export function wireConnectButtons() {
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
         state.account = accounts[0];
         state.connected = Boolean(state.account);
+        if (state.connected) rememberWalletSession();
         applyConnectedWallet();
         refreshPortfolio().then(() => { applyConnectedWallet(); renderTickets(); });
         showToast("Wallet connected. Live trading enabled.");
@@ -58,6 +63,34 @@ export function wireConnectButtons() {
       }
     });
   });
+}
+
+export async function restoreWalletSession() {
+  if (localStorage.getItem(WALLET_DISCONNECTED_KEY) === "1") return false;
+
+  const provider = getWalletProvider();
+  if (!provider) return false;
+
+  try {
+    const accounts = await provider.request({ method: 'eth_accounts' });
+    const account = accounts?.[0];
+    if (!account) {
+      localStorage.removeItem(WALLET_CONNECTED_KEY);
+      return false;
+    }
+
+    state.account = account;
+    state.connected = true;
+    state.balance = null;
+    state.portfolio = null;
+    rememberWalletSession();
+    applyConnectedWallet();
+    refreshPortfolio().then(() => { applyConnectedWallet(); renderTickets(); });
+    return true;
+  } catch (error) {
+    console.warn("Wallet session restore failed:", error);
+    return false;
+  }
 }
 
 export function applyConnectedWallet() {
@@ -90,6 +123,7 @@ export function logOutWallet() {
   state.pendingTicket = null;
   state.portfolio = null;
   state.balance = null;
+  forgetWalletSession();
   document.querySelectorAll(".balance-pill").forEach(balance => (balance.hidden = true));
   document.querySelectorAll("[data-action='open-portfolio']").forEach(button => (button.hidden = true));
   document.querySelectorAll(".profile-menu").forEach(profile => {
@@ -105,6 +139,16 @@ export function logOutWallet() {
   document.querySelectorAll("[data-profile-balance]").forEach(el => el.textContent = "");
   showTrade();
   showToast("Wallet logged out");
+}
+
+function rememberWalletSession() {
+  localStorage.setItem(WALLET_CONNECTED_KEY, "1");
+  localStorage.removeItem(WALLET_DISCONNECTED_KEY);
+}
+
+function forgetWalletSession() {
+  localStorage.removeItem(WALLET_CONNECTED_KEY);
+  localStorage.setItem(WALLET_DISCONNECTED_KEY, "1");
 }
 
 export function wireProfileMenu() {

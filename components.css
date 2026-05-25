@@ -2783,3 +2783,93 @@
 .option-row.is-disabled {
   opacity: 0.78;
 }
+
+/* Final clean screenshot card. */
+
+.pnl-modal {
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.share-pnl-card {
+  width: min(430px, calc(100vw - 32px), calc(100vh - 32px));
+  aspect-ratio: 1 / 1;
+  gap: 12px;
+  padding: 22px;
+  border: 1px solid rgba(37, 216, 232, 0.28);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 84% 12%, rgba(37, 216, 232, 0.14), transparent 30%),
+    linear-gradient(160deg, #172633 0%, #11141d 48%, #16121a 100%);
+}
+
+.share-pnl-card::before,
+.share-pnl-card::after,
+.share-pnl-card__stadium,
+.share-pnl-card__teams {
+  display: none;
+}
+
+.share-pnl-card__brand {
+  min-height: 46px;
+}
+
+.share-pnl-card__headline {
+  margin-top: 2px;
+  text-align: center;
+}
+
+.share-pnl-card__headline h2 {
+  max-width: 100%;
+  font-size: clamp(24px, 6vw, 34px);
+  line-height: 1.02;
+}
+
+.share-pnl-card__amount {
+  min-height: 82px;
+  border-radius: 18px;
+  color: #15d875;
+  font-size: clamp(36px, 10vw, 54px);
+}
+
+.share-pnl-card__amount.is-profit {
+  color: #15d875;
+}
+
+.share-pnl-card__amount.is-loss {
+  color: #ff1741;
+}
+
+.share-pnl-card__meta {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.share-pnl-card__meta div {
+  border-radius: 14px;
+}
+
+.share-pnl-card__bar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.share-pnl-card__bar span {
+  background: linear-gradient(90deg, #15d875, var(--cyan));
+}
+
+#share-pnl-summary {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+#share-pnl-summary strong,
+#share-pnl-summary span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  line-height: 1.3;
+}

@@ -1,11 +1,11 @@
-import { state } from './state.js';
-import { SYMBOL, XLAYER_TESTNET_TX_EXPLORER } from './constants.js';
-import { gameMarkets } from './data.js';
-import { claimWinnings, refreshPortfolioActivity, refreshPortfolioPositions } from './api.js';
-import { applyConnectedWallet } from './wallet.js';
-import { markPositionsSeen, renderTickets } from './trading.js';
-import { showToast } from './ui.js';
-import { escapeHtml, humanMarketLabel } from './utils.js';
+import { state } from './state.js?v=55';
+import { SYMBOL, XLAYER_TESTNET_TX_EXPLORER } from './constants.js?v=55';
+import { gameMarkets } from './data.js?v=55';
+import { claimWinnings, refreshPortfolioActivity, refreshPortfolioPositions } from './api.js?v=55';
+import { applyConnectedWallet } from './wallet.js?v=55';
+import { markPositionsSeen, renderTickets } from './trading.js?v=55';
+import { showToast } from './ui.js?v=55';
+import { escapeHtml, humanMarketLabel } from './utils.js?v=55';
 
 const dashboard = document.querySelector('#positions-dashboard');
 const positionsList = document.querySelector('#dashboard-positions');
@@ -33,7 +33,7 @@ export async function openPortfolioDashboard() {
     return;
   }
   document.body.classList.add('is-history-page');
-  document.body.classList.remove('is-match-open');
+  document.body.classList.remove('is-match-open', 'is-detail-page');
   document.querySelector('#match-page').hidden = true;
   document.querySelector('#history-page').hidden = true;
   document.querySelectorAll('.home-section').forEach(section => (section.hidden = true));
@@ -44,7 +44,6 @@ export async function openPortfolioDashboard() {
   renderPortfolioDashboard();
   void loadPortfolioActivity();
   void loadPortfolioPositions();
-  dashboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export function hidePortfolioDashboard() {

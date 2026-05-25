@@ -1,6 +1,6 @@
-import { escapeHtml, formatSigned, estimateCurrentPrice, estimatePnl } from './utils.js';
-import { selectMarket, getTicketPnl } from './trading.js';
-import { SYMBOL } from './constants.js';
+import { escapeHtml, formatSigned, estimateCurrentPrice, estimatePnl } from './utils.js?v=55';
+import { selectMarket, getTicketPnl } from './trading.js?v=55';
+import { SYMBOL } from './constants.js?v=55';
 
 const toast = createToast();
 
@@ -82,11 +82,26 @@ export function openPnlCard(ticket) {
     ? ticket.currentPrice
     : estimateCurrentPrice(ticket.price, pnl, ticket.amount, ticket.side);
   const shares = ticket.price > 0 ? ticket.amount / (ticket.price / 100) : 0;
-  const payout = shares;
+  const movement = currentPrice - ticket.price;
+  const pct = Math.max(8, Math.min(92, currentPrice));
+  const signedPnl = `${formatSigned(pnl)} ${SYMBOL}`;
   document.querySelector("#share-pnl-status").textContent = pnl >= 0 ? "Winning position" : "Position down";
   document.querySelector("#share-pnl-title").textContent = ticket.title;
-  document.querySelector("#share-pnl-amount").textContent = `${formatSigned(pnl)} ${SYMBOL}`;
+  const amountEl = document.querySelector("#share-pnl-amount");
+  amountEl.textContent = signedPnl;
+  amountEl.classList.toggle("is-profit", pnl >= 0);
+  amountEl.classList.toggle("is-loss", pnl < 0);
+  document.querySelector("#share-pnl-side").textContent = ticket.side;
+  document.querySelector("#share-pnl-entry").textContent = `${ticket.price}c`;
   document.querySelector("#share-pnl-stake").textContent = `${ticket.amount.toFixed(0)} ${SYMBOL}`;
+  document.querySelector("#share-pnl-current").textContent = `${currentPrice}c`;
+  document.querySelector("#share-pnl-bar").style.width = `${pct}%`;
+  document.querySelector("#share-pnl-summary").innerHTML = `
+    <strong>${ticket.side} at ${ticket.price}c, now ${currentPrice}c</strong>
+    <span>${movement >= 0 ? "Up" : "Down"} ${Math.abs(movement)}c on ${shares.toFixed(1)} shares.</span>
+  `;
+  document.body.classList.add("has-pnl-modal");
+  pnlModal.hidden = false;
 }
 
 export function ticketRow(ticket, index) {

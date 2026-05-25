@@ -1,11 +1,11 @@
-import { state } from './state.js';
-import { FALLBACK_WALLET_ADDRESS } from './constants.js';
-import { shortAddress } from './utils.js';
-import { showToast, showTrade, setConnectButtons, applyProfileImage } from './ui.js';
-import { apiGet, refreshPortfolio } from './api.js';
-import { showHome } from './rendering.js';
-import { renderTickets, openHistoryPage } from './trading.js';
-import { describeWalletProvider, getWalletProvider } from './provider.js';
+import { state } from './state.js?v=55';
+import { FALLBACK_WALLET_ADDRESS } from './constants.js?v=55';
+import { shortAddress } from './utils.js?v=55';
+import { showToast, showTrade, setConnectButtons, applyProfileImage } from './ui.js?v=55';
+import { apiGet, refreshPortfolio } from './api.js?v=55';
+import { showHome } from './rendering.js?v=55';
+import { renderTickets, openHistoryPage } from './trading.js?v=55';
+import { describeWalletProvider, getWalletProvider } from './provider.js?v=55';
 
 const WALLET_CONNECTED_KEY = "x-cup-wallet-connected";
 const WALLET_DISCONNECTED_KEY = "x-cup-wallet-disconnected";

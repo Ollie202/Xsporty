@@ -1,11 +1,11 @@
-import { showToast } from './ui.js';
-import { renderGameTiles, syncSportHero, initializeImageFallbacks, openMatchPage, showHome } from './rendering.js';
-import { updateQuote, renderTickets, wireConfirmTrade } from './trading.js';
-import { hydrateFromBackend } from './api.js';
-import { state } from './state.js';
-import { wireConnectButtons, wireProfileMenu, initializeProfileImage, restoreWalletSession } from './wallet.js';
-import { wireNavigation, wireTopSportNav, wireBoardTabs, wireDashboardTools, wireFooterLinks, wireSlipTabs, wireSideToggle, wireOutsideClose, wirePnlModal } from './navigation.js';
-import { wirePortfolioDashboard } from './portfolio.js';
+import { showToast } from './ui.js?v=55';
+import { renderGameTiles, syncSportHero, initializeImageFallbacks, openMatchPage, showHome } from './rendering.js?v=55';
+import { updateQuote, renderTickets, wireConfirmTrade } from './trading.js?v=55';
+import { hydrateFromBackend } from './api.js?v=55';
+import { state } from './state.js?v=55';
+import { wireConnectButtons, wireProfileMenu, initializeProfileImage, restoreWalletSession } from './wallet.js?v=55';
+import { wireNavigation, wireTopSportNav, syncTopSportNav, wireBoardTabs, wireDashboardTools, wireFooterLinks, wireSlipTabs, wireSideToggle, wireOutsideClose, wirePnlModal } from './navigation.js?v=55';
+import { wirePortfolioDashboard } from './portfolio.js?v=55';
 
 const errorScreen = document.getElementById("error-screen");
 
@@ -38,6 +38,7 @@ async function bootApp() {
   const loaded = await hydrateFromBackend();
   if (loaded) {
     await restoreWalletSession();
+    syncTopSportNav();
     renderGameTiles();
     updateQuote();
     renderTickets();

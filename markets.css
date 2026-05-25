@@ -2344,3 +2344,171 @@
     gap: 8px;
   }
 }
+
+/* Final UX audit cleanup: keep cards compact and remove stale UFC distance UI. */
+
+.fight-distance-pick {
+  display: none;
+}
+
+.market-board {
+  padding: 12px 14px;
+}
+
+.match-row {
+  min-height: 74px;
+  grid-template-columns: minmax(180px, 0.58fr) minmax(280px, 1fr);
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.match-list .game-tile {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.match-list .game-tile .quick-odds {
+  width: 100%;
+}
+
+.match-teams strong {
+  font-size: 14px;
+}
+
+.match-teams img {
+  width: 30px;
+  height: 21px;
+}
+
+.quick-odds {
+  gap: 7px;
+}
+
+.quick-odds button {
+  min-height: 40px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.quick-odds span {
+  font-size: 14px;
+}
+
+.match-list[data-sport="ufc"] .ufc-title-card {
+  padding: 14px;
+}
+
+.match-list[data-sport="ufc"] .ufc-title-stage {
+  width: min(100%, 860px);
+}
+
+.match-list[data-sport="ufc"] .fighter-image {
+  min-height: 190px;
+}
+
+/* Final sports-card polish. */
+
+.match-list[data-sport="ufc"] .ufc-title-card {
+  justify-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.match-list[data-sport="ufc"] .fight-event-line {
+  order: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  margin: 0 auto;
+  border: 1px solid rgba(37, 216, 232, 0.25);
+  border-radius: 999px;
+  padding: 0 14px;
+  color: var(--text);
+  background: rgba(37, 216, 232, 0.08);
+  text-align: center;
+}
+
+.match-list[data-sport="ufc"] .ufc-title-stage {
+  width: min(100%, 980px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
+  margin: 0 auto;
+}
+
+.match-list[data-sport="ufc"] .fighter-card {
+  min-height: 216px;
+  display: grid;
+  grid-template-columns: minmax(128px, 0.64fr) minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.match-list[data-sport="ufc"] .fighter-card.is-away {
+  grid-template-columns: minmax(0, 1fr) minmax(128px, 0.64fr);
+}
+
+.match-list[data-sport="ufc"] .fighter-card.is-away .fighter-image {
+  order: 2;
+}
+
+.match-list[data-sport="ufc"] .fighter-image {
+  width: 100%;
+  height: 100%;
+  min-height: 216px;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.match-list[data-sport="ufc"] .fighter-card-copy {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.match-list[data-sport="ufc"] .fighter-card strong {
+  max-width: 13ch;
+  color: var(--text);
+  font-size: clamp(18px, 2.2vw, 28px);
+  line-height: 1;
+  text-align: center;
+}
+
+.match-list[data-sport="ufc"] .fighter-card button {
+  width: min(100%, 180px);
+  min-height: 48px;
+  border: 1px solid rgba(37, 216, 232, 0.28);
+  border-radius: 10px;
+  color: var(--text);
+  background: rgba(37, 216, 232, 0.08);
+}
+
+.match-list[data-sport="ufc"] .fighter-card button span {
+  color: var(--cyan);
+}
+
+.match-list[data-sport="ufc"] .fight-vs {
+  width: 58px;
+  height: 58px;
+  align-self: center;
+  justify-self: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--red);
+  box-shadow: 0 16px 34px rgba(240, 0, 24, 0.24);
+}
+
+.match-list[data-sport="formula-1"] .formula-event-card {
+  min-height: 204px;
+  grid-template-columns: minmax(0, 0.9fr) minmax(220px, 0.72fr);
+}
+
+.match-list[data-sport="formula-1"] .formula-event-art {
+  min-height: 204px;
+}

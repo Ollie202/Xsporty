@@ -1,8 +1,8 @@
-import { state } from './state.js';
-import { sportLabels, WC_ANIMS } from './constants.js';
-import { showToast, setActive, showTrade, showPositions, closePnlCard } from './ui.js';
-import { showHome, renderGameTiles, renderFeaturedMarkets, syncSportHero, renderLeagueMarkets, filterMatchRows, applyPlayerSearch, openMatchPage } from './rendering.js';
-import { markPositionsSeen, renderHistoryPage } from './trading.js';
+import { state } from './state.js?v=55';
+import { sportLabels, WC_ANIMS } from './constants.js?v=55';
+import { showToast, setActive, showTrade, showPositions, closePnlCard } from './ui.js?v=55';
+import { showHome, renderGameTiles, renderFeaturedMarkets, syncSportHero, renderLeagueMarkets, filterMatchRows, applyPlayerSearch, openMatchPage } from './rendering.js?v=55';
+import { markPositionsSeen, renderHistoryPage } from './trading.js?v=55';
 
 export function wireNavigation() {
   document.querySelectorAll("[data-action='home']").forEach(link => {
@@ -54,6 +54,12 @@ export function wireTopSportNav() {
 
     });
   });
+}
+
+export function syncTopSportNav() {
+  const sportButton = document.querySelector(`.top-sport-nav button[data-sport='${state.sport}']`);
+  if (!sportButton) return;
+  setActive(document.querySelectorAll(".top-sport-nav button"), sportButton);
 }
 
 export function wireBoardTabs() {
@@ -119,9 +125,12 @@ export function wireDashboardTools() {
 
   searchInput?.addEventListener("input", () => {
     const query = searchInput.value.trim().toLowerCase();
+    let visibleCount = 0;
     document.querySelectorAll("[data-search]").forEach(item => {
       item.hidden = query.length > 0 && !item.dataset.search.includes(query);
+      if (!item.hidden) visibleCount += 1;
     });
+    syncSearchEmptyState(query, visibleCount);
   });
 
   playerSearch?.addEventListener("input", () => {
@@ -141,6 +150,17 @@ export function wireDashboardTools() {
       renderFeaturedMarkets(button.dataset.featuredMode);
     });
   });
+}
+
+function syncSearchEmptyState(query, visibleCount) {
+  const container = document.querySelector("#games-grid");
+  if (!container) return;
+  container.querySelector(".market-search-empty")?.remove();
+  if (!query || visibleCount > 0) return;
+  const empty = document.createElement("article");
+  empty.className = "market-empty-state market-search-empty";
+  empty.textContent = "No markets match that search yet.";
+  container.appendChild(empty);
 }
 
 export function wireFooterLinks() {

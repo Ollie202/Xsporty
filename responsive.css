@@ -835,3 +835,298 @@
     text-align: right;
   }
 }
+
+/* Final mobile UX audit pass. */
+@media (max-width: 760px) {
+  body {
+    font-size: 12px;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+  }
+
+  .topbar__inner {
+    width: 100%;
+    padding: 10px 12px;
+    padding-right: 12px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .brand__mark {
+    width: 38px;
+    height: 34px;
+  }
+
+  .brand strong {
+    font-size: 17px;
+  }
+
+  .wallet-panel {
+    position: static !important;
+    width: auto;
+    max-width: 132px;
+    justify-self: end;
+  }
+
+  .wallet-panel .connect-btn,
+  .connect-btn {
+    width: auto;
+    max-width: 132px;
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
+  .top-sport-nav {
+    min-height: 38px;
+    padding: 3px;
+  }
+
+  .top-sport-nav button {
+    min-height: 30px;
+    padding: 0 11px;
+    font-size: 12px;
+  }
+
+  .header-search {
+    min-height: 36px;
+  }
+
+  .dashboard-shell {
+    width: 100%;
+    gap: 12px;
+    padding: 10px;
+  }
+
+  .wc-hero-banner {
+    width: 100%;
+    min-height: 310px;
+  }
+
+  .wc-hero-content {
+    gap: 12px;
+    padding: 18px;
+  }
+
+  .wc-hero-title {
+    font-size: clamp(30px, 10vw, 42px);
+    line-height: 0.96;
+  }
+
+  .wc-hero-subtitle,
+  .wc-hero-badges {
+    font-size: 12px;
+  }
+
+  .wc-hero-right {
+    gap: 10px;
+  }
+
+  .market-board,
+  .trade-slip,
+  .match-detail-card {
+    padding: 12px;
+  }
+
+  .section-head h2 {
+    font-size: 20px;
+  }
+
+  .market-tabs button {
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .match-row {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .match-meta-line {
+    font-size: 10px;
+  }
+
+  .match-teams strong {
+    font-size: 13px;
+  }
+
+  .quick-odds button {
+    min-height: 38px;
+    font-size: 12px;
+  }
+
+  .quick-odds span {
+    font-size: 13px;
+  }
+
+  .footer-main,
+  .footer-bottom {
+    grid-template-columns: 1fr;
+    padding: 20px 14px;
+  }
+
+  .is-match-open .right-rail {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    z-index: 80;
+    width: auto;
+    max-height: min(72vh, 520px);
+    overflow: auto;
+    border-radius: 14px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  }
+
+  .is-match-open .trade-slip {
+    padding: 14px;
+  }
+}
+
+@media (min-width: 761px) {
+  .is-match-open .right-rail {
+    position: fixed;
+    top: 92px;
+    right: max(16px, calc((100vw - 1240px) / 2 + 16px));
+    z-index: 70;
+    width: 340px;
+    max-height: calc(100vh - 108px);
+    overflow: auto;
+    padding: 0;
+  }
+}
+
+/* Final compact mobile pass. */
+@media (max-width: 760px) {
+  .topbar {
+    height: auto;
+  }
+
+  .topbar__inner {
+    width: min(100% - 20px, 520px);
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .top-sport-nav,
+  .header-search {
+    grid-column: 1 / -1;
+  }
+
+  .header-search {
+    order: 3;
+    width: 100%;
+  }
+
+  .wallet-panel {
+    justify-self: end;
+  }
+
+  .dashboard-shell {
+    width: min(100% - 18px, 520px);
+    padding-top: 10px;
+  }
+
+  .wc-hero-banner {
+    min-height: 220px;
+  }
+
+  .wc-hero-content {
+    gap: 8px;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .wc-hero-title {
+    font-size: clamp(26px, 9vw, 34px);
+  }
+
+  .wc-hero-subtitle {
+    display: none;
+  }
+
+  .wc-hero-badges {
+    display: none;
+  }
+
+  .wc-hero-right {
+    display: none;
+  }
+
+  .market-board {
+    padding: 10px;
+  }
+
+  .match-list {
+    grid-template-columns: 1fr;
+  }
+
+  .match-row {
+    padding: 10px;
+  }
+
+  .quick-odds {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .match-list[data-sport="ufc"] .ufc-title-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .match-list[data-sport="ufc"] .fight-vs {
+    width: 42px;
+    height: 42px;
+  }
+
+  .match-list[data-sport="ufc"] .fighter-card,
+  .match-list[data-sport="ufc"] .fighter-card.is-away {
+    grid-template-columns: 96px minmax(0, 1fr);
+    min-height: 128px;
+  }
+
+  .match-list[data-sport="ufc"] .fighter-card.is-away .fighter-image {
+    order: 0;
+  }
+
+  .match-list[data-sport="ufc"] .fighter-image {
+    min-height: 128px;
+  }
+
+  .match-list[data-sport="ufc"] .fighter-card strong {
+    max-width: 100%;
+    font-size: 18px;
+  }
+
+  .match-list[data-sport="formula-1"] .formula-event-card {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .match-list[data-sport="formula-1"] .formula-event-art {
+    min-height: 132px;
+    max-height: 150px;
+  }
+
+  .share-pnl-card {
+    width: min(360px, calc(100vw - 24px), calc(100vh - 24px));
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .share-pnl-card__amount {
+    min-height: 64px;
+  }
+
+  .share-pnl-card__meta div {
+    padding: 8px;
+  }
+
+  .footer-main {
+    width: min(100% - 28px, 520px);
+    gap: 22px;
+  }
+}

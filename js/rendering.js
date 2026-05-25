@@ -1,10 +1,10 @@
-import { state } from './state.js?v=55';
-import { sportLabels, marketVisuals } from './constants.js?v=55';
-import { gameMarkets, playerPropMarkets, leagueMarkets, liveFeaturedMarkets, quickChoices } from './data.js?v=55';
-import { escapeHtml, flagUrl, esportsLogoHtml, getInitials } from './utils.js?v=55';
-import { apiGet } from './api.js?v=55';
-import { setActive, optionRow } from './ui.js?v=55';
-import { selectMarket } from './trading.js?v=55';
+import { state } from './state.js';
+import { sportLabels, marketVisuals } from './constants.js';
+import { gameMarkets, playerPropMarkets, leagueMarkets, liveFeaturedMarkets, quickChoices } from './data.js';
+import { escapeHtml, flagUrl, esportsLogoHtml, getInitials } from './utils.js';
+import { apiGet } from './api.js';
+import { setActive, optionRow } from './ui.js';
+import { selectMarket } from './trading.js';
 
 const gamesGrid = document.querySelector("#games-grid");
 const featuredGames = document.querySelector("#featured-games");
@@ -195,6 +195,7 @@ export function renderGameTiles() {
             </div>
           </article>
         </div>
+        <button class="fight-distance-pick" type="button">${escapeHtml(choices[1].label)}<span>${escapeHtml(choices[1].price)}</span></button>
       `;
       card.querySelector(".fighter-card.is-home button").addEventListener("click", event => {
         event.stopPropagation();
@@ -203,6 +204,10 @@ export function renderGameTiles() {
       card.querySelector(".fighter-card.is-away button").addEventListener("click", event => {
         event.stopPropagation();
         selectMarket(choices[2].title, event.currentTarget, choices[2]);
+      });
+      card.querySelector(".fight-distance-pick").addEventListener("click", event => {
+        event.stopPropagation();
+        selectMarket(choices[1].title, event.currentTarget, choices[1]);
       });
       card.addEventListener("click", () => openMatchPage(match.id));
       gamesGrid.appendChild(card);
@@ -449,8 +454,8 @@ export function renderPlayerPropMarkets() {
 }
 
 function openPlayerFuturePage(player) {
-  document.body.classList.remove("is-history-page", "is-match-open");
-  document.body.classList.add("is-detail-page");
+  document.body.classList.remove("is-history-page");
+  document.body.classList.add("is-match-open");
   document.querySelectorAll(".home-section").forEach(section => (section.hidden = true));
   document.querySelector("#history-page").hidden = true;
   document.querySelector("#positions-dashboard").hidden = true;
@@ -550,7 +555,20 @@ export function renderMatchInsight(match, insights) {
   let hasContent = false;
 
   if (match.sport === "formula-1") {
-    return;
+    const visual = marketVisuals[match.id] || {};
+    const [eventName, eventDate] = match.time.split(" - ");
+    detailInsight.innerHTML = `
+      <article class="formula-detail-insight">
+        <img src="${visual.eventImage}" alt="${eventName} Formula 1 race car" />
+        <div>
+          <span>Formula 1 event</span>
+          <h3>${eventName}</h3>
+          <p>${eventDate} - One proposed winner market for this race.</p>
+          <strong>${match.home} to win the Grand Prix</strong>
+        </div>
+      </article>
+    `;
+    hasContent = true;
   } else if (insights) {
     const h2h = insights.headToHead;
     const standings = insights.standings;
@@ -601,12 +619,12 @@ export function renderMatchInsight(match, insights) {
 export async function openMatchPage(matchId) {
   const match = gameMarkets.find(item => item.id === matchId);
   if (!match) return;
-  document.body.classList.remove("is-history-page", "is-match-open");
-  document.body.classList.add("is-detail-page");
+  document.body.classList.remove("is-history-page");
   document.querySelectorAll(".home-section").forEach(section => (section.hidden = true));
   document.querySelector("#history-page").hidden = true;
   document.querySelector("#positions-dashboard").hidden = true;
   matchPage.hidden = false;
+  document.body.classList.add("is-match-open");
   detailTitle.textContent = match.sport === "formula-1"
     ? `${match.time.split(" - ")[0]} winner market`
     : `${match.home} vs ${match.away}`;
@@ -643,12 +661,14 @@ export async function openMatchPage(matchId) {
   };
   renderDetailTabs(match);
   renderDetailOptions(match, "All");
+  const firstBtn = detailOptions.querySelector(".option-row .price:not(:disabled)");
+  if (firstBtn) firstBtn.click();
   scrollDetailToTop();
 
 }
 
 export function showHome() {
-  document.body.classList.remove("is-match-open", "is-history-page", "is-detail-page");
+  document.body.classList.remove("is-match-open", "is-history-page");
   matchPage.hidden = true;
   document.querySelector("#history-page").hidden = true;
   document.querySelector("#positions-dashboard").hidden = true;

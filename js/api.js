@@ -1,8 +1,8 @@
-import { state } from './state.js?v=55';
-import { API_BASE_URL } from './constants.js?v=55';
-import { replaceGameMarkets, replaceLiveFeaturedMarkets, replacePlayerPropMarkets, game } from './data.js?v=55';
-import { countryCodeFromUrl, humanMarketLabel, teamCode } from './utils.js?v=55';
-import { describeWalletProvider, getWalletProvider } from './provider.js?v=55';
+import { state } from './state.js';
+import { API_BASE_URL } from './constants.js';
+import { replaceGameMarkets, replaceLiveFeaturedMarkets, replacePlayerPropMarkets, game } from './data.js';
+import { countryCodeFromUrl, humanMarketLabel, teamCode } from './utils.js';
+import { describeWalletProvider, getWalletProvider } from './provider.js';
 
 export async function apiGet(path) {
   return apiRequest(path, { method: 'GET' });

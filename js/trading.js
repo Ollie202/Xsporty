@@ -1,9 +1,9 @@
-import { state } from './state.js?v=55';
-import { getPrice, getTradeAmount, estimatePnl, formatSigned, humanMarketLabel } from './utils.js?v=55';
-import { showToast, showTrade, showPositions, setSideButton, setActive, openPnlCard, ticketRow, historyRow } from './ui.js?v=55';
-import { applyConnectedWallet } from './wallet.js?v=55';
-import { claimWinnings, submitBackendOrder, refreshPortfolio } from './api.js?v=55';
-import { SYMBOL, FALLBACK_WALLET_ADDRESS } from './constants.js?v=55';
+import { state } from './state.js';
+import { getPrice, getTradeAmount, estimatePnl, formatSigned, humanMarketLabel } from './utils.js';
+import { showToast, showTrade, showPositions, setSideButton, setActive, openPnlCard, ticketRow, historyRow } from './ui.js';
+import { applyConnectedWallet } from './wallet.js';
+import { claimWinnings, submitBackendOrder, refreshPortfolio } from './api.js';
+import { SYMBOL, FALLBACK_WALLET_ADDRESS } from './constants.js';
 
 const ticketTitle = document.querySelector(".trade-view h2");
 const amountInput = document.querySelector(".trade-slip input");
@@ -37,8 +37,10 @@ export function selectMarket(title, button, choice = {}) {
   quoteValues[0].textContent = `${price}c`;
   setSideButton(state.side === "NO" || state.side === "UNDER" ? "NO" : "YES");
   updateQuote();
-  document.body.classList.add("is-match-open");
-  document.body.classList.remove("is-history-page", "is-detail-page");
+  if (choice.marketScope === "tournament") {
+    document.body.classList.add("is-match-open");
+    document.body.classList.remove("is-history-page");
+  }
   showTrade();
   showToast("Ticket loaded in Trade. Confirm when ready.");
 }

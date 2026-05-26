@@ -6,7 +6,7 @@
     <title>X Cup Markets</title>
     <link rel="stylesheet" href="base.css?v=3" />
     <link rel="stylesheet" href="layout.css?v=6" />
-    <link rel="stylesheet" href="components.css?v=8" />
+    <link rel="stylesheet" href="components.css?v=9" />
     <link rel="stylesheet" href="markets.css?v=9" />
     <link rel="stylesheet" href="responsive.css?v=5" />
     <style>
@@ -65,7 +65,7 @@
             <span class="ticket-count-badge" data-ticket-count hidden>0</span>
           </button>
           <span class="balance-pill" hidden></span>
-          <button class="connect-btn" type="button" data-action="connect">Connect Wallet</button>
+          <div class="rainbow-wallet-root" id="rainbow-wallet-root"></div>
           <div class="profile-menu" hidden>
             <button class="profile-button" type="button" data-action="profile" aria-label="Open profile menu">
               <span class="profile-avatar" data-profile-avatar>
@@ -97,9 +97,6 @@
                 <button type="button" data-profile-view="support">
                   <span>Contact support</span>
                   <b>></b>
-                </button>
-                <button type="button" class="profile-logout" data-profile-view="logout">
-                  <span>Log Out</span>
                 </button>
               </div>
             </div>
@@ -268,10 +265,11 @@
           </div>
 
           <div class="market-tabs">
-            <button type="button" data-category="all">All Games</button>
-            <button class="is-active" type="button" data-category="world-cup">FIFA World Cup</button>
-            <button type="button" data-category="leagues">Leagues</button>
-            <button type="button" data-category="players">Player Futures (WORLD CUP)</button>
+              <button type="button" data-category="all">All Games</button>
+              <button class="is-active" type="button" data-category="world-cup">FIFA World Cup</button>
+              <button type="button" data-category="international-friendly">Int. Friendly Games</button>
+              <button type="button" data-category="leagues">Leagues</button>
+              <button type="button" data-category="players">Player Futures (WORLD CUP)</button>
             <button type="button" data-category="ufc-men" hidden>UFC Men</button>
             <button type="button" data-category="ufc-women" hidden>UFC Women</button>
           </div>
@@ -442,8 +440,8 @@
         <button type="button" onclick="location.reload()">Retry</button>
       </div>
     </div>
-    <script src="runtime-config.js?v=1"></script>
-    <script type="module" src="js/main.js?v=51"></script>
+    <script type="module" src="/runtime-config.js?v=1"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
 

@@ -64,10 +64,14 @@ export function wireConfirmTrade() {
           showToast("This market is preview-only until backend settlement is added.");
           return;
         }
-        await submitBackendOrder(pending, amount);
+        const submitted = await submitBackendOrder(pending, amount);
         await refreshPortfolio();
         applyConnectedWallet();
-        showToast("Ticket confirmed on-chain and moved to My Positions");
+        if (submitted?.autoMatch?.matched || submitted?.order?.status === "filled") {
+          showToast("Ticket confirmed on-chain and moved to My Positions");
+        } else {
+          showToast("Order accepted and waiting to fill. Balance updates after it matches.");
+        }
       } else {
         addTicket({ ...pending, amount });
         showToast("Ticket saved locally. Connect a real wallet for on-chain orders.");

@@ -19,18 +19,20 @@ export async function hydrateFromBackend() {
   try {
     const results = await Promise.all([
       apiGet('/wallet/config'),
-      apiGet('/markets/cards?limit=250&sort=kickoff_time'),
+      apiGet('/markets/cards?status=open&limit=250&sort=kickoff_time'),
+      apiGet('/markets/cards?sport=football&competitionName=World%20Cup&status=open&limit=100&sort=kickoff_time'),
       apiGet('/markets/cards?category=player_future&status=open&limit=100&sort=newest_activity')
     ]);
     state.walletConfig = results[0];
-    const backendMarkets = mapBackendCards(results[1].cards || []).filter(match => {
+    const backendCards = mergeBackendCards(results[1].cards || [], results[2].cards || []);
+    const backendMarkets = mapBackendCards(backendCards).filter(match => {
       if (isFinishedHomepageMatch(match)) return false;
       return true;
     });
     if (backendMarkets.length > 0) {
       replaceGameMarkets(backendMarkets);
       replaceLiveFeaturedMarkets(backendMarkets.filter(match => match.isLive).slice(0, 8));
-      const backendPlayerFutures = mapBackendPlayerFutureCards(results[2].cards || []);
+      const backendPlayerFutures = mapBackendPlayerFutureCards(results[3].cards || []);
       replacePlayerPropMarkets(backendPlayerFutures.length > 0 ? backendPlayerFutures : buildTournamentPlayerFutures(backendMarkets));
       state.apiOnline = true;
       if (!backendMarkets.some(match => match.sport === state.sport)) state.sport = backendMarkets[0].sport;
@@ -43,6 +45,17 @@ export async function hydrateFromBackend() {
     state.apiOnline = false;
   }
   return false;
+}
+
+function mergeBackendCards(...cardGroups) {
+  const cardsByKey = new Map();
+  cardGroups.flat().forEach((card, index) => {
+    const fixtureId = card?.fixture?.id || card?.summaries?.[0]?.fixture?.id;
+    const marketId = card?.summaries?.[0]?.market?.id;
+    const key = `${card?.type || 'CARD'}:${fixtureId || marketId || index}`;
+    cardsByKey.set(key, card);
+  });
+  return [...cardsByKey.values()];
 }
 
 function isFinishedHomepageMatch(match) {
@@ -119,7 +132,10 @@ export function mapBackendCards(cards) {
     const summaries = card.summaries || [];
     if (!fixture || summaries.length === 0) return [];
     const sport = mapBackendSport(fixture.sport);
-    const options = summaries.map(summary => marketOptionFromSummary(summary)).filter(Boolean);
+    const options = summaries
+      .filter(summary => isSupportedBackendMarket(summary.market, fixture, sport))
+      .map(summary => marketOptionFromSummary(summary))
+      .filter(Boolean);
     if (options.length === 0) return [];
     const home = fixture.homeCompetitor || 'Home';
     const away = fixture.awayCompetitor || 'Away';
@@ -144,6 +160,13 @@ export function mapBackendCards(cards) {
     match.quick = sport === 'esports' ? binaryWinnerButtons(match.options[0], match) : mainMatchButtons(match.options, home, away);
     return [match];
   });
+}
+
+function isSupportedBackendMarket(market, fixture, sport) {
+  if (sport !== 'football' || fixture?.competition?.name !== 'Friendlies') return true;
+  if (market?.type === 'TOTAL_GOALS' || market?.type === 'BOTH_TEAMS_TO_SCORE') return true;
+  const rule = market?.resolver?.rule;
+  return rule === 'HOME_TEAM_WIN' || rule === 'DRAW' || rule === 'AWAY_TEAM_WIN';
 }
 
 function marketOptionFromSummary(summary) {
@@ -214,6 +237,7 @@ function backendGroupForFixture(fixture, sport) {
   const competition = fixture.competition || {};
   const kind = String(competition.kind || '').toLowerCase();
   const name = String(competition.name || '').toLowerCase();
+  if (name === 'friendlies') return 'international-friendly';
   if (kind === 'league' && !name.includes('world cup')) return 'leagues';
   return 'world-cup';
 }
@@ -486,11 +510,6 @@ function normalizeV(sig) {
 }
 
 function typedDataForWallet(typedData) {
-  const uint256Fields = ['salt', 'tokenId', 'makerAmount', 'takerAmount', 'expiration', 'nonce', 'feeRateBps'];
-  const message = { ...typedData.message };
-  uint256Fields.forEach(field => {
-    if (message[field] != null) message[field] = '0x' + BigInt(message[field]).toString(16);
-  });
   return {
     ...typedData,
     types: {
@@ -502,8 +521,18 @@ function typedDataForWallet(typedData) {
       ],
       ...typedData.types,
     },
-    message,
+    message: { ...typedData.message },
   };
+}
+
+async function estimateGasWithFallback(provider, txParams, fallbackHex = '0x186a0') {
+  try {
+    const gasHex = await provider.request({ method: 'eth_estimateGas', params: [txParams] });
+    const gasNum = Math.min(Math.ceil(Number.parseInt(gasHex, 16) * 1.2), 8000000);
+    return '0x' + gasNum.toString(16);
+  } catch (err) {
+    return fallbackHex;
+  }
 }
 
 export async function submitBackendOrder(pending, amount) {
@@ -517,9 +546,11 @@ export async function submitBackendOrder(pending, amount) {
 
   if (approvalTx) {
     const provider = getWalletProvider();
+    const txParams = { from: activeAccount, to: approvalTx.to, data: approvalTx.data };
+    const gas = await estimateGasWithFallback(provider, txParams, '0x186a0');
     const txHash = await provider.request({
       method: 'eth_sendTransaction',
-      params: [{ from: activeAccount, to: approvalTx.to, data: approvalTx.data, gas: '100000' }]
+      params: [{ ...txParams, gas }]
     });
     await waitForTransaction(txHash);
   }
@@ -531,7 +562,7 @@ export async function submitBackendOrder(pending, amount) {
 
   const order = { ...prepared.order, signature };
   const submitted = await apiRequest('/clob/orders', { method: 'POST', body: JSON.stringify({ marketId: pending.marketId, outcomeSide: pending.outcomeSide, order }) });
-  return submitted.order && submitted.order.id;
+  return submitted;
 }
 
 export async function claimWinnings(marketId) {
@@ -545,9 +576,11 @@ export async function claimWinnings(marketId) {
   const transaction = redemption.transaction;
   if (!transaction?.to || !transaction?.data) throw new Error('Redeem transaction is unavailable');
   const provider = getWalletProvider();
+  const txParams = { from: activeAccount, to: transaction.to, data: transaction.data };
+  const gas = await estimateGasWithFallback(provider, txParams, '0x249f0');
   const txHash = await provider.request({
     method: 'eth_sendTransaction',
-    params: [{ from: activeAccount, to: transaction.to, data: transaction.data, gas: '150000' }]
+    params: [{ ...txParams, gas }]
   });
   await waitForTransaction(txHash);
   return txHash;

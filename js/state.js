@@ -2,6 +2,8 @@ export const state = {
   connected: false,
   apiOnline: false,
   walletConfig: null,
+  selectedWalletId: null,
+  walletProvider: null,
   account: null,
   side: "YES",
   price: 47,

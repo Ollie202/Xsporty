@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": ".",
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
@@ -19,7 +19,7 @@
       ]
     },
     {
-      "source": "/js/(.*)",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -39,7 +39,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!api|js|.*\\..*).*)",
+      "source": "/((?!api|assets|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]

@@ -24,6 +24,8 @@ const detailHomeFlag = document.querySelector("#detail-home-flag");
 const detailAwayFlag = document.querySelector("#detail-away-flag");
 const detailHomeCode = document.querySelector("#detail-home-code");
 const detailAwayCode = document.querySelector("#detail-away-code");
+const detailHomeTeam = detailHomeCode?.closest(".detail-team");
+const detailAwayTeam = detailAwayCode?.closest(".detail-team");
 const detailInsight = document.querySelector("#detail-insight");
 const statsToggle = document.querySelector("#stats-toggle");
 const detailTabs = document.querySelector("#detail-tabs");
@@ -139,7 +141,7 @@ export function renderGameTiles() {
   const activeMarkets = gameMarkets.filter(match => match.sport === state.sport);
   const sport = sportLabels[state.sport];
   const footballTabs = document.querySelectorAll(
-    "#games-board [data-category='world-cup'], #games-board [data-category='leagues'], #games-board [data-category='players']"
+    "#games-board [data-category='world-cup'], #games-board [data-category='international-friendly'], #games-board [data-category='leagues'], #games-board [data-category='players']"
   );
   const ufcTabs = document.querySelectorAll(
     "#games-board [data-category='ufc-men'], #games-board [data-category='ufc-women']"
@@ -162,7 +164,7 @@ export function renderGameTiles() {
   activeMarkets.forEach(match => {
     const categories = ["all"];
     if (match.isLive) categories.push("live");
-    if (state.sport === "football") categories.push(match.group === "leagues" ? "leagues" : "world-cup");
+    if (state.sport === "football") categories.push(footballCategoryForMatch(match));
     if (state.sport === "ufc") categories.push(match.group);
     const card = document.createElement("article");
     card.className = "match-row game-tile";
@@ -297,6 +299,12 @@ export function renderGameTiles() {
   renderPlayerPropMarkets();
   renderLeagueMarkets("premier-league");
   applyActiveBoardCategory();
+}
+
+function footballCategoryForMatch(match) {
+  if (match.group === "leagues") return "leagues";
+  if (match.group === "international-friendly") return "international-friendly";
+  return "world-cup";
 }
 
 function renderLeagueFilterTabs() {
@@ -462,13 +470,15 @@ function openPlayerFuturePage(player) {
   matchPage.hidden = false;
 
   detailTitle.textContent = `${player.name} - ${player.title}`;
-  detailMeta.textContent = `${player.label} - Player futures market`;
+  detailMeta.textContent = `${player.label}${player.country ? ` - ${player.country}` : ""} - Player futures market`;
   detailHomeFlag.hidden = true;
   detailAwayFlag.hidden = true;
+  if (detailHomeTeam) detailHomeTeam.hidden = true;
+  if (detailAwayTeam) detailAwayTeam.hidden = true;
   detailHomeFlag.removeAttribute("src");
   detailAwayFlag.removeAttribute("src");
-  detailHomeCode.textContent = player.country || "WC";
-  detailAwayCode.textContent = "FUT";
+  detailHomeCode.textContent = "";
+  detailAwayCode.textContent = "";
   detailInsight.hidden = true;
   detailInsight.innerHTML = "";
   statsToggle.hidden = true;
@@ -631,6 +641,8 @@ export async function openMatchPage(matchId) {
   detailMeta.textContent = `${match.time} - Prediction markets available`;
   detailHomeFlag.hidden = match.sport === "formula-1";
   detailAwayFlag.hidden = match.sport === "formula-1";
+  if (detailHomeTeam) detailHomeTeam.hidden = false;
+  if (detailAwayTeam) detailAwayTeam.hidden = false;
   if (match.sport !== "formula-1") {
     detailHomeFlag.src = match.homeLogoUrl || flagUrl(match.homeFlag);
     detailHomeFlag.alt = match.home;

@@ -5,14 +5,16 @@ import { showToast, showTrade, setConnectButtons, applyProfileImage } from './ui
 import { apiGet, refreshPortfolio } from './api.js';
 import { showHome } from './rendering.js';
 import { renderTickets, openHistoryPage } from './trading.js';
-import { describeWalletProvider, getWalletProvider } from './provider.js';
+import { describeWalletProvider, getAvailableWallets, getWalletProvider, rememberWalletProvider } from './provider.js';
 
 const WALLET_CONNECTED_KEY = "x-cup-wallet-connected";
 const WALLET_DISCONNECTED_KEY = "x-cup-wallet-disconnected";
+const WALLET_PROVIDER_KEY = "x-cup-wallet-provider";
+let walletModal;
 
 export function wireConnectButtons() {
-  const provider = getWalletProvider();
-  provider?.on?.('accountsChanged', accounts => {
+  getAvailableWallets().forEach(wallet => wallet.provider?.on?.('accountsChanged', accounts => {
+    if (state.selectedWalletId && wallet.id !== state.selectedWalletId) return;
     state.account = accounts?.[0] || null;
     state.connected = Boolean(state.account);
     state.balance = null;
@@ -24,7 +26,7 @@ export function wireConnectButtons() {
     } else {
       logOutWallet();
     }
-  });
+  }));
 
   document.querySelectorAll("[data-action='connect']").forEach(button => {
     button.addEventListener("click", async () => {
@@ -32,35 +34,7 @@ export function wireConnectButtons() {
         showToast("Wallet already connected");
         return;
       }
-      setConnectButtons("Connecting...", true);
-      try {
-        const provider = getWalletProvider();
-        if (!provider) throw new Error("No browser wallet found");
-        const config = state.walletConfig || await apiGet('/wallet/config');
-        state.walletConfig = config;
-        try {
-          await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: config.chain.hexId }] });
-        } catch (switchError) {
-          if (switchError.code === 4902 && config.walletAddEthereumChain) {
-            await provider.request({ method: 'wallet_addEthereumChain', params: [config.walletAddEthereumChain] });
-          }
-        }
-        const accounts = await provider.request({ method: 'eth_requestAccounts' });
-        state.account = accounts[0];
-        state.connected = Boolean(state.account);
-        if (state.connected) rememberWalletSession();
-        applyConnectedWallet();
-        refreshPortfolio().then(() => { applyConnectedWallet(); renderTickets(); });
-        showToast("Wallet connected. Live trading enabled.");
-      } catch (error) {
-        console.warn(error);
-        state.account = FALLBACK_WALLET_ADDRESS;
-        state.connected = true;
-        applyConnectedWallet();
-        showToast("Demo wallet connected. Install a browser wallet for live orders.");
-      } finally {
-        setConnectButtons(null, false);
-      }
+      openWalletModal();
     });
   });
 }
@@ -68,6 +42,7 @@ export function wireConnectButtons() {
 export async function restoreWalletSession() {
   if (localStorage.getItem(WALLET_DISCONNECTED_KEY) === "1") return false;
 
+  state.selectedWalletId = localStorage.getItem(WALLET_PROVIDER_KEY);
   const provider = getWalletProvider();
   if (!provider) return false;
 
@@ -90,6 +65,44 @@ export async function restoreWalletSession() {
   } catch (error) {
     console.warn("Wallet session restore failed:", error);
     return false;
+  }
+}
+
+async function connectWallet(walletId) {
+  closeWalletModal();
+  setConnectButtons("Connecting...", true);
+  try {
+    rememberWalletProvider(walletId);
+    const provider = getWalletProvider(walletId);
+    if (!provider) throw new Error(`${walletName(walletId)} is not installed`);
+    const config = state.walletConfig || await apiGet('/wallet/config');
+    state.walletConfig = config;
+    try {
+      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: config.chain.hexId }] });
+    } catch (switchError) {
+      if (switchError.code === 4902 && config.walletAddEthereumChain) {
+        await provider.request({ method: 'wallet_addEthereumChain', params: [config.walletAddEthereumChain] });
+      } else {
+        throw switchError;
+      }
+    }
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    state.account = accounts?.[0] || null;
+    state.connected = Boolean(state.account);
+    if (!state.connected) throw new Error("No wallet account selected");
+    rememberWalletSession();
+    applyConnectedWallet();
+    refreshPortfolio().then(() => { applyConnectedWallet(); renderTickets(); });
+    showToast(`${describeWalletProvider(provider)} connected. Live trading enabled.`);
+  } catch (error) {
+    console.warn(error);
+    state.connected = false;
+    state.account = null;
+    rememberWalletProvider(null);
+    localStorage.removeItem(WALLET_PROVIDER_KEY);
+    showToast(error.message || "Wallet connection failed");
+  } finally {
+    setConnectButtons(state.connected ? null : "Connect Wallet", false);
   }
 }
 
@@ -123,6 +136,7 @@ export function logOutWallet() {
   state.pendingTicket = null;
   state.portfolio = null;
   state.balance = null;
+  state.walletProvider = null;
   forgetWalletSession();
   document.querySelectorAll(".balance-pill").forEach(balance => (balance.hidden = true));
   document.querySelectorAll("[data-action='open-portfolio']").forEach(button => (button.hidden = true));
@@ -144,11 +158,65 @@ export function logOutWallet() {
 function rememberWalletSession() {
   localStorage.setItem(WALLET_CONNECTED_KEY, "1");
   localStorage.removeItem(WALLET_DISCONNECTED_KEY);
+  if (state.selectedWalletId) localStorage.setItem(WALLET_PROVIDER_KEY, state.selectedWalletId);
 }
 
 function forgetWalletSession() {
   localStorage.removeItem(WALLET_CONNECTED_KEY);
   localStorage.setItem(WALLET_DISCONNECTED_KEY, "1");
+  localStorage.removeItem(WALLET_PROVIDER_KEY);
+  rememberWalletProvider(null);
+}
+
+function openWalletModal() {
+  walletModal = walletModal || createWalletModal();
+  renderWalletChoices();
+  walletModal.hidden = false;
+}
+
+function closeWalletModal() {
+  if (walletModal) walletModal.hidden = true;
+}
+
+function createWalletModal() {
+  const modal = document.createElement("div");
+  modal.className = "wallet-modal";
+  modal.hidden = true;
+  modal.innerHTML = `
+    <button class="wallet-modal__backdrop" type="button" data-wallet-close aria-label="Close wallet selection"></button>
+    <section class="wallet-modal__panel" role="dialog" aria-modal="true" aria-labelledby="wallet-modal-title">
+      <div class="wallet-modal__head">
+        <h2 id="wallet-modal-title">Connect wallet</h2>
+        <button type="button" data-wallet-close aria-label="Close wallet selection">x</button>
+      </div>
+      <div class="wallet-choice-list" data-wallet-choices></div>
+    </section>
+  `;
+  modal.addEventListener("click", event => {
+    if (event.target.closest("[data-wallet-close]")) closeWalletModal();
+    const button = event.target.closest("[data-wallet-id]");
+    if (button && !button.disabled) connectWallet(button.dataset.walletId);
+  });
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function renderWalletChoices() {
+  const list = walletModal?.querySelector("[data-wallet-choices]");
+  if (!list) return;
+  const wallets = getAvailableWallets();
+  list.innerHTML = `
+    ${wallets.map(wallet => `
+      <button class="wallet-choice" type="button" data-wallet-id="${wallet.id}" ${wallet.installed ? "" : "disabled"}>
+        <span>${wallet.name}</span>
+        <small>${wallet.installed ? "Detected" : "Not installed"}</small>
+      </button>
+    `).join("")}
+  `;
+}
+
+function walletName(walletId) {
+  return getAvailableWallets().find(wallet => wallet.id === walletId)?.name || "Wallet";
 }
 
 export function wireProfileMenu() {
@@ -173,9 +241,6 @@ export function wireProfileMenu() {
         document.querySelector(".footer-socials")?.scrollIntoView({ behavior: "smooth", block: "center" });
         showToast("Scrolled to support socials");
         return;
-      }
-      if (button.dataset.profileView === "logout") {
-        logOutWallet();
       }
     });
   });

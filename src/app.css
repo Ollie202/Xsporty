@@ -1206,6 +1206,7 @@ body {
   .topbar {
     min-height: 144px !important;
     height: 144px !important;
+    max-height: 144px !important;
   }
 
   .topbar__inner {
@@ -1263,33 +1264,86 @@ body {
   }
 
   .wc-hero-banner {
-    height: 478px !important;
-    min-height: 478px !important;
+    width: 100% !important;
+    height: clamp(382px, calc((100vw - 40px) / 3.237), 478px) !important;
+    min-height: clamp(382px, calc((100vw - 40px) / 3.237), 478px) !important;
     max-height: 478px !important;
+    aspect-ratio: 1544 / 477 !important;
     margin-bottom: 12px !important;
   }
 
   .wc-hero-content {
-    padding: 38px 52px !important;
+    height: 100% !important;
+    padding: clamp(32px, 2.05vw, 40px) clamp(48px, 3.35vw, 52px) !important;
+    gap: 32px !important;
   }
 
   .wc-hero-title {
-    font-size: clamp(58px, 5.25vw, 88px) !important;
+    font-size: clamp(64px, 5.45vw, 88px) !important;
+    line-height: 0.95 !important;
   }
 
   .wc-hero-left {
     gap: 10px !important;
-    max-width: 720px !important;
+    max-width: clamp(600px, 50vw, 780px) !important;
+  }
+
+  .wc-hero-eyebrow {
+    font-size: 12px !important;
+    letter-spacing: 2.4px !important;
+  }
+
+  .wc-hero-subtitle {
+    max-width: 560px !important;
+    font-size: 16px !important;
+    line-height: 1.45 !important;
+  }
+
+  .wc-hero-badges {
+    margin-top: 6px !important;
+    gap: 10px !important;
   }
 
   .wc-hero-badges span {
-    min-height: 30px !important;
-    padding: 0 26px !important;
+    min-height: 26px !important;
+    padding: 0 22px !important;
   }
 
   .wc-hero-action {
-    min-height: 48px !important;
-    padding: 0 36px !important;
+    min-height: 42px !important;
+    margin-top: 4px !important;
+    padding: 0 22px !important;
+    border-radius: 4px !important;
+  }
+
+  .wc-hero-mid {
+    flex: 0 0 115px !important;
+    gap: 16px !important;
+    transform: translateX(-8px) !important;
+  }
+
+  .wc-hero-right {
+    flex: 0 0 174px !important;
+    width: 174px !important;
+    gap: 12px !important;
+  }
+
+  .wc-hero-logo {
+    width: 82px !important;
+    height: 96px !important;
+    object-fit: contain !important;
+  }
+
+  .wc-hero-teams {
+    width: 121px !important;
+    height: 44px !important;
+    gap: 9px !important;
+  }
+
+  .wc-hero-hosts {
+    width: 174px !important;
+    font-size: 11px !important;
+    letter-spacing: 1.8px !important;
   }
 }
 

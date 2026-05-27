@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
-import { Search } from 'lucide-react';
-import { useAccount } from 'wagmi';
+import { ArrowDownLeft, ArrowUpRight, Briefcase, ChevronDown, ChevronRight, Copy, Search, Settings } from 'lucide-react';
+import { useAccount, useDisconnect } from 'wagmi';
 import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
 import { FALLBACK_WALLET_ADDRESS, sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
 import { flagUrl, getInitials, shortAddress } from '../js/utils.js';
+import { useUiStore } from './stores/uiStore';
 
 const appState = legacyState as {
   selectedWalletId: string | null;
@@ -22,6 +23,11 @@ const appState = legacyState as {
   tickets: Ticket[];
 };
 const labelsBySport = sportLabels as Record<string, { title: string; icon: string }>;
+const alpha3ToAlpha2: Record<string, string> = {
+  ARG: 'ar', AUS: 'au', BEL: 'be', BRA: 'br', CAN: 'ca', CZE: 'cz', ECU: 'ec', ENG: 'gb-eng', ESP: 'es', FRA: 'fr',
+  GER: 'de', HAI: 'ht', CIV: 'ci', JPN: 'jp', KOR: 'kr', MAR: 'ma', MEX: 'mx', NED: 'nl', PAR: 'py', POR: 'pt',
+  QAT: 'qa', RSA: 'za', SCO: 'gb-sct', SWE: 'se', SUI: 'ch', TUN: 'tn', TUR: 'tr', URU: 'uy', USA: 'us',
+};
 
 type MatchOption = [string, string, number, number, string?, string?, string?, string?, string?, string?];
 type Choice = {
@@ -146,6 +152,12 @@ function imageFor(match: MarketMatch, side: 'home' | 'away') {
   return match.awayLogoUrl || flagUrl(match.awayFlag || 'un');
 }
 
+function countryFlagFor(match: MarketMatch, side: 'home' | 'away') {
+  const flag = side === 'home' ? match.homeFlag : match.awayFlag;
+  const code = side === 'home' ? match.homeCode : match.awayCode;
+  return flagUrl(flag || alpha3ToAlpha2[String(code || '').toUpperCase()] || 'un');
+}
+
 function priceNumber(price: string | number) {
   const value = Number(String(price).replace(/[^\d.]/g, ''));
   if (!Number.isFinite(value)) return 50;
@@ -265,6 +277,8 @@ function Header({
   onHome,
   onSearchSubmit,
   connected,
+  address,
+  balance,
 }: {
   sport: string;
   setSport: (sport: string) => void;
@@ -275,7 +289,25 @@ function Header({
   onHome: () => void;
   onSearchSubmit: () => void;
   connected: boolean;
+  address?: string;
+  balance: number | null;
 }) {
+  const [walletOpen, setWalletOpen] = useState(false);
+  const { disconnect } = useDisconnect();
+  const theme = useUiStore(state => state.theme);
+  const toggleTheme = useUiStore(state => state.toggleTheme);
+  const displayAddress = address ? shortAddress(address) : '';
+  const balanceText = `${(balance ?? 0.87).toFixed(2)} USD`;
+
+  useEffect(() => {
+    if (!walletOpen) return;
+    function close() {
+      setWalletOpen(false);
+    }
+    window.addEventListener('click', close);
+    return () => window.removeEventListener('click', close);
+  }, [walletOpen]);
+
   return (
     <header className="topbar">
       <div className="topbar__inner">
@@ -299,7 +331,64 @@ function Header({
               {positionCount > 0 ? <span className="ticket-count-badge">{positionCount}</span> : null}
             </button>
           ) : null}
-          <ConnectButton chainStatus="none" accountStatus="address" showBalance={false} />
+          {connected ? (
+            <div className="profile-wallet" onClick={event => event.stopPropagation()}>
+              <button className="deposit-btn" type="button">Deposit</button>
+              <button className="portfolio-btn" type="button" onClick={onOpenPositions}>
+                <Briefcase size={16} aria-hidden="true" />
+                Portfolio
+              </button>
+              <button className="account-chip" type="button" onClick={() => setWalletOpen(open => !open)} aria-expanded={walletOpen} aria-label="Open wallet menu">
+                <span>{balanceText}</span>
+                <ChevronDown size={16} aria-hidden="true" />
+                <span className="profile-pixel" aria-hidden="true" />
+              </button>
+              {walletOpen ? (
+                <div className="profile-dropdown modern-wallet-menu">
+                  <div className="wallet-menu-head">
+                    <span className="profile-pixel is-large" aria-hidden="true" />
+                    <div>
+                      <strong>{displayAddress}</strong>
+                      <small>{displayAddress}</small>
+                    </div>
+                    <button type="button" aria-label="Copy wallet address" onClick={() => address && navigator.clipboard?.writeText(address)}>
+                      <Copy size={18} />
+                    </button>
+                    <button type="button" aria-label="Wallet settings">
+                      <Settings size={18} />
+                    </button>
+                  </div>
+                  <div className="wallet-menu-balance">
+                    <strong>~{balanceText}</strong>
+                    <button type="button">
+                      Wallet <ChevronRight size={15} />
+                    </button>
+                  </div>
+                  <div className="wallet-menu-actions">
+                    <button type="button"><ArrowDownLeft size={17} />Deposit</button>
+                    <button type="button"><ArrowUpRight size={17} />Withdraw</button>
+                  </div>
+                  <button className="wallet-menu-row" type="button">
+                    <span>Invite Friends</span><b>0</b><ChevronRight size={15} />
+                  </button>
+                  <button className="wallet-menu-row" type="button" onClick={toggleTheme}>
+                    <span>Dark theme</span><i className={theme === 'dark' ? 'toggle is-on' : 'toggle'} aria-hidden="true" />
+                  </button>
+                  <button className="wallet-menu-logout" type="button" onClick={() => disconnect()}>
+                    Log out
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <ConnectButton.Custom>
+              {({ openConnectModal }) => (
+                <button className="connect-wallet-btn" type="button" onClick={openConnectModal}>
+                  Connect Wallet
+                </button>
+              )}
+            </ConnectButton.Custom>
+          )}
         </div>
 
         <nav className="top-sport-nav" aria-label="Sports">
@@ -373,9 +462,9 @@ function Hero({ match, onOpen }: { match?: MarketMatch; onOpen: (match: MarketMa
         <div className="wc-hero-right">
           <img className="wc-hero-logo" src="wc2026.png" alt="FIFA World Cup 2026" />
           <div className="wc-hero-teams" aria-label="Featured matchup teams">
-            <span>{match ? <img src={imageFor(match, 'home')} alt={match.home} /> : null}</span>
+            <span>{match ? <img src={countryFlagFor(match, 'home')} alt={match.home} /> : null}</span>
             <b>VS</b>
-            <span>{match ? <img src={imageFor(match, 'away')} alt={match.away} /> : null}</span>
+            <span>{match ? <img src={countryFlagFor(match, 'away')} alt={match.away} /> : null}</span>
           </div>
           <span className="wc-hero-hosts">USA - Mexico - Canada</span>
         </div>
@@ -912,7 +1001,7 @@ export function App() {
   const [pnlTicket, setPnlTicket] = useState<Ticket | null>(null);
   const [apiError, setApiError] = useState('');
   const [loadingMarkets, setLoadingMarkets] = useState(true);
-  const [, setWalletPulse] = useState(0);
+  const [walletPulse, setWalletPulse] = useState(0);
   const orbRef = useRef<HTMLButtonElement | null>(null);
   const didHandleInitialSport = useRef(false);
   const { address, isConnected } = useAccount();
@@ -1149,6 +1238,8 @@ export function App() {
         onHome={showHome}
         onSearchSubmit={submitSearch}
         connected={isConnected}
+        address={address}
+        balance={appState.balance}
       />
       <main className={`dashboard-shell ${page === 'match' ? 'is-match-open' : ''} ${pending || tickets.length || page === 'positions' || (isConnected && slipView === 'positions') ? 'has-right-rail' : 'no-right-rail'}`}>
         <section className="main-column">

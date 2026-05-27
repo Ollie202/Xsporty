@@ -1108,6 +1108,7 @@ body {
   background: #90ff00 !important;
   box-shadow: 0 10px 24px rgba(144, 255, 0, 0.22) !important;
   font-weight: 900 !important;
+  white-space: nowrap !important;
   transform: none !important;
 }
 
@@ -1148,6 +1149,57 @@ body {
 .featured-card,
 .match-row {
   transform: none !important;
+}
+
+.match-row--two-way .quick-odds {
+  grid-template-columns: repeat(2, minmax(0, 124px)) !important;
+  justify-content: center;
+}
+
+.match-row--two-way .quick-odds button {
+  max-width: 124px;
+}
+
+.match-row--esports {
+  min-height: 218px !important;
+  padding: 16px 18px !important;
+}
+
+.match-row--esports .match-meta {
+  margin-bottom: 2px;
+}
+
+.match-row--esports .match-teams {
+  min-height: 104px;
+  grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr) !important;
+  gap: 12px !important;
+}
+
+.match-row--esports .match-teams > div {
+  grid-template-rows: 58px auto;
+  gap: 8px;
+}
+
+.match-row--esports .match-teams img {
+  width: 76px !important;
+  height: 58px !important;
+  padding: 2px;
+}
+
+.match-row--esports .match-teams > b {
+  font-size: 20px;
+}
+
+.match-row--esports .match-teams strong {
+  max-width: 128px;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: 1.08;
+}
+
+.match-row--esports .quick-odds button {
+  min-height: 48px;
+  border-radius: 8px;
 }
 
 @media (min-width: 981px) {

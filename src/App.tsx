@@ -474,8 +474,13 @@ function FeaturedStrip({
 
 function MatchCard({ match, onOpen, onPick }: { match: MarketMatch; onOpen: (match: MarketMatch) => void; onPick: (choice: Choice) => void }) {
   const choices = quickChoices(match) as Choice[];
+  const isTwoWay = choices.length === 2;
   return (
-    <article className="match-row" data-search={marketSearch(match)} onClick={() => onOpen(match)}>
+    <article
+      className={`match-row match-row--${match.sport} ${isTwoWay ? 'match-row--two-way' : 'match-row--three-way'}`}
+      data-search={marketSearch(match)}
+      onClick={() => onOpen(match)}
+    >
       <div className="match-meta">
         <span>{match.isLive ? 'LIVE' : match.time}</span>
       </div>

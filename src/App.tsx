@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
-import { ArrowDownLeft, ArrowUpRight, Briefcase, ChevronDown, ChevronRight, Copy, Search, Settings } from 'lucide-react';
+import { ChevronDown, ChevronRight, Copy, Search, Settings } from 'lucide-react';
 import { useAccount, useDisconnect } from 'wagmi';
 import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
@@ -333,11 +333,6 @@ function Header({
           ) : null}
           {connected ? (
             <div className="profile-wallet" onClick={event => event.stopPropagation()}>
-              <button className="deposit-btn" type="button">Deposit</button>
-              <button className="portfolio-btn" type="button" onClick={onOpenPositions}>
-                <Briefcase size={16} aria-hidden="true" />
-                Portfolio
-              </button>
               <button className="account-chip" type="button" onClick={() => setWalletOpen(open => !open)} aria-expanded={walletOpen} aria-label="Open wallet menu">
                 <span>{balanceText}</span>
                 <ChevronDown size={16} aria-hidden="true" />
@@ -364,13 +359,6 @@ function Header({
                       Wallet <ChevronRight size={15} />
                     </button>
                   </div>
-                  <div className="wallet-menu-actions">
-                    <button type="button"><ArrowDownLeft size={17} />Deposit</button>
-                    <button type="button"><ArrowUpRight size={17} />Withdraw</button>
-                  </div>
-                  <button className="wallet-menu-row" type="button">
-                    <span>Invite Friends</span><b>0</b><ChevronRight size={15} />
-                  </button>
                   <button className="wallet-menu-row" type="button" onClick={toggleTheme}>
                     <span>Dark theme</span><i className={theme === 'dark' ? 'toggle is-on' : 'toggle'} aria-hidden="true" />
                   </button>
@@ -779,110 +767,63 @@ function TradeSlip({
   pending,
   amount,
   setAmount,
-  tickets,
-  view,
-  setView,
   connected,
   onConfirm,
-  onPnl,
 }: {
   pending: PendingTicket | null;
   amount: string;
   setAmount: (amount: string) => void;
-  tickets: Ticket[];
-  view: 'trade' | 'positions';
-  setView: (view: 'trade' | 'positions') => void;
   connected: boolean;
   onConfirm: () => void;
-  onPnl: (ticket: Ticket, index: number) => void;
 }) {
   const numericAmount = Number(amount) || 0;
   const price = pending?.price || 50;
   const shares = price > 0 ? numericAmount / (price / 100) : 0;
-  const [positionFilter, setPositionFilter] = useState<'open' | 'wins' | 'losses'>('open');
-  const visibleTickets = tickets.filter((ticket, index) => {
-    if (positionFilter === 'wins') return pNl(ticket, index) >= 0;
-    if (positionFilter === 'losses') return pNl(ticket, index) < 0;
-    return true;
-  });
 
   return (
     <aside className="right-rail">
       <section className="trade-slip">
         <div className="slip-tabs">
-          <button className={view === 'trade' ? 'is-active' : ''} type="button" onClick={() => setView('trade')}>Trade</button>
-          <button className={view === 'positions' ? 'is-active positions-tab' : 'positions-tab'} type="button" onClick={() => setView('positions')}>
-            My Positions
-            {tickets.length ? <span className="ticket-count-badge">{tickets.length}</span> : null}
+          <button className="is-active" type="button">Trade</button>
+        </div>
+        <div className="ticket-view trade-view is-active">
+          <div className="side-toggle" role="group" aria-label="Trade side">
+            <button className={pending?.side !== 'NO' ? 'is-active' : ''} type="button">YES</button>
+            <button className={pending?.side === 'NO' ? 'is-active' : ''} type="button">NO</button>
+          </div>
+          <h2>{pending?.title || 'Choose a market price'}</h2>
+          <label>
+            Amount
+            <span className="amount-wrap">
+              <input value={amount} onChange={event => setAmount(event.target.value.replace(/[^0-9.]/g, ''))} type="text" inputMode="decimal" aria-label="Trade amount" />
+              <span className="amount-suffix">{SYMBOL}</span>
+            </span>
+          </label>
+          <div className="quote-grid">
+            <span>Avg price</span>
+            <strong>{price}c</strong>
+            <span>Est. shares</span>
+            <strong>{shares.toFixed(1)}</strong>
+            <span>Max payout</span>
+            <strong>${shares.toFixed(2)}</strong>
+          </div>
+          <button className="connect-btn full confirm-trade" type="button" onClick={onConfirm}>
+            {connected ? 'Confirm ticket' : 'Connect wallet first'}
           </button>
         </div>
-        {view === 'trade' ? (
-          <div className="ticket-view trade-view is-active">
-            <div className="side-toggle" role="group" aria-label="Trade side">
-              <button className={pending?.side !== 'NO' ? 'is-active' : ''} type="button">YES</button>
-              <button className={pending?.side === 'NO' ? 'is-active' : ''} type="button">NO</button>
-            </div>
-            <h2>{pending?.title || 'Choose a market price'}</h2>
-            <label>
-              Amount
-              <span className="amount-wrap">
-                <input value={amount} onChange={event => setAmount(event.target.value.replace(/[^0-9.]/g, ''))} type="text" inputMode="decimal" aria-label="Trade amount" />
-                <span className="amount-suffix">{SYMBOL}</span>
-              </span>
-            </label>
-            <div className="quote-grid">
-              <span>Avg price</span>
-              <strong>{price}c</strong>
-              <span>Est. shares</span>
-              <strong>{shares.toFixed(1)}</strong>
-              <span>Max payout</span>
-              <strong>${shares.toFixed(2)}</strong>
-            </div>
-            <button className="connect-btn full confirm-trade" type="button" onClick={onConfirm}>
-              {connected ? 'Confirm ticket' : 'Connect wallet first'}
-            </button>
-          </div>
-        ) : (
-          <div className="ticket-view positions-view is-active">
-            <h2 className="positions-title">My Positions</h2>
-            <div className="mini-position-tabs" role="tablist" aria-label="Position filters">
-              <button className={positionFilter === 'open' ? 'is-active' : ''} type="button" onClick={() => setPositionFilter('open')}>Open tickets</button>
-              <button className={positionFilter === 'wins' ? 'is-active' : ''} type="button" onClick={() => setPositionFilter('wins')}>Wins</button>
-              <button className={positionFilter === 'losses' ? 'is-active' : ''} type="button" onClick={() => setPositionFilter('losses')}>Losses</button>
-            </div>
-            <div className="ticket-stack">
-              {visibleTickets.length ? (
-                <div className="position-tabs" aria-label="My positions">
-                  {visibleTickets.map((ticket) => {
-                    const originalIndex = tickets.findIndex(item => item.id === ticket.id);
-                    return (
-                    <button className="ticket-card" type="button" key={ticket.id} onClick={() => onPnl(ticket, originalIndex)}>
-                      <span className={`ticket-side ${ticket.side.toLowerCase()}`}>{ticket.side}</span>
-                      <strong>{ticket.title}</strong>
-                      <small>{ticket.price}c entry - {ticket.amount.toFixed(2)} {SYMBOL}</small>
-                      <b className={pNl(ticket, originalIndex) >= 0 ? 'is-profit' : 'is-loss'}>
-                        {pNl(ticket, originalIndex) >= 0 ? '+' : ''}{pNl(ticket, originalIndex).toFixed(2)}
-                      </b>
-                    </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="ticket-empty">
-                  <strong>{tickets.length ? 'No tickets in this tab' : 'No positions yet'}</strong>
-                  <span>{tickets.length ? 'Confirmed tickets will appear here when they match this filter.' : 'Pick any YES or NO price to create a position.'}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </section>
     </aside>
   );
 }
 
 function PositionsPage({ tickets, onBack, onPnl }: { tickets: Ticket[]; onBack: () => void; onPnl: (ticket: Ticket, index: number) => void }) {
+  const [positionFilter, setPositionFilter] = useState<'open' | 'wins' | 'losses'>('open');
   const net = tickets.reduce((sum, ticket, index) => sum + pNl(ticket, index), 0);
+  const visibleTickets = tickets.filter((ticket, index) => {
+    if (positionFilter === 'wins') return pNl(ticket, index) >= 0;
+    if (positionFilter === 'losses') return pNl(ticket, index) < 0;
+    return true;
+  });
   return (
     <section className="positions-dashboard">
       <button className="back-button" type="button" onClick={onBack}>Back to games</button>
@@ -900,19 +841,26 @@ function PositionsPage({ tickets, onBack, onPnl }: { tickets: Ticket[]; onBack: 
       </div>
       <div className="positions-dashboard__grid">
         <article className="history-list positions-dashboard__history">
-          <h3>Positions</h3>
+          <div className="positions-page-tabs" role="tablist" aria-label="Position filters">
+            <button className={positionFilter === 'open' ? 'is-active' : ''} type="button" onClick={() => setPositionFilter('open')}>Open tickets</button>
+            <button className={positionFilter === 'wins' ? 'is-active' : ''} type="button" onClick={() => setPositionFilter('wins')}>Wins</button>
+            <button className={positionFilter === 'losses' ? 'is-active' : ''} type="button" onClick={() => setPositionFilter('losses')}>Losses</button>
+          </div>
           <div className="dashboard-list">
-            {tickets.map((ticket, index) => (
-              <button className="dashboard-row" type="button" key={ticket.id} onClick={() => onPnl(ticket, index)}>
+            {visibleTickets.map((ticket) => {
+              const originalIndex = tickets.findIndex(item => item.id === ticket.id);
+              return (
+              <button className="dashboard-row" type="button" key={ticket.id} onClick={() => onPnl(ticket, originalIndex)}>
                 <div>
                   <span className={`ticket-side ${ticket.side.toLowerCase()}`}>{ticket.side}</span>
                   <strong>{ticket.title}</strong>
                   <small>{ticket.amount.toFixed(2)} shares at {ticket.price}c</small>
                 </div>
-                <b className={pNl(ticket, index) >= 0 ? 'is-profit' : 'is-loss'}>{pNl(ticket, index) >= 0 ? '+' : ''}{pNl(ticket, index).toFixed(2)} {SYMBOL}</b>
+                <b className={pNl(ticket, originalIndex) >= 0 ? 'is-profit' : 'is-loss'}>{pNl(ticket, originalIndex) >= 0 ? '+' : ''}{pNl(ticket, originalIndex).toFixed(2)} {SYMBOL}</b>
               </button>
-            ))}
-            {!tickets.length ? <div className="ticket-empty"><strong>No positions</strong><span>Confirmed tickets appear here.</span></div> : null}
+              );
+            })}
+            {!visibleTickets.length ? <div className="ticket-empty"><strong>{tickets.length ? 'No tickets in this tab' : 'No positions'}</strong><span>{tickets.length ? 'Try another tab.' : 'Confirmed tickets appear here.'}</span></div> : null}
           </div>
         </article>
       </div>
@@ -996,7 +944,6 @@ export function App() {
   const [pending, setPending] = useState<PendingTicket | null>(null);
   const [amount, setAmount] = useState('100');
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [slipView, setSlipView] = useState<'trade' | 'positions'>('trade');
   const [page, setPage] = useState<PageName>(initialRoute.current.page === 'match' && !initialRoute.current.matchId ? 'home' : initialRoute.current.page);
   const [pnlTicket, setPnlTicket] = useState<Ticket | null>(null);
   const [apiError, setApiError] = useState('');
@@ -1135,11 +1082,12 @@ export function App() {
     appState.price = price;
     appState.side = side;
     setPending(next);
-    setSlipView('trade');
   }, []);
 
   const openMatch = useCallback((match: MarketMatch) => {
+    appState.pendingTicket = null;
     setSelectedMatch(match);
+    setPending(null);
     setPage('match');
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }, []);
@@ -1200,7 +1148,7 @@ export function App() {
       appState.tickets = nextTickets;
       setTickets(nextTickets);
       setPending(null);
-      setSlipView('positions');
+      setPage('positions');
     } catch (error) {
       console.warn(error);
       window.alert(error instanceof Error ? error.message : 'Order submission failed');
@@ -1232,8 +1180,8 @@ export function App() {
         setQuery={setQuery}
         positionCount={tickets.length}
         onOpenPositions={() => {
-          setPage('home');
-          setSlipView('positions');
+          setSelectedMatch(null);
+          setPage('positions');
         }}
         onHome={showHome}
         onSearchSubmit={submitSearch}
@@ -1241,7 +1189,7 @@ export function App() {
         address={address}
         balance={appState.balance}
       />
-      <main className={`dashboard-shell ${page === 'match' ? 'is-match-open' : ''} ${pending || tickets.length || page === 'positions' || (isConnected && slipView === 'positions') ? 'has-right-rail' : 'no-right-rail'}`}>
+      <main className={`dashboard-shell ${page === 'match' ? 'is-match-open' : ''} ${pending && page === 'match' ? 'has-right-rail' : 'no-right-rail'}`}>
         <section className="main-column">
           {page === 'home' ? (
             <>
@@ -1257,17 +1205,15 @@ export function App() {
           {page === 'match' && selectedMatch ? <MatchPage match={selectedMatch} onBack={() => setPage('home')} onPick={pickMarket} /> : null}
           {page === 'positions' ? <PositionsPage tickets={tickets} onBack={() => setPage('home')} onPnl={setPnlTicket} /> : null}
         </section>
-        <TradeSlip
-          pending={pending}
-          amount={amount}
-          setAmount={setAmount}
-          tickets={tickets}
-          view={slipView}
-          setView={setSlipView}
-          connected={isConnected}
-          onConfirm={confirmTicket}
-          onPnl={setPnlTicket}
-        />
+        {pending && page === 'match' ? (
+          <TradeSlip
+            pending={pending}
+            amount={amount}
+            setAmount={setAmount}
+            connected={isConnected}
+            onConfirm={confirmTicket}
+          />
+        ) : null}
       </main>
       <button
         className="floating-ticket-button"
@@ -1278,8 +1224,8 @@ export function App() {
             animateOrb();
             return;
           }
-          setPage('home');
-          setSlipView('positions');
+          setSelectedMatch(null);
+          setPage('positions');
         }}
         aria-label={tickets.length ? 'Open positions' : 'FIFA World Cup 2026'}
       >

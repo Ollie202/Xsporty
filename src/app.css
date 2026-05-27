@@ -2050,3 +2050,826 @@ html[data-theme='dark'] .site-footer {
     gap: 24px !important;
   }
 }
+
+/* Final wallet simplification and smoother theme motion. */
+:root {
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+html,
+body,
+.topbar,
+.header-search,
+.market-board,
+.match-row,
+.featured-card,
+.trade-slip,
+.match-detail-card,
+.positions-dashboard,
+.site-footer,
+.quick-odds button,
+.featured-odds button,
+.option-row,
+.option-row .price,
+.account-chip,
+.modern-wallet-menu,
+.wallet-menu-head button,
+.wallet-menu-row,
+.wallet-menu-logout,
+.floating-ticket-btn {
+  transition:
+    background-color 650ms ease,
+    border-color 650ms ease,
+    color 650ms ease,
+    box-shadow 650ms ease,
+    opacity 650ms ease;
+}
+
+.wallet-panel {
+  gap: 12px !important;
+}
+
+.profile-wallet {
+  gap: 0 !important;
+}
+
+.account-chip {
+  min-width: 138px;
+  justify-content: space-between;
+  border-radius: 12px;
+}
+
+.modern-wallet-menu {
+  width: 360px;
+}
+
+.wallet-menu-balance {
+  padding: 4px 0 8px;
+  border-bottom: 1px solid #e8edf3;
+}
+
+.wallet-menu-row {
+  padding: 0;
+}
+
+html[data-theme='dark'] {
+  --bg: #060708;
+  --panel: #121417;
+  --panel-soft: #181b20;
+  --panel-raised: #171a1f;
+  --line: #272b31;
+  --line-soft: #343941;
+  --text: #f5f7fb;
+  --muted: #aeb6c3;
+}
+
+html[data-theme='dark'] body {
+  background:
+    radial-gradient(circle at top left, rgba(144, 255, 0, 0.06), transparent 30vw),
+    linear-gradient(180deg, #090b0d 0%, #050607 100%) !important;
+}
+
+html[data-theme='dark'] .topbar {
+  background: rgba(17, 19, 23, 0.96) !important;
+  border-color: #252a31 !important;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.24) !important;
+}
+
+html[data-theme='dark'] .header-search {
+  background: #202329 !important;
+  border-color: #2d333b !important;
+}
+
+html[data-theme='dark'] .header-search svg {
+  color: #e4e9f2 !important;
+}
+
+html[data-theme='dark'] .header-search input::placeholder {
+  color: #7f8898 !important;
+}
+
+html[data-theme='dark'] .market-board {
+  background: #101215 !important;
+  border-color: #272c34 !important;
+}
+
+html[data-theme='dark'] .match-row,
+html[data-theme='dark'] .featured-card {
+  background: linear-gradient(180deg, #15181d 0%, #101215 100%) !important;
+  border-color: #2c323a !important;
+}
+
+html[data-theme='dark'] .match-row:hover,
+html[data-theme='dark'] .featured-card:hover {
+  border-color: rgba(144, 255, 0, 0.38) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme='dark'] .quick-odds button,
+html[data-theme='dark'] .featured-odds button,
+html[data-theme='dark'] .option-row .price {
+  background: #1c2026 !important;
+  border-color: #363d47 !important;
+  color: #f4f7fb !important;
+}
+
+html[data-theme='dark'] .quick-odds button b,
+html[data-theme='dark'] .featured-odds button b,
+html[data-theme='dark'] .option-row .price b {
+  color: #f4f7fb !important;
+}
+
+html[data-theme='dark'] .quick-odds button span,
+html[data-theme='dark'] .featured-odds button span,
+html[data-theme='dark'] .option-row .price span {
+  color: #90ff00 !important;
+}
+
+html[data-theme='dark'] .quick-odds button:hover,
+html[data-theme='dark'] .featured-odds button:hover,
+html[data-theme='dark'] .option-row .price:hover {
+  border-color: #90ff00 !important;
+  background: #222832 !important;
+}
+
+html[data-theme='dark'] .match-meta,
+html[data-theme='dark'] .market-tabs button,
+html[data-theme='dark'] .top-sport-nav button {
+  color: #9fa9b8 !important;
+}
+
+html[data-theme='dark'] .top-sport-nav button.is-active,
+html[data-theme='dark'] .market-tabs button.is-active {
+  color: #fff !important;
+}
+
+html[data-theme='dark'] .account-chip,
+html[data-theme='dark'] .positions-top-btn {
+  background: #171a20 !important;
+  border-color: #333944 !important;
+  color: #f4f7fb !important;
+}
+
+html[data-theme='dark'] .modern-wallet-menu {
+  background: #101318 !important;
+  border-color: #2f3640 !important;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.52) !important;
+}
+
+html[data-theme='dark'] .wallet-menu-balance {
+  border-color: #2b313a !important;
+}
+
+html[data-theme='dark'] .wallet-menu-head small,
+html[data-theme='dark'] .wallet-menu-balance button,
+html[data-theme='dark'] .wallet-menu-row b {
+  color: #9ca6b6 !important;
+}
+
+html[data-theme='dark'] .wallet-menu-row:hover,
+html[data-theme='dark'] .wallet-menu-head button:hover {
+  color: #90ff00 !important;
+}
+
+html[data-theme='dark'] .site-footer {
+  background: #0d1117 !important;
+  border-top: 1px solid #242a33 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  .topbar,
+  .header-search,
+  .market-board,
+  .match-row,
+  .featured-card,
+  .trade-slip,
+  .match-detail-card,
+  .positions-dashboard,
+  .site-footer,
+  .quick-odds button,
+  .featured-odds button,
+  .option-row,
+  .option-row .price,
+  .account-chip,
+  .modern-wallet-menu,
+  .wallet-menu-head button,
+  .wallet-menu-row,
+  .wallet-menu-logout,
+  .floating-ticket-btn {
+    transition: none !important;
+  }
+}
+
+/* Positions now live on their own page, and dark mode is tuned for contrast. */
+.connect-wallet-btn {
+  min-height: 44px !important;
+  border-radius: 10px !important;
+  padding: 0 22px !important;
+  color: #0b1220 !important;
+  background: #90ff00 !important;
+  box-shadow: 0 12px 26px rgba(144, 255, 0, 0.24) !important;
+}
+
+.connect-wallet-btn:hover {
+  background: #7ee900 !important;
+  transform: translateY(-1px);
+}
+
+.positions-page-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(110px, 1fr));
+  gap: 4px;
+  width: min(100%, 480px);
+  margin: 0 0 18px;
+  padding: 4px;
+  border: 1px solid #dbe3eb;
+  border-radius: 12px;
+  background: #eef2f6;
+}
+
+.positions-page-tabs button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 9px;
+  color: #647085;
+  background: transparent;
+  font-weight: 900;
+}
+
+.positions-page-tabs button.is-active {
+  color: #0f172a;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+}
+
+html,
+body,
+.topbar,
+.header-search,
+.market-board,
+.match-detail-card,
+.trade-slip,
+.positions-dashboard,
+.site-footer {
+  transition:
+    background-color 360ms ease,
+    border-color 360ms ease,
+    color 360ms ease,
+    box-shadow 360ms ease !important;
+}
+
+.match-row,
+.featured-card,
+.quick-odds button,
+.featured-odds button,
+.option-row,
+.option-row .price,
+.account-chip,
+.modern-wallet-menu,
+.wallet-menu-row,
+.floating-ticket-button {
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease !important;
+}
+
+html[data-theme='dark'] .connect-wallet-btn {
+  color: #0b1220 !important;
+  background: #90ff00 !important;
+  border: 0 !important;
+  box-shadow: 0 14px 30px rgba(144, 255, 0, 0.16) !important;
+}
+
+html[data-theme='dark'] .account-chip {
+  background: #171b21 !important;
+  border-color: #303743 !important;
+  color: #f7f9fc !important;
+}
+
+html[data-theme='dark'] .match-detail-card {
+  background: #101317 !important;
+  border-color: #2b3139 !important;
+}
+
+html[data-theme='dark'] .detail-matchup h2,
+html[data-theme='dark'] .detail-team span,
+html[data-theme='dark'] .option-row strong {
+  color: #f8fafc !important;
+}
+
+html[data-theme='dark'] .detail-team small,
+html[data-theme='dark'] .option-row small {
+  color: #95a0af !important;
+}
+
+html[data-theme='dark'] .option-tabs {
+  border-color: #303743 !important;
+}
+
+html[data-theme='dark'] .option-tabs button {
+  color: #9aa5b5 !important;
+}
+
+html[data-theme='dark'] .option-tabs button.is-active {
+  color: #f8fafc !important;
+}
+
+html[data-theme='dark'] .option-row {
+  background: #171b20 !important;
+  border-color: #2b3139 !important;
+}
+
+html[data-theme='dark'] .option-row:nth-child(even) {
+  background: #14181d !important;
+}
+
+html[data-theme='dark'] .option-row .price {
+  background: #0f141b !important;
+  border-color: #343c47 !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme='dark'] .option-row .price:hover {
+  background: #18212b !important;
+  border-color: #90ff00 !important;
+}
+
+html[data-theme='dark'] .positions-dashboard {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-theme='dark'] .history-hero,
+html[data-theme='dark'] .history-summary article,
+html[data-theme='dark'] .positions-dashboard__history {
+  background: #11151a !important;
+  border-color: #2b3139 !important;
+}
+
+html[data-theme='dark'] .positions-page-tabs {
+  background: #171b21 !important;
+  border-color: #303743 !important;
+}
+
+html[data-theme='dark'] .positions-page-tabs button {
+  color: #9aa5b5 !important;
+}
+
+html[data-theme='dark'] .positions-page-tabs button.is-active {
+  color: #0b1220 !important;
+  background: #90ff00 !important;
+}
+
+html[data-theme='dark'] .back-button {
+  background: #f8fafc !important;
+  color: #0b1220 !important;
+  border-color: #f8fafc !important;
+}
+
+html[data-theme='dark'] .ticket-empty {
+  background: #12161c !important;
+  border-color: #303743 !important;
+}
+
+/* Theme/layout stabilization: dark mode should be the same app, not a new layout. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition:
+    background-color 420ms ease,
+    border-color 420ms ease,
+    color 420ms ease,
+    box-shadow 420ms ease !important;
+}
+
+html:not(.theme-switching) *,
+html:not(.theme-switching) *::before,
+html:not(.theme-switching) *::after {
+  transition-duration: revert !important;
+}
+
+html[data-theme='dark'] {
+  --bg: #07090c;
+  --panel: #12161c;
+  --panel-soft: #171c23;
+  --panel-raised: #151a21;
+  --line: #29313b;
+  --line-soft: #343d49;
+  --text: #f7f9fc;
+  --muted: #9aa5b5;
+}
+
+html[data-theme='dark'] body {
+  color: #f7f9fc !important;
+  background: #07090c !important;
+}
+
+html[data-theme='dark'] .topbar {
+  color: #f7f9fc !important;
+  background: #10141a !important;
+  border-color: #29313b !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22) !important;
+}
+
+html[data-theme='dark'] .brand strong,
+html[data-theme='dark'] .brand small,
+html[data-theme='dark'] .top-sport-nav button,
+html[data-theme='dark'] .top-sport-nav button.is-active {
+  color: #f7f9fc !important;
+}
+
+html[data-theme='dark'] .top-sport-nav button:not(.is-active) {
+  color: #9aa5b5 !important;
+}
+
+html[data-theme='dark'] .header-search {
+  color: #f7f9fc !important;
+  background: #171c23 !important;
+  border-color: #303946 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+html[data-theme='dark'] .header-search svg,
+html[data-theme='dark'] .header-search input {
+  color: #f7f9fc !important;
+}
+
+html[data-theme='dark'] .header-search input::placeholder {
+  color: #9aa5b5 !important;
+}
+
+html[data-theme='dark'] .market-board,
+html[data-theme='dark'] .match-row,
+html[data-theme='dark'] .featured-card,
+html[data-theme='dark'] .match-detail-card,
+html[data-theme='dark'] .positions-dashboard,
+html[data-theme='dark'] .history-hero,
+html[data-theme='dark'] .history-summary article,
+html[data-theme='dark'] .positions-dashboard__history {
+  color: #f7f9fc !important;
+  background: #12161c !important;
+  border-color: #29313b !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.24) !important;
+}
+
+html[data-theme='dark'] .match-row:hover,
+html[data-theme='dark'] .featured-card:hover {
+  border-color: #3d4856 !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme='dark'] .match-teams strong,
+html[data-theme='dark'] .featured-names span,
+html[data-theme='dark'] .section-head h2,
+html[data-theme='dark'] .market-tabs button.is-active,
+html[data-theme='dark'] .detail-matchup h2,
+html[data-theme='dark'] .detail-team span,
+html[data-theme='dark'] .option-row strong,
+html[data-theme='dark'] .trade-slip h2 {
+  color: #f7f9fc !important;
+}
+
+html[data-theme='dark'] .match-meta,
+html[data-theme='dark'] .market-tabs button,
+html[data-theme='dark'] .option-row small,
+html[data-theme='dark'] .option-row span,
+html[data-theme='dark'] .trade-slip label {
+  color: #9aa5b5 !important;
+}
+
+html[data-theme='dark'] .quick-odds button,
+html[data-theme='dark'] .featured-odds button,
+html[data-theme='dark'] .option-row .price,
+html[data-theme='dark'] .amount-wrap,
+html[data-theme='dark'] .quote-grid,
+html[data-theme='dark'] .side-toggle,
+html[data-theme='dark'] .ticket-empty {
+  color: #f7f9fc !important;
+  background: #171c23 !important;
+  border-color: #343d49 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme='dark'] .quick-odds button b,
+html[data-theme='dark'] .featured-odds button b,
+html[data-theme='dark'] .option-row .price b {
+  color: #f7f9fc !important;
+}
+
+html[data-theme='dark'] .quick-odds button span,
+html[data-theme='dark'] .featured-odds button span,
+html[data-theme='dark'] .option-row .price span {
+  color: #90ff00 !important;
+}
+
+html[data-theme='dark'] .option-row {
+  grid-template-columns: minmax(0, 1fr) repeat(2, minmax(130px, 190px)) !important;
+  color: #f7f9fc !important;
+  background: #12161c !important;
+  border-color: #29313b !important;
+}
+
+html[data-theme='dark'] .option-row:nth-child(even) {
+  background: #151a21 !important;
+}
+
+html[data-theme='dark'] .option-row .price:hover,
+html[data-theme='dark'] .quick-odds button:hover,
+html[data-theme='dark'] .featured-odds button:hover {
+  border-color: #90ff00 !important;
+  background: #1b241f !important;
+}
+
+html[data-theme='dark'] .trade-slip {
+  color: #f7f9fc !important;
+  background: #12161c !important;
+  border-color: #29313b !important;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme='dark'] .account-chip,
+html[data-theme='dark'] .positions-top-btn {
+  color: #f7f9fc !important;
+  background: #151a21 !important;
+  border-color: #303946 !important;
+}
+
+html[data-theme='dark'] .connect-wallet-btn {
+  color: #0b1220 !important;
+  background: #90ff00 !important;
+  border-color: #90ff00 !important;
+  box-shadow: 0 12px 26px rgba(144, 255, 0, 0.24) !important;
+}
+
+html[data-theme='dark'] .modern-wallet-menu {
+  color: #f7f9fc !important;
+  background: #12161c !important;
+  border-color: #303946 !important;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.4) !important;
+}
+
+html[data-theme='dark'] .wallet-menu-balance strong,
+html[data-theme='dark'] .wallet-menu-row {
+  color: #f7f9fc !important;
+}
+
+html[data-theme='dark'] .wallet-menu-head button {
+  color: #c8d0dc !important;
+  background: #171c23 !important;
+  border-color: #303946 !important;
+}
+
+.dashboard-shell.is-match-open.no-right-rail .main-column {
+  width: min(100%, 1240px) !important;
+  margin: 0 auto !important;
+}
+
+.dashboard-shell.is-match-open.no-right-rail .match-detail-card {
+  max-width: 1240px !important;
+  margin: 0 auto !important;
+}
+
+.dashboard-shell.is-match-open .option-row {
+  grid-template-columns: minmax(0, 1fr) repeat(2, minmax(130px, 190px)) !important;
+}
+
+.dashboard-shell.is-match-open .option-row .price {
+  width: 100% !important;
+}
+
+/* Clean final theme layer. This keeps dark mode as the same layout with new colors only. */
+html.theme-switching body,
+html.theme-switching .topbar,
+html.theme-switching .header-search,
+html.theme-switching .market-board,
+html.theme-switching .match-row,
+html.theme-switching .featured-card,
+html.theme-switching .match-detail-card,
+html.theme-switching .trade-slip,
+html.theme-switching .positions-dashboard,
+html.theme-switching .site-footer,
+html.theme-switching .quick-odds button,
+html.theme-switching .featured-odds button,
+html.theme-switching .option-row,
+html.theme-switching .option-row .price,
+html.theme-switching .account-chip,
+html.theme-switching .modern-wallet-menu,
+html.theme-switching .wallet-menu-row,
+html.theme-switching .wallet-menu-head button {
+  transition:
+    background-color 520ms ease,
+    border-color 520ms ease,
+    color 520ms ease,
+    box-shadow 520ms ease !important;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #07090c;
+  --panel: #11151a;
+  --panel-soft: #161b22;
+  --panel-raised: #141920;
+  --line: #29313a;
+  --line-soft: #343d48;
+  --text: #f7f9fc;
+  --muted: #9ba6b6;
+}
+
+html[data-theme='dark'] body {
+  color: var(--text) !important;
+  background: #07090c !important;
+}
+
+html[data-theme='dark'] .topbar {
+  background: #10141a !important;
+  border-color: #29313a !important;
+  box-shadow: none !important;
+}
+
+html[data-theme='dark'] .header-search {
+  color: var(--text) !important;
+  background: #171c23 !important;
+  border-color: #303946 !important;
+}
+
+html[data-theme='dark'] .header-search svg,
+html[data-theme='dark'] .header-search input {
+  color: var(--text) !important;
+}
+
+html[data-theme='dark'] .header-search input::placeholder {
+  color: #9ba6b6 !important;
+}
+
+html[data-theme='dark'] .brand strong,
+html[data-theme='dark'] .section-head h2,
+html[data-theme='dark'] .market-tabs button.is-active,
+html[data-theme='dark'] .top-sport-nav button.is-active,
+html[data-theme='dark'] .match-teams strong,
+html[data-theme='dark'] .featured-names span,
+html[data-theme='dark'] .detail-matchup h2,
+html[data-theme='dark'] .detail-team span,
+html[data-theme='dark'] .option-row strong,
+html[data-theme='dark'] .trade-slip h2 {
+  color: var(--text) !important;
+}
+
+html[data-theme='dark'] .brand small,
+html[data-theme='dark'] .market-tabs button,
+html[data-theme='dark'] .top-sport-nav button,
+html[data-theme='dark'] .match-meta,
+html[data-theme='dark'] .option-row small,
+html[data-theme='dark'] .option-row span,
+html[data-theme='dark'] .trade-slip label {
+  color: var(--muted) !important;
+}
+
+html[data-theme='dark'] .market-board,
+html[data-theme='dark'] .match-row,
+html[data-theme='dark'] .featured-card,
+html[data-theme='dark'] .match-detail-card,
+html[data-theme='dark'] .positions-dashboard,
+html[data-theme='dark'] .history-hero,
+html[data-theme='dark'] .history-summary article,
+html[data-theme='dark'] .positions-dashboard__history {
+  color: var(--text) !important;
+  background: var(--panel) !important;
+  border-color: var(--line) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme='dark'] .quick-odds button,
+html[data-theme='dark'] .featured-odds button,
+html[data-theme='dark'] .option-row .price,
+html[data-theme='dark'] .amount-wrap,
+html[data-theme='dark'] .quote-grid,
+html[data-theme='dark'] .side-toggle,
+html[data-theme='dark'] .ticket-empty {
+  color: var(--text) !important;
+  background: var(--panel-soft) !important;
+  border-color: var(--line-soft) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme='dark'] .quick-odds button b,
+html[data-theme='dark'] .featured-odds button b,
+html[data-theme='dark'] .option-row .price b {
+  color: var(--text) !important;
+}
+
+html[data-theme='dark'] .quick-odds button span,
+html[data-theme='dark'] .featured-odds button span,
+html[data-theme='dark'] .option-row .price span {
+  color: #90ff00 !important;
+}
+
+html[data-theme='dark'] .option-row {
+  color: var(--text) !important;
+  background: var(--panel) !important;
+  border-color: var(--line) !important;
+}
+
+html[data-theme='dark'] .option-row:nth-child(even) {
+  background: var(--panel-raised) !important;
+}
+
+html[data-theme='dark'] .connect-wallet-btn {
+  color: #0b1220 !important;
+  background: #90ff00 !important;
+  border-color: #90ff00 !important;
+  box-shadow: 0 12px 26px rgba(144, 255, 0, 0.2) !important;
+}
+
+html[data-theme='dark'] .account-chip,
+html[data-theme='dark'] .positions-top-btn {
+  color: var(--text) !important;
+  background: var(--panel-raised) !important;
+  border-color: var(--line-soft) !important;
+}
+
+html[data-theme='dark'] .modern-wallet-menu {
+  color: var(--text) !important;
+  background: var(--panel) !important;
+  border-color: var(--line-soft) !important;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.42) !important;
+}
+
+html[data-theme='dark'] .wallet-menu-balance strong,
+html[data-theme='dark'] .wallet-menu-row {
+  color: var(--text) !important;
+}
+
+html[data-theme='dark'] .wallet-menu-head button {
+  color: #c9d1dd !important;
+  background: var(--panel-soft) !important;
+  border-color: var(--line-soft) !important;
+}
+
+html[data-theme='dark'] .site-footer {
+  background: #0d1117 !important;
+  border-top-color: #242b34 !important;
+}
+
+.dashboard-shell.no-right-rail {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.dashboard-shell.no-right-rail .right-rail {
+  display: none !important;
+}
+
+.dashboard-shell.is-match-open.no-right-rail .main-column,
+.dashboard-shell.is-match-open.no-right-rail .match-detail-card {
+  width: min(100%, 1240px) !important;
+  max-width: 1240px !important;
+  margin-inline: auto !important;
+}
+
+.dashboard-shell.is-match-open .option-row {
+  grid-template-columns: minmax(0, 1fr) repeat(2, minmax(132px, 190px)) !important;
+  align-items: center !important;
+}
+
+.dashboard-shell.is-match-open .option-row .price {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+/* Dark mode polish for migrated legacy pills/buttons. */
+html[data-theme='dark'] .match-meta,
+html[data-theme='dark'] .detail-meta span {
+  color: #c3cbd7 !important;
+  background: #171d25 !important;
+  border-color: #303946 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+html[data-theme='dark'] .connect-wallet-btn {
+  color: #08111f !important;
+  background: #7ee600 !important;
+  border-color: #7ee600 !important;
+  box-shadow: 0 10px 22px rgba(126, 230, 0, 0.14) !important;
+}
+
+html[data-theme='dark'] .connect-wallet-btn:hover {
+  background: #73d400 !important;
+  box-shadow: 0 12px 24px rgba(126, 230, 0, 0.18) !important;
+}
+
+html[data-theme='dark'] .featured-odds button span,
+html[data-theme='dark'] .quick-odds button span,
+html[data-theme='dark'] .option-row .price span {
+  color: #7ee600 !important;
+}
+
+@media (max-width: 860px) {
+  .dashboard-shell.is-match-open .option-row,
+  html[data-theme='dark'] .option-row {
+    grid-template-columns: 1fr !important;
+  }
+}

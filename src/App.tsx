@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
-import { ChevronDown, ChevronRight, Copy, Search, Settings } from 'lucide-react';
+import { ChevronDown, ChevronRight, Copy, Search, Settings, X as XIcon } from 'lucide-react';
 import { useAccount, useDisconnect } from 'wagmi';
 import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
@@ -698,11 +698,15 @@ function LoadingMarkets() {
 
 function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () => void; onPick: (choice: Choice) => void }) {
   const [group, setGroup] = useState('All');
+  const [statsOpen, setStatsOpen] = useState(false);
   const groups = useMemo(() => ['All', ...Array.from(new Set(match.options.map(optionCategory)))], [match]);
   const shownOptions = group === 'All' ? match.options : match.options.filter(option => optionCategory(option) === group);
+  const homeForm = useMemo(() => buildFormRows(match.homeCode, match.home), [match.homeCode, match.home]);
+  const awayForm = useMemo(() => buildFormRows(match.awayCode, match.away), [match.awayCode, match.away]);
 
   useEffect(() => {
     setGroup('All');
+    setStatsOpen(false);
   }, [match.id]);
 
   return (
@@ -728,7 +732,21 @@ function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () =
           </div>
         </div>
         <div className="stats-toggle-box">
-          <button className="stats-toggle" type="button">STATS</button>
+          <button className="stats-toggle" type="button" onClick={() => setStatsOpen(open => !open)} aria-expanded={statsOpen}>
+            STATS <ChevronDown size={15} className={statsOpen ? 'is-open' : ''} aria-hidden="true" />
+          </button>
+          {statsOpen ? (
+            <div className="stats-dropdown">
+              <div className="stats-dropdown__header">
+                <strong>Last 5 matches</strong>
+                <span>Placeholder form data</span>
+              </div>
+              <div className="stats-grid">
+                <FormColumn title={match.home} rows={homeForm} />
+                <FormColumn title={match.away} rows={awayForm} />
+              </div>
+            </div>
+          ) : null}
         </div>
         <div className="option-tabs" aria-label="Match market groups">
           {groups.map(item => (
@@ -763,18 +781,47 @@ function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () =
   );
 }
 
+function buildFormRows(code: string, name: string) {
+  const shortCode = code || getInitials(name);
+  return [
+    { result: 'W', venue: 'Home', score: '2-1', opponent: 'USA' },
+    { result: 'D', venue: 'Away', score: '1-1', opponent: 'Japan' },
+    { result: 'W', venue: 'Home', score: '3-0', opponent: 'Canada' },
+    { result: 'L', venue: 'Away', score: '0-1', opponent: 'France' },
+    { result: 'D', venue: 'Home', score: '2-2', opponent: 'Mexico' },
+  ].map(row => ({ ...row, code: shortCode }));
+}
+
+function FormColumn({ title, rows }: { title: string; rows: ReturnType<typeof buildFormRows> }) {
+  return (
+    <div className="form-column">
+      <h3>{title}</h3>
+      {rows.map((row, index) => (
+        <div className="form-row" key={`${row.code}-${row.opponent}-${index}`}>
+          <span className={`form-badge ${row.result.toLowerCase()}`}>{row.result}</span>
+          <strong>{row.code}</strong>
+          <span>{row.score}</span>
+          <small>{row.venue} vs {row.opponent}</small>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function TradeSlip({
   pending,
   amount,
   setAmount,
   connected,
   onConfirm,
+  onClose,
 }: {
   pending: PendingTicket | null;
   amount: string;
   setAmount: (amount: string) => void;
   connected: boolean;
   onConfirm: () => void;
+  onClose: () => void;
 }) {
   const numericAmount = Number(amount) || 0;
   const price = pending?.price || 50;
@@ -783,8 +830,13 @@ function TradeSlip({
   return (
     <aside className="right-rail">
       <section className="trade-slip">
-        <div className="slip-tabs">
-          <button className="is-active" type="button">Trade</button>
+        <div className="slip-topline">
+          <div className="slip-tabs">
+            <button className="is-active" type="button">Trade</button>
+          </div>
+          <button className="slip-close" type="button" onClick={onClose} aria-label="Close trade panel">
+            <XIcon size={16} aria-hidden="true" />
+          </button>
         </div>
         <div className="ticket-view trade-view is-active">
           <div className="side-toggle" role="group" aria-label="Trade side">
@@ -1212,6 +1264,10 @@ export function App() {
             setAmount={setAmount}
             connected={isConnected}
             onConfirm={confirmTicket}
+            onClose={() => {
+              appState.pendingTicket = null;
+              setPending(null);
+            }}
           />
         ) : null}
       </main>

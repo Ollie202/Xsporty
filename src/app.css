@@ -1204,26 +1204,92 @@ body {
 
 @media (min-width: 981px) {
   .topbar {
-    min-height: 132px !important;
+    min-height: 144px !important;
+    height: 144px !important;
   }
 
   .topbar__inner {
-    padding: 18px 0 12px !important;
-    gap: 14px 24px !important;
+    width: min(100% - 40px, 1840px) !important;
+    grid-template-columns: minmax(230px, 280px) minmax(360px, 1fr) auto !important;
+    grid-template-rows: 56px 32px !important;
+    align-items: center !important;
+    padding: 20px 0 12px !important;
+    gap: 12px 28px !important;
+  }
+
+  .brand__mark {
+    flex-basis: 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .brand strong {
+    font-size: 21px !important;
+  }
+
+  .brand small {
+    font-size: 11px !important;
+  }
+
+  .header-search {
+    max-width: 975px !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    border-radius: 14px !important;
+  }
+
+  .positions-top-btn,
+  .wallet-panel [data-testid="rk-connect-button"],
+  .wallet-panel [data-testid="rk-account-button"] {
+    min-height: 44px !important;
+  }
+
+  .top-sport-nav {
+    align-self: end !important;
+    gap: 22px !important;
+    padding-bottom: 0 !important;
+  }
+
+  .top-sport-nav button {
+    min-height: 28px !important;
+    padding-bottom: 7px !important;
+    font-size: 14px !important;
+  }
+
+  .dashboard-shell {
+    width: min(100% - 40px, 1840px) !important;
+    margin: 12px auto 0 !important;
+    padding: 0 0 12px !important;
   }
 
   .wc-hero-banner {
-    height: 470px !important;
-    min-height: 470px !important;
-    max-height: 470px !important;
+    height: 478px !important;
+    min-height: 478px !important;
+    max-height: 478px !important;
+    margin-bottom: 12px !important;
   }
 
   .wc-hero-content {
-    padding: 42px 58px !important;
+    padding: 38px 52px !important;
   }
 
   .wc-hero-title {
-    font-size: clamp(58px, 5.7vw, 92px) !important;
+    font-size: clamp(58px, 5.25vw, 88px) !important;
+  }
+
+  .wc-hero-left {
+    gap: 10px !important;
+    max-width: 720px !important;
+  }
+
+  .wc-hero-badges span {
+    min-height: 30px !important;
+    padding: 0 26px !important;
+  }
+
+  .wc-hero-action {
+    min-height: 48px !important;
+    padding: 0 36px !important;
   }
 }
 

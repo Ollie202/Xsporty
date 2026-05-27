@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
     "build": "node scripts/build-runtime-config.mjs && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "start": "npm run dev"
@@ -16,13 +17,26 @@
     "@tanstack/query-core": "5.100.14",
     "@tanstack/react-query": "^5.59.16",
     "@vitejs/plugin-react": "^4.3.3",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.40.0",
+    "lucide-react": "^1.16.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.6.0",
     "viem": "^2.21.38",
     "vite": "^5.4.10",
-    "wagmi": "^2.12.25"
+    "wagmi": "^2.12.25",
+    "zustand": "^5.0.13"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "3.4.17",
+    "typescript": "^5.9.3"
   }
 }

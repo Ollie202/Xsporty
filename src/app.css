@@ -1340,6 +1340,21 @@ body {
     gap: 9px !important;
   }
 
+  .wc-hero-teams span {
+    width: 52px !important;
+    height: 34px !important;
+    border-radius: 6px !important;
+    border-color: rgba(240, 204, 96, 0.42) !important;
+    background: rgba(8, 13, 24, 0.42) !important;
+  }
+
+  .wc-hero-teams img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 4px !important;
+  }
+
   .wc-hero-hosts {
     width: 174px !important;
     font-size: 11px !important;
@@ -1441,5 +1456,142 @@ body {
   .wc-hero-teams {
     transform: scale(0.86) !important;
     transform-origin: right center !important;
+  }
+
+  .wc-hero-teams span {
+    width: 50px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
+  }
+
+  .wc-hero-teams img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 4px !important;
+  }
+}
+
+/* Header, search, positions and rail polish after the React migration. */
+.header-search {
+  appearance: none !important;
+}
+
+.header-search input {
+  appearance: none !important;
+}
+
+.mini-position-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 4px;
+  border: 1px solid #dbe3eb;
+  border-radius: 12px;
+  background: #f3f6fa;
+}
+
+.mini-position-tabs button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 8px;
+  color: #667085;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.mini-position-tabs button.is-active {
+  color: #101827;
+  background: #fff;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-shell {
+  display: grid !important;
+}
+
+.dashboard-shell.has-right-rail {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.dashboard-shell.has-right-rail .right-rail {
+  display: block !important;
+}
+
+@media (min-width: 1180px) {
+  .topbar {
+    height: 144px !important;
+    min-height: 144px !important;
+    max-height: 144px !important;
+  }
+
+  .topbar__inner {
+    height: 100% !important;
+    grid-template-columns: minmax(220px, 280px) minmax(360px, 1fr) auto !important;
+    grid-template-rows: minmax(54px, 1fr) 34px !important;
+    grid-template-areas:
+      "brand search wallet"
+      "sports sports sports" !important;
+    align-items: center !important;
+    padding: 20px 0 14px !important;
+  }
+
+  .top-sport-nav {
+    align-self: end !important;
+    align-items: flex-end !important;
+    min-height: 34px !important;
+    padding-bottom: 0 !important;
+  }
+
+  .top-sport-nav button {
+    align-self: end !important;
+  }
+
+  .header-search {
+    max-width: 900px !important;
+    justify-self: center !important;
+  }
+
+  .dashboard-shell.has-right-rail {
+    grid-template-columns: minmax(0, 1fr) 360px !important;
+    align-items: start !important;
+    gap: 18px !important;
+  }
+
+  .dashboard-shell.has-right-rail .main-column {
+    min-width: 0 !important;
+  }
+
+  .dashboard-shell.has-right-rail .right-rail {
+    display: block !important;
+    position: sticky !important;
+    top: 158px !important;
+    align-self: start !important;
+    width: 360px !important;
+    min-width: 0 !important;
+    z-index: 4 !important;
+  }
+
+  .dashboard-shell.has-right-rail .trade-slip {
+    max-height: calc(100vh - 178px) !important;
+    overflow: auto !important;
+  }
+
+  .dashboard-shell.has-right-rail .match-list {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1179px) {
+  .dashboard-shell.has-right-rail {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .dashboard-shell.has-right-rail .right-rail {
+    position: static !important;
+    width: 100% !important;
   }
 }

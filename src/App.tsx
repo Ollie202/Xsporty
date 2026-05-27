@@ -263,6 +263,7 @@ function Header({
   positionCount,
   onOpenPositions,
   onHome,
+  onSearchSubmit,
   connected,
 }: {
   sport: string;
@@ -272,6 +273,7 @@ function Header({
   positionCount: number;
   onOpenPositions: () => void;
   onHome: () => void;
+  onSearchSubmit: () => void;
   connected: boolean;
 }) {
   return (
@@ -285,10 +287,10 @@ function Header({
           </span>
         </button>
 
-        <label className="search-box header-search">
+        <form className="search-box header-search" role="search" onSubmit={event => { event.preventDefault(); onSearchSubmit(); }}>
           <Search aria-hidden="true" size={22} />
           <input value={query} onChange={event => setQuery(event.target.value)} type="search" placeholder="Search teams, players, markets" />
-        </label>
+        </form>
 
         <div className="wallet-panel">
           {connected ? (
@@ -708,6 +710,12 @@ function TradeSlip({
   const numericAmount = Number(amount) || 0;
   const price = pending?.price || 50;
   const shares = price > 0 ? numericAmount / (price / 100) : 0;
+  const [positionFilter, setPositionFilter] = useState<'open' | 'wins' | 'losses'>('open');
+  const visibleTickets = tickets.filter((ticket, index) => {
+    if (positionFilter === 'wins') return pNl(ticket, index) >= 0;
+    if (positionFilter === 'losses') return pNl(ticket, index) < 0;
+    return true;
+  });
 
   return (
     <aside className="right-rail">
@@ -748,24 +756,32 @@ function TradeSlip({
         ) : (
           <div className="ticket-view positions-view is-active">
             <h2 className="positions-title">My Positions</h2>
+            <div className="mini-position-tabs" role="tablist" aria-label="Position filters">
+              <button className={positionFilter === 'open' ? 'is-active' : ''} type="button" onClick={() => setPositionFilter('open')}>Open tickets</button>
+              <button className={positionFilter === 'wins' ? 'is-active' : ''} type="button" onClick={() => setPositionFilter('wins')}>Wins</button>
+              <button className={positionFilter === 'losses' ? 'is-active' : ''} type="button" onClick={() => setPositionFilter('losses')}>Losses</button>
+            </div>
             <div className="ticket-stack">
-              {tickets.length ? (
+              {visibleTickets.length ? (
                 <div className="position-tabs" aria-label="My positions">
-                  {tickets.map((ticket, index) => (
-                    <button className="ticket-card" type="button" key={ticket.id} onClick={() => onPnl(ticket, index)}>
+                  {visibleTickets.map((ticket) => {
+                    const originalIndex = tickets.findIndex(item => item.id === ticket.id);
+                    return (
+                    <button className="ticket-card" type="button" key={ticket.id} onClick={() => onPnl(ticket, originalIndex)}>
                       <span className={`ticket-side ${ticket.side.toLowerCase()}`}>{ticket.side}</span>
                       <strong>{ticket.title}</strong>
                       <small>{ticket.price}c entry - {ticket.amount.toFixed(2)} {SYMBOL}</small>
-                      <b className={pNl(ticket, index) >= 0 ? 'is-profit' : 'is-loss'}>
-                        {pNl(ticket, index) >= 0 ? '+' : ''}{pNl(ticket, index).toFixed(2)}
+                      <b className={pNl(ticket, originalIndex) >= 0 ? 'is-profit' : 'is-loss'}>
+                        {pNl(ticket, originalIndex) >= 0 ? '+' : ''}{pNl(ticket, originalIndex).toFixed(2)}
                       </b>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="ticket-empty">
-                  <strong>No positions yet</strong>
-                  <span>Pick any YES or NO price to create a position.</span>
+                  <strong>{tickets.length ? 'No tickets in this tab' : 'No positions yet'}</strong>
+                  <span>{tickets.length ? 'Confirmed tickets will appear here when they match this filter.' : 'Pick any YES or NO price to create a position.'}</span>
                 </div>
               )}
             </div>
@@ -1039,6 +1055,29 @@ export function App() {
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }, []);
 
+  const submitSearch = useCallback(() => {
+    const term = query.trim().toLowerCase();
+    if (!term) {
+      document.querySelector('#games-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    const playerHit = players.find(player => `${player.name} ${player.country} ${player.title} ${player.label}`.toLowerCase().includes(term));
+    if (playerHit) {
+      setSport('football');
+      setCategory('players');
+      document.querySelector('#games-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    const matchHit = matches.find(match => match.sport === sport && marketSearch(match).includes(term)) || matches.find(match => marketSearch(match).includes(term));
+    if (matchHit) {
+      setSport(matchHit.sport);
+      setCategory(matchHit.group || 'all');
+      openMatch(matchHit);
+      return;
+    }
+    document.querySelector('#games-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [matches, openMatch, players, query, sport]);
+
   const showHome = useCallback(() => {
     setSelectedMatch(null);
     setPage('home');
@@ -1103,11 +1142,15 @@ export function App() {
         query={query}
         setQuery={setQuery}
         positionCount={tickets.length}
-        onOpenPositions={() => setPage('positions')}
+        onOpenPositions={() => {
+          setPage('home');
+          setSlipView('positions');
+        }}
         onHome={showHome}
+        onSearchSubmit={submitSearch}
         connected={isConnected}
       />
-      <main className={`dashboard-shell ${page === 'match' ? 'is-match-open' : ''} ${pending || tickets.length || page === 'positions' ? 'has-right-rail' : 'no-right-rail'}`}>
+      <main className={`dashboard-shell ${page === 'match' ? 'is-match-open' : ''} ${pending || tickets.length || page === 'positions' || (isConnected && slipView === 'positions') ? 'has-right-rail' : 'no-right-rail'}`}>
         <section className="main-column">
           {page === 'home' ? (
             <>
@@ -1135,7 +1178,20 @@ export function App() {
           onPnl={setPnlTicket}
         />
       </main>
-      <button className="floating-ticket-button" type="button" ref={orbRef} onClick={() => (tickets.length ? setPage('positions') : animateOrb())} aria-label={tickets.length ? 'Open positions' : 'FIFA World Cup 2026'}>
+      <button
+        className="floating-ticket-button"
+        type="button"
+        ref={orbRef}
+        onClick={() => {
+          if (!tickets.length) {
+            animateOrb();
+            return;
+          }
+          setPage('home');
+          setSlipView('positions');
+        }}
+        aria-label={tickets.length ? 'Open positions' : 'FIFA World Cup 2026'}
+      >
         {tickets.length ? <span className="ticket-count-badge">{tickets.length}</span> : null}
         <img src="wc2026.png" alt="FIFA World Cup 2026" className="wc26-logo" />
       </button>

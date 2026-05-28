@@ -1,13 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, ChevronRight, Copy, Search, X as XIcon } from 'lucide-react';
-import { useAccount, useDisconnect } from 'wagmi';
 import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
 import { getApiBaseUrl, sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
 import { flagUrl, getInitials, shortAddress } from '../js/utils.js';
 import { useUiStore } from './stores/uiStore';
+import type { WalletActions } from './wallet/WalletRuntime';
 
 const appState = legacyState as {
   selectedWalletId: string | null;
@@ -135,6 +134,16 @@ const footballTabs = [
   ['players', 'Player Futures'],
 ];
 const nonFootballTabs = [['all', 'All Games']];
+const LazyWalletRuntime = lazy(() => import('./wallet/WalletRuntime').then(module => ({ default: module.WalletRuntime })));
+
+type WalletUiState = {
+  connected: boolean;
+  address?: string;
+};
+
+function shouldLoadWalletRuntimeOnBoot() {
+  return appState.connected || window.localStorage.getItem('wagmi.store') !== null;
+}
 
 function BrandMark() {
   return (
@@ -281,54 +290,6 @@ function pNl(ticket: Ticket, index: number) {
   return ticket.amount * move;
 }
 
-function WalletSync({ onWalletChange }: { onWalletChange: () => void }) {
-  const { address, connector, isConnected } = useAccount();
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function syncWallet() {
-      if (!isConnected || !address || !connector) {
-        if (appState.selectedWalletId === 'rainbowkit') {
-          appState.selectedWalletId = null;
-          appState.walletProvider = null;
-          appState.account = null;
-          appState.connected = false;
-          appState.balance = null;
-          appState.portfolio = null;
-          appState.pendingTicket = null;
-        }
-        onWalletChange();
-        return;
-      }
-
-      const provider = await connector.getProvider();
-      if (cancelled) return;
-
-      appState.selectedWalletId = 'rainbowkit';
-      appState.walletProvider = provider;
-      appState.account = address;
-      appState.connected = true;
-      appState.balance = null;
-      appState.portfolio = null;
-
-      await refreshPortfolio().catch(() => undefined);
-      onWalletChange();
-    }
-
-    syncWallet().catch(error => {
-      console.warn('Wallet sync failed:', error);
-      onWalletChange();
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [address, connector, isConnected, onWalletChange]);
-
-  return null;
-}
-
 function Header({
   sport,
   setSport,
@@ -341,6 +302,8 @@ function Header({
   connected,
   address,
   balance,
+  onConnectWallet,
+  onDisconnectWallet,
 }: {
   sport: string;
   setSport: (sport: string) => void;
@@ -353,9 +316,10 @@ function Header({
   connected: boolean;
   address?: string;
   balance: number | null;
+  onConnectWallet: () => void;
+  onDisconnectWallet: () => void;
 }) {
   const [walletOpen, setWalletOpen] = useState(false);
-  const { disconnect } = useDisconnect();
   const theme = useUiStore(state => state.theme);
   const toggleTheme = useUiStore(state => state.toggleTheme);
   const displayAddress = address ? shortAddress(address) : '';
@@ -421,20 +385,16 @@ function Header({
                     <span>Dark theme</span>
                     <i className={theme === 'dark' ? 'toggle is-on' : 'toggle'} aria-hidden="true" />
                   </button>
-                  <button className="wallet-menu-logout" type="button" onClick={() => disconnect()}>
+                  <button className="wallet-menu-logout" type="button" onClick={() => { setWalletOpen(false); onDisconnectWallet(); }}>
                     Log out
                   </button>
                 </div>
               ) : null}
             </div>
           ) : (
-            <ConnectButton.Custom>
-              {({ openConnectModal }) => (
-                <button className="connect-wallet-btn" type="button" onClick={openConnectModal}>
-                  Connect Wallet
-                </button>
-              )}
-            </ConnectButton.Custom>
+            <button className="connect-wallet-btn" type="button" onClick={onConnectWallet}>
+              Connect Wallet
+            </button>
           )}
         </div>
 
@@ -1116,14 +1076,36 @@ export function App() {
   const [apiError, setApiError] = useState('');
   const [loadingMarkets, setLoadingMarkets] = useState(true);
   const [walletPulse, setWalletPulse] = useState(0);
+  const [walletRuntimeEnabled, setWalletRuntimeEnabled] = useState(shouldLoadWalletRuntimeOnBoot);
+  const [walletConnectRequestId, setWalletConnectRequestId] = useState(0);
+  const [walletState, setWalletState] = useState<WalletUiState>({
+    connected: appState.connected,
+    address: appState.account || undefined,
+  });
   const orbRef = useRef<HTMLButtonElement | null>(null);
+  const walletActionsRef = useRef<WalletActions>({});
   const didHandleInitialSport = useRef(false);
-  const { address, isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
 
   const refreshWalletState = useCallback(() => {
     setWalletPulse(value => value + 1);
     setTickets([...(appState.tickets || [])] as Ticket[]);
+  }, []);
+
+  const requestWalletConnect = useCallback(() => {
+    setWalletRuntimeEnabled(true);
+    setWalletConnectRequestId(value => value + 1);
+  }, []);
+
+  const registerWalletActions = useCallback((actions: WalletActions) => {
+    walletActionsRef.current = actions;
+  }, []);
+
+  const updateWalletState = useCallback((nextState: WalletUiState) => {
+    setWalletState(nextState);
+  }, []);
+
+  const disconnectWallet = useCallback(() => {
+    walletActionsRef.current.disconnect?.();
   }, []);
 
   const changeSport = useCallback((nextSport: string) => {
@@ -1314,8 +1296,8 @@ export function App() {
       window.alert('Enter an amount');
       return;
     }
-    if (!isConnected || !address) {
-      openConnectModal?.();
+    if (!walletState.connected || !walletState.address) {
+      requestWalletConnect();
       return;
     }
     try {
@@ -1332,7 +1314,7 @@ export function App() {
       console.warn(error);
       window.alert(error instanceof Error ? error.message : 'Order submission failed');
     }
-  }, [address, amount, isConnected, openConnectModal, pending, refreshWalletState]);
+  }, [amount, pending, refreshWalletState, requestWalletConnect, walletState.address, walletState.connected]);
 
   const animateOrb = useCallback(() => {
     const node = orbRef.current;
@@ -1344,7 +1326,16 @@ export function App() {
 
   return (
     <>
-      <WalletSync onWalletChange={refreshWalletState} />
+      {walletRuntimeEnabled ? (
+        <Suspense fallback={null}>
+          <LazyWalletRuntime
+            connectRequestId={walletConnectRequestId}
+            onWalletChange={refreshWalletState}
+            onWalletState={updateWalletState}
+            onActions={registerWalletActions}
+          />
+        </Suspense>
+      ) : null}
       <Header
         sport={sport}
         setSport={changeSport}
@@ -1357,9 +1348,11 @@ export function App() {
         }}
         onHome={showHome}
         onSearchSubmit={submitSearch}
-        connected={isConnected}
-        address={address}
+        connected={walletState.connected}
+        address={walletState.address}
         balance={appState.balance}
+        onConnectWallet={requestWalletConnect}
+        onDisconnectWallet={disconnectWallet}
       />
       <main className={`dashboard-shell ${page === 'match' ? 'is-match-open' : ''} ${pending && page === 'match' ? 'has-right-rail' : 'no-right-rail'}`}>
         <section className="main-column">
@@ -1382,7 +1375,7 @@ export function App() {
             pending={pending}
             amount={amount}
             setAmount={setAmount}
-            connected={isConnected}
+            connected={walletState.connected}
             onConfirm={confirmTicket}
             onClose={() => {
               appState.pendingTicket = null;

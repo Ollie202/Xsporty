@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { API_BASE_URL } from './constants.js';
+import { getApiBaseUrl } from './constants.js';
 import { replaceGameMarkets, replaceLiveFeaturedMarkets, replacePlayerPropMarkets, game } from './data.js';
 import { countryCodeFromUrl, humanMarketLabel, teamCode } from './utils.js';
 import { describeWalletProvider, getWalletProvider } from './provider.js';
@@ -9,9 +9,10 @@ export async function apiGet(path) {
 }
 
 export async function apiRequest(path, options = {}) {
-  const response = await fetch(API_BASE_URL + path, { headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
+  const baseUrl = getApiBaseUrl();
+  const response = await fetch(baseUrl + path, { headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || response.status + ' ' + response.statusText);
+  if (!response.ok) throw new Error(payload.error || `${response.status} ${response.statusText}`);
   return payload;
 }
 
@@ -33,16 +34,17 @@ export async function hydrateFromBackend() {
       replaceGameMarkets(backendMarkets);
       replaceLiveFeaturedMarkets(backendMarkets.filter(match => match.isLive).slice(0, 8));
       const backendPlayerFutures = mapBackendPlayerFutureCards(results[3].cards || []);
-      replacePlayerPropMarkets(backendPlayerFutures.length > 0 ? backendPlayerFutures : buildTournamentPlayerFutures(backendMarkets));
+      replacePlayerPropMarkets(backendPlayerFutures);
       state.apiOnline = true;
       if (!backendMarkets.some(match => match.sport === state.sport)) state.sport = backendMarkets[0].sport;
       return true;
     }
     state.apiOnline = false;
-    return true;
+    throw new Error('Backend returned no open tradable market cards');
   } catch (error) {
-    console.warn('Using static market fallback:', error);
+    console.warn('Backend market load failed:', error);
     state.apiOnline = false;
+    state.apiError = error instanceof Error ? error.message : String(error);
   }
   return false;
 }
@@ -92,38 +94,6 @@ function mapBackendPlayerFutureCards(cards) {
       marketScope: 'tournament'
     }];
   });
-}
-
-function buildTournamentPlayerFutures(markets) {
-  const hasWorldCup = markets.some(match =>
-    match.sport === 'football' &&
-    String(match.fixture?.competition?.name || '').toLowerCase().includes('world cup')
-  );
-  if (!hasWorldCup) return [];
-
-  return [
-    tournamentFuture('Lionel Messi', 'Argentina', '154', 'Tournament goals over 3.5', 'Goals', 46, 54),
-    tournamentFuture('Kylian Mbappe', 'France', '278', 'Tournament goals over 4.5', 'Goals', 49, 51),
-    tournamentFuture('Cristiano Ronaldo', 'Portugal', '874', 'Tournament goals over 2.5', 'Goals', 41, 59),
-    tournamentFuture('Neymar Jr', 'Brazil', '276', 'To score from a free kick', 'Free kicks', 18, 82),
-    tournamentFuture('Jude Bellingham', 'England', '', 'Tournament fouls committed over 8.5', 'Fouls', 52, 48),
-    tournamentFuture('Vinicius Jr', 'Brazil', '', 'Tournament yellow cards over 1.5', 'Cards', 36, 64),
-    tournamentFuture('Lamine Yamal', 'Spain', '', 'Tournament assists over 2.5', 'Assists', 43, 57),
-    tournamentFuture('Achraf Hakimi', 'Morocco', '', 'Tournament cards over 1.5', 'Cards', 39, 61)
-  ];
-}
-
-function tournamentFuture(name, country, playerId, title, label, yes, no) {
-  return {
-    name,
-    country,
-    image: playerId ? `https://media.api-sports.io/football/players/${playerId}.png` : '',
-    title,
-    label: `World Cup 2026 - ${label}`,
-    yes,
-    no,
-    marketScope: 'tournament'
-  };
 }
 
 export function mapBackendCards(cards) {

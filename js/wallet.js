@@ -1,5 +1,4 @@
 import { state } from './state.js';
-import { FALLBACK_WALLET_ADDRESS } from './constants.js';
 import { shortAddress } from './utils.js';
 import { showToast, showTrade, setConnectButtons, applyProfileImage } from './ui.js';
 import { apiGet, refreshPortfolio } from './api.js';
@@ -107,7 +106,11 @@ async function connectWallet(walletId) {
 }
 
 export function applyConnectedWallet() {
-  const address = state.account || FALLBACK_WALLET_ADDRESS;
+  if (!state.connected || !state.account) {
+    applyDisconnectedWalletUi();
+    return;
+  }
+  const address = state.account;
   const loaded = state.balance != null;
   const balanceText = loaded ? `${state.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDC` : "... USDC";
   document.querySelectorAll(".balance-pill").forEach(el => {
@@ -138,6 +141,12 @@ export function logOutWallet() {
   state.balance = null;
   state.walletProvider = null;
   forgetWalletSession();
+  applyDisconnectedWalletUi();
+  showTrade();
+  showToast("Wallet logged out");
+}
+
+function applyDisconnectedWalletUi() {
   document.querySelectorAll(".balance-pill").forEach(balance => (balance.hidden = true));
   document.querySelectorAll("[data-action='open-portfolio']").forEach(button => (button.hidden = true));
   document.querySelectorAll(".profile-menu").forEach(profile => {
@@ -151,8 +160,7 @@ export function logOutWallet() {
     connectButton.hidden = false;
   });
   document.querySelectorAll("[data-profile-balance]").forEach(el => el.textContent = "");
-  showTrade();
-  showToast("Wallet logged out");
+  document.querySelectorAll("[data-wallet-address]").forEach(node => (node.textContent = ""));
 }
 
 function rememberWalletSession() {
@@ -247,8 +255,12 @@ export function wireProfileMenu() {
 
   copyWalletButton?.addEventListener("click", async event => {
     event.stopPropagation();
+    if (!state.account) {
+      showToast("Connect wallet first");
+      return;
+    }
     try {
-      await navigator.clipboard.writeText(state.account || FALLBACK_WALLET_ADDRESS);
+      await navigator.clipboard.writeText(state.account);
       showToast("Wallet address copied");
     } catch {
       showToast("Copy unavailable in this browser");
@@ -258,11 +270,12 @@ export function wireProfileMenu() {
 
 export function initializeProfileImage() {
   localStorage.removeItem("x-cup-profile-image");
-  applyProfileImage(generatedWalletAvatar(state.account || FALLBACK_WALLET_ADDRESS));
+  applyProfileImage(generatedWalletAvatar(state.account));
 }
 
 function generatedWalletAvatar(address) {
-  const normalized = String(address || FALLBACK_WALLET_ADDRESS).toLowerCase().replace(/^0x/, "");
+  const seed = String(address || "x-cup-markets").toLowerCase().replace(/^0x/, "");
+  const normalized = seed.replace(/[^0-9a-f]/g, "") || Array.from(seed).map(char => char.charCodeAt(0).toString(16)).join("") || "25d8e8";
   const hue = parseInt(normalized.slice(0, 6) || "25d8e8", 16) % 360;
   const accent = `hsl(${hue} 78% 48%)`;
   const secondary = `hsl(${(hue + 54) % 360} 72% 42%)`;

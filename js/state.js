@@ -1,6 +1,7 @@
 export const state = {
   connected: false,
   apiOnline: false,
+  apiError: "",
   walletConfig: null,
   selectedWalletId: null,
   walletProvider: null,

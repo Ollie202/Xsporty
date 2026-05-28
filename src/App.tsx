@@ -5,7 +5,7 @@ import { useAccount, useDisconnect } from 'wagmi';
 import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
-import { FALLBACK_WALLET_ADDRESS, sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
+import { getApiBaseUrl, sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
 import { flagUrl, getInitials, shortAddress } from '../js/utils.js';
 import { useUiStore } from './stores/uiStore';
 
@@ -14,6 +14,8 @@ const appState = legacyState as {
   walletProvider: unknown;
   account: string | null;
   connected: boolean;
+  apiOnline: boolean;
+  apiError?: string;
   balance: number | null;
   portfolio: unknown;
   pendingTicket: PendingTicket | null;
@@ -305,7 +307,7 @@ function Header({
   const theme = useUiStore(state => state.theme);
   const toggleTheme = useUiStore(state => state.toggleTheme);
   const displayAddress = address ? shortAddress(address) : '';
-  const balanceText = `${(balance ?? 0.87).toFixed(2)} USD`;
+  const balanceText = balance == null ? `... ${SYMBOL}` : `${balance.toFixed(2)} ${SYMBOL}`;
 
   useEffect(() => {
     if (!walletOpen) return;
@@ -1021,17 +1023,18 @@ export function App() {
 
     async function load() {
       setApiError('');
-      const fallbackMatches = dedupeMatches([...(gameMarkets as MarketMatch[])]);
-      if (fallbackMatches.length && !cancelled) {
-        setMatches(fallbackMatches);
-        setPlayers([...(playerPropMarkets as PlayerMarket[])]);
-        setLoadingMarkets(false);
-      }
-
       const ok = await withTimeout(hydrateFromBackend(), 15000, 'Backend market load');
       if (cancelled) return;
       const nextMatches = dedupeMatches([...(gameMarkets as MarketMatch[])]);
-      if (nextMatches.length) setMatches(nextMatches);
+      if (ok && nextMatches.length) {
+        setMatches(nextMatches);
+      } else {
+        setMatches([]);
+        setPlayers([]);
+        setApiError(appState.apiError || `Could not load backend market data from ${getApiBaseUrl()}.`);
+        setLoadingMarkets(false);
+        return;
+      }
       setPlayers([...(playerPropMarkets as PlayerMarket[])]);
       if (!sports.includes(sport)) setSport(appState.sport || 'football');
       const route = initialRoute.current;
@@ -1042,20 +1045,15 @@ export function App() {
           setPage('match');
         }
       }
-      if (!ok && !fallbackMatches.length) setApiError('Could not connect to backend market data.');
       setLoadingMarkets(false);
     }
 
     load().catch(error => {
       console.warn('Market load failed:', error);
       if (!cancelled) {
-        const fallbackMatches = dedupeMatches([...(gameMarkets as MarketMatch[])]);
-        if (fallbackMatches.length) {
-          setMatches(fallbackMatches);
-          setPlayers([...(playerPropMarkets as PlayerMarket[])]);
-        } else {
-          setApiError('Could not connect to backend market data.');
-        }
+        setMatches([]);
+        setPlayers([]);
+        setApiError(error instanceof Error ? error.message : `Could not load backend market data from ${getApiBaseUrl()}.`);
         setLoadingMarkets(false);
       }
     });
@@ -1196,21 +1194,20 @@ export function App() {
       return;
     }
     try {
-      if (address !== FALLBACK_WALLET_ADDRESS && pending.marketId) {
-        await submitBackendOrder(pending, stake);
-        await refreshPortfolio().catch(() => undefined);
+      if (!pending.marketId) {
+        window.alert('This market is preview-only until backend settlement is added.');
+        return;
       }
-      const ticket: Ticket = { ...pending, id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, amount: stake, updatedAt: new Date() };
-      const nextTickets = [ticket, ...tickets];
-      appState.tickets = nextTickets;
-      setTickets(nextTickets);
+      await submitBackendOrder(pending, stake);
+      await refreshPortfolio().catch(() => undefined);
+      refreshWalletState();
       setPending(null);
       setPage('positions');
     } catch (error) {
       console.warn(error);
       window.alert(error instanceof Error ? error.message : 'Order submission failed');
     }
-  }, [address, amount, isConnected, openConnectModal, pending, tickets]);
+  }, [address, amount, isConnected, openConnectModal, pending, refreshWalletState]);
 
   const animateOrb = useCallback(() => {
     const node = orbRef.current;

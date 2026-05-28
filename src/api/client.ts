@@ -1,13 +1,8 @@
 import type { MarketCardsResponse, PortfolioResponse, WalletConfigResponse } from './types';
-
-const DEFAULT_API_BASE_URL = 'https://x-cup-backend-production.up.railway.app';
+import { getApiBaseUrl as getConfiguredApiBaseUrl } from '../../js/constants.js';
 
 export function getApiBaseUrl() {
-  return (
-    window.XCUP_API_BASE_URL ||
-    localStorage.getItem('x-cup-api-base-url') ||
-    DEFAULT_API_BASE_URL
-  ).replace(/\/$/, '');
+  return getConfiguredApiBaseUrl();
 }
 
 export async function apiRequest<TResponse>(path: string, options: RequestInit = {}) {

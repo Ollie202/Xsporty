@@ -3,7 +3,7 @@ import { getPrice, getTradeAmount, estimatePnl, formatSigned, humanMarketLabel }
 import { showToast, showTrade, showPositions, setSideButton, setActive, openPnlCard, ticketRow, historyRow } from './ui.js';
 import { applyConnectedWallet } from './wallet.js';
 import { claimWinnings, submitBackendOrder, refreshPortfolio } from './api.js';
-import { SYMBOL, FALLBACK_WALLET_ADDRESS } from './constants.js';
+import { SYMBOL } from './constants.js';
 
 const ticketTitle = document.querySelector(".trade-view h2");
 const amountInput = document.querySelector(".trade-slip input");
@@ -57,24 +57,23 @@ export function wireConfirmTrade() {
       showToast("Connect wallet before confirming");
       return;
     }
+    if (!state.account) {
+      showToast("Wallet account not ready. Reconnect wallet.");
+      return;
+    }
+    if (!pending.marketId) {
+      showToast("This market is preview-only until backend settlement is added.");
+      return;
+    }
     confirmTradeButton.disabled = true;
     try {
-      if (state.account && state.account !== FALLBACK_WALLET_ADDRESS) {
-        if (!pending.marketId) {
-          showToast("This market is preview-only until backend settlement is added.");
-          return;
-        }
-        const submitted = await submitBackendOrder(pending, amount);
-        await refreshPortfolio();
-        applyConnectedWallet();
-        if (submitted?.autoMatch?.matched || submitted?.order?.status === "filled") {
-          showToast("Ticket confirmed on-chain and moved to My Positions");
-        } else {
-          showToast("Order accepted and waiting to fill. Balance updates after it matches.");
-        }
+      const submitted = await submitBackendOrder(pending, amount);
+      await refreshPortfolio();
+      applyConnectedWallet();
+      if (submitted?.autoMatch?.matched || submitted?.order?.status === "filled") {
+        showToast("Ticket confirmed on-chain and moved to My Positions");
       } else {
-        addTicket({ ...pending, amount });
-        showToast("Ticket saved locally. Connect a real wallet for on-chain orders.");
+        showToast("Order accepted and waiting to fill. Balance updates after it matches.");
       }
       state.pendingTicket = null;
       showPositions();

@@ -552,31 +552,13 @@ body {
 }
 
 .esports-status-toggle {
-  display: inline-grid;
-  grid-template-columns: repeat(2, minmax(104px, 1fr));
   justify-self: start;
-  padding: 3px;
-  border: 1px solid #d8e1eb;
-  border-radius: 8px;
-  background: #f8fafc;
 }
 
 .esports-status-toggle button {
-  min-height: 34px;
-  border: 0;
-  border-radius: 6px;
-  padding: 0 14px;
-  color: #556274;
-  background: transparent;
+  min-width: 104px;
   font-size: 13px;
   font-weight: 900;
-  cursor: pointer;
-}
-
-.esports-status-toggle button.is-active {
-  color: #101827;
-  background: #fff;
-  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.08);
 }
 
 .esports-market-section {
@@ -1974,6 +1956,14 @@ body {
   display: flex !important;
 }
 
+.footer-logo strong {
+  color: #fff !important;
+}
+
+.footer-logo small {
+  color: #d8dee8 !important;
+}
+
 .footer-brand p {
   max-width: 440px !important;
   margin: 0 !important;
@@ -2052,7 +2042,6 @@ html[data-theme='dark'] .brand strong,
 html[data-theme='dark'] .top-sport-nav button.is-active,
 html[data-theme='dark'] .section-head h2,
 html[data-theme='dark'] .market-tabs button.is-active,
-html[data-theme='dark'] .esports-status-toggle button.is-active,
 html[data-theme='dark'] .match-teams strong,
 html[data-theme='dark'] .featured-names span,
 html[data-theme='dark'] .detail-matchup h2,
@@ -2064,7 +2053,6 @@ html[data-theme='dark'] .trade-slip h2 {
 html[data-theme='dark'] .brand small,
 html[data-theme='dark'] .top-sport-nav button,
 html[data-theme='dark'] .market-tabs button,
-html[data-theme='dark'] .esports-status-toggle button,
 html[data-theme='dark'] .match-meta,
 html[data-theme='dark'] .option-row small,
 html[data-theme='dark'] .trade-slip label,
@@ -2819,7 +2807,6 @@ html[data-theme='dark'] .brand strong,
 html[data-theme='dark'] .section-head h2,
 html[data-theme='dark'] .esports-section-head h3,
 html[data-theme='dark'] .market-tabs button.is-active,
-html[data-theme='dark'] .esports-status-toggle button.is-active,
 html[data-theme='dark'] .top-sport-nav button.is-active,
 html[data-theme='dark'] .match-teams strong,
 html[data-theme='dark'] .featured-names span,
@@ -2832,7 +2819,6 @@ html[data-theme='dark'] .trade-slip h2 {
 
 html[data-theme='dark'] .brand small,
 html[data-theme='dark'] .market-tabs button,
-html[data-theme='dark'] .esports-status-toggle button,
 html[data-theme='dark'] .top-sport-nav button,
 html[data-theme='dark'] .match-meta,
 html[data-theme='dark'] .esports-section-head span,
@@ -2858,16 +2844,6 @@ html[data-theme='dark'] .positions-dashboard__history {
 
 html[data-theme='dark'] .esports-section-head {
   border-color: var(--line) !important;
-}
-
-html[data-theme='dark'] .esports-status-toggle {
-  background: var(--panel-soft) !important;
-  border-color: var(--line) !important;
-}
-
-html[data-theme='dark'] .esports-status-toggle button.is-active {
-  background: var(--panel-raised) !important;
-  box-shadow: none !important;
 }
 
 html[data-theme='dark'] .esports-section-head span {
@@ -3797,4 +3773,385 @@ html[data-theme='dark'] .xs-assistant-launcher {
   background: transparent;
   color: #f8fbff;
   box-shadow: none;
+}
+
+/* Final mobile layout pass. Keep this at the end so it wins older migrated rules. */
+@media (max-width: 760px) {
+  html {
+    scroll-padding-top: 0 !important;
+  }
+
+  body {
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .topbar {
+    position: relative !important;
+    top: auto !important;
+    margin: 0 !important;
+    border-width: 0 0 1px !important;
+    border-radius: 0 !important;
+  }
+
+  .topbar__inner {
+    width: 100% !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "brand wallet"
+      "search search"
+      "sports sports" !important;
+    gap: 10px !important;
+    padding: 10px 12px 12px !important;
+  }
+
+  .brand {
+    min-width: 0 !important;
+    gap: 9px !important;
+  }
+
+  .brand strong {
+    font-size: 17px !important;
+  }
+
+  .brand small {
+    max-width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .brand__mark {
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 9px !important;
+  }
+
+  .wallet-panel {
+    min-width: 0 !important;
+    justify-self: end !important;
+    gap: 8px !important;
+  }
+
+  .wallet-panel .positions-top-btn,
+  .wallet-panel .account-chip,
+  .wallet-panel .connect-wallet-btn {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-width: 142px !important;
+    padding-inline: 10px !important;
+    border-radius: 10px !important;
+    font-size: 11px !important;
+  }
+
+  .wallet-panel .account-chip span,
+  .wallet-panel .connect-wallet-btn span {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .header-search {
+    max-width: none !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 12px !important;
+    border-radius: 11px !important;
+  }
+
+  .top-sport-nav {
+    width: 100% !important;
+    display: flex !important;
+    gap: 14px !important;
+    overflow-x: auto !important;
+    padding: 4px 2px 0 !important;
+    scrollbar-width: none !important;
+  }
+
+  .top-sport-nav::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .top-sport-nav button {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
+  .dashboard-shell,
+  .dashboard-shell.has-right-rail,
+  .dashboard-shell.no-right-rail {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    margin: 0 !important;
+    padding: 12px !important;
+  }
+
+  .main-column {
+    min-width: 0 !important;
+    padding: 0 !important;
+  }
+
+  .right-rail,
+  .dashboard-shell.has-right-rail .right-rail {
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .wc-hero-banner {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 430px !important;
+    max-height: none !important;
+    border-radius: 14px !important;
+  }
+
+  .wc-hero-content {
+    grid-template-columns: 1fr !important;
+    align-content: start !important;
+    gap: 18px !important;
+    padding: 22px !important;
+  }
+
+  .wc-hero-left {
+    max-width: 100% !important;
+  }
+
+  .wc-hero-title {
+    max-width: 100% !important;
+    font-size: 42px !important;
+    line-height: 0.94 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .wc-hero-subtitle {
+    max-width: 100% !important;
+    font-size: 13px !important;
+  }
+
+  .wc-hero-mid {
+    display: none !important;
+  }
+
+  .wc-hero-right {
+    width: 100% !important;
+    align-items: flex-start !important;
+    justify-content: start !important;
+  }
+
+  .wc-hero-logo {
+    width: min(180px, 58vw) !important;
+  }
+
+  .wc-hero-teams {
+    width: 100% !important;
+    max-width: 280px !important;
+  }
+
+  .compact-section-head {
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .featured-mode-tabs,
+  .esports-status-toggle {
+    width: 100% !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .featured-mode-tabs button,
+  .esports-status-toggle button {
+    min-width: 0 !important;
+    padding-inline: 10px !important;
+    white-space: nowrap !important;
+  }
+
+  .featured-games {
+    grid-auto-columns: minmax(260px, calc(100vw - 44px)) !important;
+    gap: 10px !important;
+    overflow-x: auto !important;
+  }
+
+  .market-board,
+  .match-detail-card,
+  .trade-slip,
+  .positions-dashboard {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 14px !important;
+    border-radius: 14px !important;
+  }
+
+  .section-head {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .market-tabs {
+    width: 100% !important;
+    display: flex !important;
+    gap: 18px !important;
+    overflow-x: auto !important;
+    padding-bottom: 2px !important;
+    scrollbar-width: none !important;
+  }
+
+  .market-tabs::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .market-tabs button {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
+  .match-list,
+  .player-market-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .match-row,
+  .featured-card,
+  .player-prop-card {
+    min-width: 0 !important;
+  }
+
+  .quick-odds,
+  .featured-odds,
+  .player-prop-prices {
+    grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)) !important;
+  }
+
+  .match-page {
+    gap: 12px !important;
+  }
+
+  .detail-title-row,
+  .detail-matchup {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .detail-matchup {
+    grid-template-columns: 56px minmax(0, 1fr) 56px !important;
+    gap: 8px !important;
+  }
+
+  .detail-matchup h2 {
+    min-width: 0 !important;
+    font-size: 22px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .option-tabs {
+    width: 100% !important;
+    overflow-x: auto !important;
+  }
+
+  .option-row,
+  .dashboard-shell.is-match-open .option-row,
+  html[data-theme='dark'] .option-row {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  .option-row .price,
+  .dashboard-shell.is-match-open .option-row .price {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .stats-dropdown {
+    width: 100% !important;
+  }
+
+  .site-footer {
+    margin-top: 10px !important;
+    padding: 26px 0 !important;
+  }
+
+  .footer-main {
+    width: calc(100% - 24px) !important;
+    grid-template-columns: 1fr !important;
+    gap: 22px !important;
+  }
+
+  .footer-logo {
+    align-items: center !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .dashboard-shell,
+  .dashboard-shell.has-right-rail,
+  .dashboard-shell.no-right-rail {
+    padding: 10px !important;
+  }
+
+  .wallet-panel .positions-top-btn {
+    width: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+    font-size: 0 !important;
+  }
+
+  .wc-hero-banner {
+    min-height: 390px !important;
+  }
+
+  .wc-hero-content {
+    padding: 18px !important;
+  }
+
+  .wc-hero-title {
+    font-size: 34px !important;
+  }
+
+  .wc-hero-badges {
+    gap: 6px !important;
+  }
+
+  .wc-hero-badges span {
+    font-size: 10px !important;
+    padding-inline: 8px !important;
+  }
+
+  .featured-games {
+    grid-auto-columns: calc(100vw - 36px) !important;
+  }
+
+  .market-board,
+  .match-detail-card,
+  .trade-slip,
+  .positions-dashboard {
+    padding: 12px !important;
+  }
+
+  .detail-matchup {
+    grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+  }
+
+  .detail-team img,
+  .detail-team .team-logo {
+    width: 42px !important;
+    height: 32px !important;
+  }
+
+  .xs-assistant {
+    right: 10px !important;
+    bottom: 78px !important;
+  }
+
+  .xs-assistant-panel {
+    width: calc(100vw - 20px) !important;
+  }
 }

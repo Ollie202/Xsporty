@@ -828,7 +828,7 @@ function MarketBoard({
       </div>
       {sport === 'esports' ? (
         <div className="esports-dashboard">
-          <div className="esports-status-toggle" aria-label="Esports game status">
+          <div className="featured-mode-tabs esports-status-toggle" aria-label="Esports game status">
             <button
               className={esportsStatus === 'upcoming' ? 'is-active' : ''}
               type="button"

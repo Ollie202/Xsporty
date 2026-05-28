@@ -49,6 +49,8 @@ async function bootApp() {
   }
 }
 
-window.XCupMarkets = { openMatchPage, showHome };
+window.Xsporty = { openMatchPage, showHome };
+// Backward-compat alias; safe to remove later.
+window.XCupMarkets = window.Xsporty;
 
 bootApp();

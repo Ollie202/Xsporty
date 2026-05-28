@@ -48,6 +48,7 @@ const xLayerTestnet = defineChain({
 });
 
 const walletConnectProjectId =
+  window.XSPORTY_WALLETCONNECT_PROJECT_ID ||
   window.XCUP_WALLETCONNECT_PROJECT_ID ||
   import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ||
   '00000000000000000000000000000000';

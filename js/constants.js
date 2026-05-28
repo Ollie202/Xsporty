@@ -7,7 +7,9 @@ function normalizeApiBaseUrl(url) {
 
 export function getApiBaseUrl() {
   return normalizeApiBaseUrl(
+    window.XSPORTY_API_BASE_URL ||
     window.XCUP_API_BASE_URL ||
+    localStorage.getItem("xsporty-api-base-url") ||
     localStorage.getItem("x-cup-api-base-url") ||
     DEFAULT_API_BASE_URL
   );

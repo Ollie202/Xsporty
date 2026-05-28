@@ -274,7 +274,7 @@ export function initializeProfileImage() {
 }
 
 function generatedWalletAvatar(address) {
-  const seed = String(address || "x-cup-markets").toLowerCase().replace(/^0x/, "");
+  const seed = String(address || "xsporty").toLowerCase().replace(/^0x/, "");
   const normalized = seed.replace(/[^0-9a-f]/g, "") || Array.from(seed).map(char => char.charCodeAt(0).toString(16)).join("") || "25d8e8";
   const hue = parseInt(normalized.slice(0, 6) || "25d8e8", 16) % 360;
   const accent = `hsl(${hue} 78% 48%)`;

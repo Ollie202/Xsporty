@@ -1,89 +1,146 @@
-# X Cup Markets Frontend
+# Xsporty
 
-Static-first frontend for a World Cup-themed prediction market on X Layer. The app hydrates markets and wallet state from the backend and keeps demo-only behavior local to the fallback wallet.
+**Xsporty** is a sports prediction market built on **X Layer**. Stake on real-world sports outcomes, settle on-chain, and trade positions through a CLOB-style order flow — all from a fast, static-first web app.
 
-## Files
+Live at **[xsporty.xyz](https://xsporty.xyz)**.
 
-- `index.html` contains the page structure.
-- `base.css`, `layout.css`, `components.css`, `markets.css`, and `responsive.css` contain the loaded stylesheet split.
-- `js/main.js` is the active module entrypoint loaded by `index.html`.
-- `js/api.js`, `js/rendering.js`, `js/trading.js`, `js/wallet.js`, `js/navigation.js`, `js/ui.js`, `js/state.js`, `js/data.js`, `js/utils.js`, and `js/constants.js` contain the modular runtime.
-- `wc2026.png` is the floating World Cup action button asset.
+---
+
+## What makes Xsporty different
+
+### 1. An on-site assistant that actually does things
+
+Most prediction markets make you hunt through tabs to figure out what to bet on. Xsporty ships with a built-in assistant that lets you talk to the market in plain English. Type things like:
+
+- *"What are the odds on Argentina vs Brazil tonight?"*
+- *"Give me a breakdown of the Lakers game — who's the smart pick?"*
+- *"Put 20 USDC on Real Madrid to win."*
+
+The assistant answers questions, surfaces insights across markets, compares prices, and can load a ready-to-confirm prediction ticket for you. You stay in control — it prepares the trade, you sign.
+
+It lives in the floating action button on every page. See [`Xsporty_Assistant/`](./Xsporty_Assistant) for the implementation.
+
+### 2. A Telegram bot for the World Cup
+
+For World Cup matches, you don't even need to open the site. Our Telegram bot lets you:
+
+- Browse live markets
+- Check prices and your portfolio
+- Place predictions directly inside the chat
+
+Same backend, same settlement, same wallet — just a different surface. Built for people who already live in Telegram during match days.
+
+### 3. Built on X Layer
+
+Xsporty runs on **X Layer** (X Layer Testnet today), which means:
+
+- Cheap, fast transactions — settlements feel instant
+- USDC-denominated markets
+- Non-custodial: positions and balances live in your wallet, not ours
+- On-chain order book via a CLOB exchange contract
+
+---
+
+## Repository layout
+
+This repo is the **frontend** for Xsporty.
+
+```
+.
+├── index.html               # Page shell
+├── base.css / layout.css / components.css / markets.css / responsive.css
+├── js/                      # Vanilla-JS modular runtime (main.js is the entry)
+├── src/                     # React/Vite islands (wallet runtime, etc.)
+├── Xsporty_Assistant/       # On-site natural-language assistant
+├── scripts/                 # Build + local-dev helpers
+├── runtime-config.js        # Injected at build time with the API base URL
+└── vercel.json              # Deploy config (legacy — primary host is xsporty.xyz)
+```
 
 ## Runtime config
 
-By default the frontend calls the Railway backend:
+By default the frontend calls the backend at:
 
-`https://x-cup-backend-production.up.railway.app`
+```
+https://x-cup-backend-production.up.railway.app
+```
 
-For local testing, you can override it in the browser with:
+To override locally:
 
-`localStorage.setItem("x-cup-api-base-url", "http://localhost:3000")`
+```js
+localStorage.setItem("xsporty-api-base-url", "http://localhost:3000")
+```
 
-or define `window.XCUP_API_BASE_URL` before `js/main.js` loads.
+Or set `window.XSPORTY_API_BASE_URL` before `js/main.js` loads. The legacy `XCUP_API_BASE_URL` name still works as a fallback for now.
 
-## Vercel Deploy
+## Running locally
 
-This repo is ready to deploy as a static Vercel site.
+```bash
+npm install
+npm run dev
+```
 
-Use these Vercel project settings:
+That starts Vite on `127.0.0.1`. To build a static bundle:
 
-- Framework Preset: `Other`
-- Build Command: `npm run build`
-- Output Directory: `.`
-- Install Command: `npm install`
+```bash
+npm run build
+```
 
-The frontend backend URL is set in `js/constants.js`:
-
-`https://x-cup-backend-production.up.railway.app`
-
-You can override it on Vercel with this public environment variable:
-
-`XCUP_API_BASE_URL=https://x-cup-backend-production.up.railway.app`
-
-After deploy, make sure the Railway backend allows the Vercel frontend origin in CORS. The first Vercel preview URL will look like:
-
-`https://your-project-name.vercel.app`
-
-The backend should allow both the preview URL and the final production domain.
+The build runs `scripts/build-runtime-config.mjs`, which writes `runtime-config.js` from `XSPORTY_API_BASE_URL` (or falls back to the default Railway URL).
 
 ## Backend integration
 
-Implemented progressive wiring:
+The frontend talks to the backend over these endpoints:
 
-- `GET /wallet/config` for X Layer wallet metadata.
-- `GET /markets/cards` for market discovery cards.
-- `GET /portfolio/:account` for wallet positions after connect.
-- `POST /clob/orders/prepare`, optional approval transaction, wallet `eth_signTypedData_v4`, and `POST /clob/orders` for live CLOB order submission.
+- `GET /wallet/config` — X Layer wallet metadata
+- `GET /markets/cards` — market discovery cards
+- `GET /portfolio/:account` — wallet positions after connect
+- `POST /clob/orders/prepare` → `eth_signTypedData_v4` → `POST /clob/orders` — live CLOB order submission
 
-Demo wallet orders remain in local in-memory UI state. Real connected wallets submit backend on-chain orders and require X Layer Testnet USDC balance plus exchange approval.
+A demo (wallet-less) mode keeps order state in memory so the UI is explorable without a connected wallet. Real connected wallets submit on-chain orders and require X Layer Testnet USDC plus exchange approval.
 
-Remaining production hardening:
+## Deploy
 
-- Replace demo-only sports that the backend does not yet support.
-- Continue moving render paths from `innerHTML` to DOM builders where practical; backend-provided strings are escaped on the active card, ticket, history, and portfolio render paths.
-- Add automated browser smoke tests for market hydration, wallet-less fallback, and responsive layouts.
+Production is served from **xsporty.xyz**. The legacy Vercel deploy is no longer the source of truth — `vercel.json` is kept only for preview environments.
 
-## Stylesheet Split
+Whatever host you point at the repo, configure:
 
-The active page loads CSS in this order:
+- Build command: `npm run build`
+- Output directory: `.`
+- Public env var: `XSPORTY_API_BASE_URL` (the backend URL)
 
-1. `base.css` for tokens, resets, root elements, and global affordances.
-2. `layout.css` for shell, header, hero, rail, and footer layout.
-3. `components.css` for reusable controls, wallet/profile UI, tickets, modals, and animation utilities.
-4. `markets.css` for market cards, match rows, league/player/detail views, and sport-specific presentations.
-5. `responsive.css` for all media-query overrides.
+Make sure the backend's CORS allowlist includes `https://xsporty.xyz`.
 
-Keep new styles in the narrowest matching file.
+## Stylesheet split
 
-## Xsporty Assistant
+CSS loads in this order — keep new rules in the narrowest matching file:
 
-The Xsporty Assistant lives in `Xsporty_Assistant/`. The active product direction is the on-site assistant: users can ask sports questions, compare markets, and load a ticket in natural language from the floating assistant on the page.
+1. `base.css` — tokens, resets, global affordances
+2. `layout.css` — shell, header, hero, rail, footer
+3. `components.css` — buttons, wallet/profile UI, tickets, modals, animations
+4. `markets.css` — market cards, match rows, league/player/detail views
+5. `responsive.css` — all media-query overrides
 
-Run it with:
+## The Xsporty Assistant
+
+Lives in [`Xsporty_Assistant/`](./Xsporty_Assistant). Active product direction is the on-site assistant: ask sports questions, compare markets, load a ticket — all from natural language.
 
 ```bash
 cd Xsporty_Assistant
-copy .env.example .env
+cp .env.example .env   # or: copy .env.example .env  on Windows
+npm install
 npm start
 ```
+
+---
+
+## Status
+
+- Frontend: live on xsporty.xyz
+- Backend: Railway (`x-cup-backend-production.up.railway.app`)
+- Chain: X Layer Testnet
+- Telegram bot: live for World Cup markets
+
+## License
+
+Private — all rights reserved until further notice.

@@ -48,5 +48,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(port, host, () => {
-  console.log(`X Cup local frontend: http://${host}:${port}`);
+  console.log(`Xsporty local frontend: http://${host}:${port}`);
 });

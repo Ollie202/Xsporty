@@ -43,6 +43,7 @@ type Choice = {
   disabled?: boolean;
   disabledReason?: string;
   marketScope?: string;
+  sidePrices?: Partial<Record<'YES' | 'NO', { price: number; outcomeSide: string }>>;
 };
 type MarketMatch = {
   id: string;
@@ -116,6 +117,7 @@ type Ticket = {
 type PendingTicket = Omit<Ticket, 'id' | 'amount' | 'updatedAt'> & {
   backendMarketId?: string;
   marketScope?: string;
+  sidePrices?: Partial<Record<'YES' | 'NO', { price: number; outcomeSide: string }>>;
 };
 type PageName = 'home' | 'match' | 'positions';
 type RouteState = {
@@ -285,26 +287,34 @@ function optionCategory(option: MatchOption) {
 }
 
 function optionChoices(option: MatchOption, match: MarketMatch): Choice[] {
+  const yesPrice = Number(option[2]) || 0;
+  const noPrice = Number(option[3]) || 0;
+  const sidePrices = {
+    YES: { price: yesPrice, outcomeSide: option[5] || 'YES' },
+    NO: { price: noPrice, outcomeSide: option[7] || 'NO' },
+  };
   return [
     {
       label: option[6] || 'Yes',
-      price: `${option[2]}c`,
+      price: `${yesPrice}c`,
       title: option[0],
       marketId: option[4],
       outcomeSide: option[5] || 'YES',
       cssClass: 'up',
       disabled: Boolean(option[9]),
       disabledReason: option[9] || '',
+      sidePrices,
     },
     {
       label: option[8] || 'No',
-      price: `${option[3]}c`,
+      price: `${noPrice}c`,
       title: option[0],
       marketId: option[4],
       outcomeSide: option[7] || 'NO',
       cssClass: 'down',
       disabled: Boolean(option[9]),
       disabledReason: option[9] || '',
+      sidePrices,
     },
   ].map(choice => ({
     ...choice,
@@ -399,7 +409,7 @@ function Header({
                   <div className="wallet-menu-head wallet-menu-head--simple">
                     <div>
                       <strong>{displayAddress}</strong>
-                      <small>{address || displayAddress}</small>
+                      <small>{displayAddress}</small>
                     </div>
                     <button className="wallet-copy-btn" type="button" aria-label="Copy wallet address" onClick={() => address && navigator.clipboard?.writeText(address)}>
                       <Copy size={18} aria-hidden="true" />
@@ -642,6 +652,11 @@ function MatchCard({ match, onOpen, onPick }: { match: MarketMatch; onOpen: (mat
 
 function PlayerMarketCard({ player, onPick }: { player: PlayerMarket; onPick: (choice: Choice) => void }) {
   const playerKey = player.name.toLowerCase().replaceAll(' ', '-');
+  const sidePrices = {
+    YES: { price: player.yes, outcomeSide: 'YES' },
+    NO: { price: player.no, outcomeSide: 'NO' },
+  };
+
   return (
     <article className="player-prop-card" data-player={playerKey} data-search={`${player.name} ${player.country} ${player.title} ${player.label}`.toLowerCase()}>
       <div className="player-prop-image" data-initials={getInitials(player.name)}>
@@ -655,10 +670,10 @@ function PlayerMarketCard({ player, onPick }: { player: PlayerMarket; onPick: (c
         <small>{player.name}</small>
       </div>
       <div className="player-prop-prices">
-        <button className="price up" type="button" onClick={() => onPick({ label: 'Yes', price: `${player.yes}c`, title: player.title, marketId: player.marketId, backendMarketId: player.backendMarketId, outcomeSide: 'YES', marketScope: player.marketScope })}>
+        <button className="price up" type="button" onClick={() => onPick({ label: 'Yes', price: `${player.yes}c`, title: player.title, marketId: player.marketId, backendMarketId: player.backendMarketId, outcomeSide: 'YES', marketScope: player.marketScope, sidePrices })}>
           Yes {player.yes}c
         </button>
-        <button className="price down" type="button" onClick={() => onPick({ label: 'No', price: `${player.no}c`, title: player.title, marketId: player.marketId, backendMarketId: player.backendMarketId, outcomeSide: 'NO', marketScope: player.marketScope })}>
+        <button className="price down" type="button" onClick={() => onPick({ label: 'No', price: `${player.no}c`, title: player.title, marketId: player.marketId, backendMarketId: player.backendMarketId, outcomeSide: 'NO', marketScope: player.marketScope, sidePrices })}>
           No {player.no}c
         </button>
       </div>
@@ -919,6 +934,7 @@ function TradeSlip({
   amount,
   setAmount,
   connected,
+  onSelectSide,
   onConfirm,
   onClose,
 }: {
@@ -926,6 +942,7 @@ function TradeSlip({
   amount: string;
   setAmount: (amount: string) => void;
   connected: boolean;
+  onSelectSide: (side: 'YES' | 'NO') => void;
   onConfirm: () => void;
   onClose: () => void;
 }) {
@@ -946,8 +963,12 @@ function TradeSlip({
         </div>
         <div className="ticket-view trade-view is-active">
           <div className="side-toggle" role="group" aria-label="Trade side">
-            <button className={pending?.side !== 'NO' ? 'is-active' : ''} type="button">YES</button>
-            <button className={pending?.side === 'NO' ? 'is-active' : ''} type="button">NO</button>
+            <button className={pending?.side !== 'NO' ? 'is-active' : ''} type="button" onClick={() => onSelectSide('YES')}>
+              YES
+            </button>
+            <button className={pending?.side === 'NO' ? 'is-active' : ''} type="button" onClick={() => onSelectSide('NO')}>
+              NO
+            </button>
           </div>
           <h2>{pending?.title || 'Choose a market price'}</h2>
           <label>
@@ -1069,7 +1090,6 @@ function Footer() {
           <div className="footer-socials" aria-label="Social links">
             <a href="https://x.com/XsportyApp" target="_blank" rel="noreferrer" aria-label="Xsporty on X"><XSocialIcon /></a>
             <a href="https://t.me/XsportyBot" target="_blank" rel="noreferrer" aria-label="Telegram"><TelegramIcon /></a>
-            <a href="https://discord.com" target="_blank" rel="noreferrer" aria-label="Discord">DC</a>
           </div>
         </div>
         <nav className="footer-links" aria-label="Market links">
@@ -1103,6 +1123,7 @@ export function App() {
   const [amount, setAmount] = useState('100');
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [page, setPage] = useState<PageName>(initialRoute.current.page === 'match' && !initialRoute.current.matchId ? 'home' : initialRoute.current.page);
+  const [seenPositionCount, setSeenPositionCount] = useState(0);
   const [pnlTicket, setPnlTicket] = useState<Ticket | null>(null);
   const [apiError, setApiError] = useState('');
   const [loadingMarkets, setLoadingMarkets] = useState(true);
@@ -1225,6 +1246,10 @@ export function App() {
   }, [category, page, selectedMatch?.id, sport]);
 
   useEffect(() => {
+    if (page === 'positions') setSeenPositionCount(tickets.length);
+  }, [page, tickets.length]);
+
+  useEffect(() => {
     function handleRouteChange() {
       const route = parseRoute();
       setSport(route.sport);
@@ -1270,11 +1295,30 @@ export function App() {
       backendMarketId: choice.backendMarketId,
       outcomeSide: choice.outcomeSide || side,
       marketScope: choice.marketScope,
+      sidePrices: choice.sidePrices,
     };
     appState.pendingTicket = next;
     appState.price = price;
     appState.side = side;
     setPending(next);
+  }, []);
+
+  const selectPendingSide = useCallback((side: 'YES' | 'NO') => {
+    setPending(current => {
+      if (!current || current.side === side) return current;
+      const sidePrice = current.sidePrices?.[side];
+      const nextPrice = sidePrice?.price ?? 100 - current.price;
+      const next = {
+        ...current,
+        side,
+        price: nextPrice,
+        outcomeSide: sidePrice?.outcomeSide || side,
+      };
+      appState.pendingTicket = next;
+      appState.price = nextPrice;
+      appState.side = side;
+      return next;
+    });
   }, []);
 
   const openMatch = useCallback((match: MarketMatch) => {
@@ -1325,6 +1369,12 @@ export function App() {
     });
   }, []);
 
+  const openPositions = useCallback(() => {
+    setSelectedMatch(null);
+    setSeenPositionCount(tickets.length);
+    setPage('positions');
+  }, [tickets.length]);
+
   const confirmTicket = useCallback(async () => {
     if (!pending) {
       window.alert('Choose a market price first');
@@ -1347,6 +1397,7 @@ export function App() {
       await submitBackendOrder(pending, stake);
       await refreshPortfolio().catch(() => undefined);
       refreshWalletState();
+      setSeenPositionCount((appState.tickets || []).length);
       setPending(null);
       setPage('positions');
     } catch (error) {
@@ -1380,11 +1431,8 @@ export function App() {
         setSport={changeSport}
         query={query}
         setQuery={setQuery}
-        positionCount={tickets.length}
-        onOpenPositions={() => {
-          setSelectedMatch(null);
-          setPage('positions');
-        }}
+        positionCount={Math.max(0, tickets.length - seenPositionCount)}
+        onOpenPositions={openPositions}
         onHome={showHome}
         onSearchSubmit={submitSearch}
         connected={walletState.connected}
@@ -1415,6 +1463,7 @@ export function App() {
             amount={amount}
             setAmount={setAmount}
             connected={walletState.connected}
+            onSelectSide={selectPendingSide}
             onConfirm={confirmTicket}
             onClose={() => {
               appState.pendingTicket = null;
@@ -1427,17 +1476,9 @@ export function App() {
         className="floating-ticket-button"
         type="button"
         ref={orbRef}
-        onClick={() => {
-          if (!tickets.length) {
-            animateOrb();
-            return;
-          }
-          setSelectedMatch(null);
-          setPage('positions');
-        }}
-        aria-label={tickets.length ? 'Open positions' : 'FIFA World Cup 2026'}
+        onClick={animateOrb}
+        aria-label="FIFA World Cup 2026"
       >
-        {tickets.length ? <span className="ticket-count-badge">{tickets.length}</span> : null}
         <img src="/wc2026.png" alt="FIFA World Cup 2026" className="wc26-logo" />
       </button>
       <PnlModal ticket={pnlTicket} onClose={() => setPnlTicket(null)} />

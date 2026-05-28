@@ -1257,26 +1257,34 @@ export function App() {
 
   const submitSearch = useCallback(() => {
     const term = query.trim().toLowerCase();
+    const showResults = () => {
+      setSelectedMatch(null);
+      setPage('home');
+      window.requestAnimationFrame(() => {
+        document.querySelector('#games-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    };
+
     if (!term) {
-      document.querySelector('#games-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showResults();
       return;
     }
     const playerHit = players.find(player => `${player.name} ${player.country} ${player.title} ${player.label}`.toLowerCase().includes(term));
     if (playerHit) {
       setSport('football');
       setCategory('players');
-      document.querySelector('#games-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showResults();
       return;
     }
     const matchHit = matches.find(match => match.sport === sport && marketSearch(match).includes(term)) || matches.find(match => marketSearch(match).includes(term));
     if (matchHit) {
       setSport(matchHit.sport);
-      setCategory(matchHit.group || 'all');
-      openMatch(matchHit);
+      setCategory('all');
+      showResults();
       return;
     }
-    document.querySelector('#games-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [matches, openMatch, players, query, sport]);
+    showResults();
+  }, [matches, players, query, sport]);
 
   const showHome = useCallback(() => {
     setSelectedMatch(null);

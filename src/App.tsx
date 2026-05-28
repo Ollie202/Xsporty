@@ -134,6 +134,7 @@ const footballTabs = [
   ['players', 'Player Futures'],
 ];
 const nonFootballTabs = [['all', 'All Games']];
+const MARKET_LOAD_TIMEOUT_MS = 45000;
 const LazyWalletRuntime = lazy(() => import('./wallet/WalletRuntime').then(module => ({ default: module.WalletRuntime })));
 
 type WalletUiState = {
@@ -1123,7 +1124,7 @@ export function App() {
 
     async function load() {
       setApiError('');
-      const ok = await withTimeout(hydrateFromBackend(), 15000, 'Backend market load');
+      const ok = await withTimeout(hydrateFromBackend(), MARKET_LOAD_TIMEOUT_MS, 'Backend market load');
       if (cancelled) return;
       const nextMatches = dedupeMatches([...(gameMarkets as MarketMatch[])]);
       const nextPlayers = [...(playerPropMarkets as PlayerMarket[])];

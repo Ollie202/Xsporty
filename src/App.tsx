@@ -144,6 +144,22 @@ function BrandMark() {
   );
 }
 
+function XSocialIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M13.9 10.5 21.3 2h-1.8l-6.4 7.4L8 2H2l7.8 11.3L2 22h1.8l6.8-7.8L16 22h6l-8.1-11.5Zm-2.4 2.8-.8-1.1L4.4 3.3h2.7l5 7.1.8 1.1 6.6 9.3h-2.7l-5.3-7.5Z" />
+    </svg>
+  );
+}
+
+function TelegramIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M21.6 4.2 18.3 19c-.2 1-.8 1.2-1.6.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6 12.7 1.2 11.2c-1-.3-1-1 .2-1.5L20.1 2.5c.9-.3 1.7.2 1.5 1.7Z" />
+    </svg>
+  );
+}
+
 function parseRoute(): RouteState {
   const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
   const sport = params.get('sport') || 'football';
@@ -610,6 +626,7 @@ function MatchCard({ match, onOpen, onPick }: { match: MarketMatch; onOpen: (mat
       onClick={() => onOpen(match)}
     >
       <div className="match-meta">
+        {match.isLive ? <span className="status-dot live" aria-hidden="true" /> : null}
         <span>{match.isLive ? 'LIVE' : match.time}</span>
       </div>
       <div className="match-teams">
@@ -1059,8 +1076,8 @@ function Footer() {
           </a>
           <p>World Cup markets for match outcomes and player moments.</p>
           <div className="footer-socials" aria-label="Social links">
-            <a href="https://x.com/XLayerOfficial" target="_blank" rel="noreferrer" aria-label="X Layer on X">X</a>
-            <a href="https://t.me/okxofficial_en" target="_blank" rel="noreferrer" aria-label="Telegram">TG</a>
+            <a href="https://x.com/XsportyApp" target="_blank" rel="noreferrer" aria-label="Xsporty on X"><XSocialIcon /></a>
+            <a href="https://t.me/XsportyBot" target="_blank" rel="noreferrer" aria-label="Telegram"><TelegramIcon /></a>
             <a href="https://discord.com" target="_blank" rel="noreferrer" aria-label="Discord">DC</a>
           </div>
         </div>

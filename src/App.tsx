@@ -3,7 +3,7 @@ import { Bot, ChevronDown, ChevronRight, Copy, Moon, Send, Sun, Trash2, Search, 
 import { fetchFixtureInsights, hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
-import { sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
+import { getApiBaseUrl, sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
 import { flagUrl, getInitials, shortAddress } from '../js/utils.js';
 import { useUiStore } from './stores/uiStore';
 import type { WalletActions } from './wallet/types';
@@ -448,22 +448,20 @@ function Header({
 
         <div className="wallet-panel">
           {connected ? (
-            <>
-              <button className="positions-top-btn" type="button" onClick={onOpenPositions}>
-                My Positions
-                {positionCount > 0 ? <span className="ticket-count-badge">{positionCount}</span> : null}
-              </button>
-              <button
-                className="theme-top-btn"
-                type="button"
-                onClick={toggleTheme}
-                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-                title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-              >
-                {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
-              </button>
-            </>
+            <button className="positions-top-btn" type="button" onClick={onOpenPositions}>
+              My Positions
+              {positionCount > 0 ? <span className="ticket-count-badge">{positionCount}</span> : null}
+            </button>
           ) : null}
+          <button
+            className="theme-top-btn"
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          >
+            {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
+          </button>
           {connected ? (
             <div className="profile-wallet" onClick={event => event.stopPropagation()}>
               <button className="account-chip" type="button" onClick={() => setWalletOpen(open => !open)} aria-expanded={walletOpen} aria-label="Open wallet menu">
@@ -1024,7 +1022,7 @@ function statsForMatch(match: MarketMatch) {
   const rows = normalizeStatRows(match.fixture?.statistics || match.fixture?.stats);
   const insightHomeForm = meetingRowsForTeam(insights?.lastMeetings, match.home);
   const insightAwayForm = meetingRowsForTeam(insights?.lastMeetings, match.away);
-  const insightRows = insightStatRows(insights);
+  const insightRows = normalizeStatRows(insightStatRows(insights));
   return {
     homeForm: homeForm.length ? homeForm : insightHomeForm,
     awayForm: awayForm.length ? awayForm : insightAwayForm,

@@ -67,7 +67,28 @@ type MarketMatch = {
     kickoffTime?: string;
     status?: string;
     competition?: { name?: string; kind?: string };
+    statistics?: TeamStats[];
+    stats?: TeamStats[];
+    recentForm?: {
+      home?: FormRowData[];
+      away?: FormRowData[];
+    };
   };
+};
+type FormRowData = {
+  result?: string;
+  venue?: string;
+  score?: string;
+  opponent?: string;
+  date?: string;
+};
+type TeamStats = {
+  team?: string;
+  name?: string;
+  label?: string;
+  value?: string | number;
+  home?: string | number;
+  away?: string | number;
 };
 type PlayerMarket = {
   name: string;
@@ -186,6 +207,18 @@ function dedupeMatches(matches: MarketMatch[]) {
     seen.add(key);
     return true;
   });
+}
+
+function defaultCategoryForSport(sport: string, matches: MarketMatch[]) {
+  if (sport !== 'football') return 'all';
+  return matches.some(match => match.sport === 'football' && match.group === 'world-cup') ? 'world-cup' : 'all';
+}
+
+function categoryHasMarkets(sport: string, category: string, matches: MarketMatch[], players: PlayerMarket[]) {
+  if (sport !== 'football') return matches.some(match => match.sport === sport);
+  if (category === 'players') return players.length > 0;
+  if (category === 'all') return matches.some(match => match.sport === 'football');
+  return matches.some(match => match.sport === 'football' && match.group === category);
 }
 
 function optionCategory(option: MatchOption) {
@@ -404,8 +437,8 @@ function Header({
   );
 }
 
-function Hero({ match, onOpen }: { match?: MarketMatch; onOpen: (match: MarketMatch) => void }) {
-  const title = match ? `${match.home}\nVS\n${match.away}` : 'World Cup\nHeadline\nMarket';
+function Hero({ match, onOpen, loading }: { match?: MarketMatch; onOpen: (match: MarketMatch) => void; loading: boolean }) {
+  const title = match ? `${match.home}\nVS\n${match.away}` : loading ? 'Loading\nWorld Cup\nMarkets' : 'No World Cup\nMarkets\nAvailable';
   return (
     <section className="hero-banner wc-hero-banner home-section" aria-label="Featured World Cup market">
       <div className="wc-hero-bg" />
@@ -421,7 +454,13 @@ function Hero({ match, onOpen }: { match?: MarketMatch; onOpen: (match: MarketMa
               </React.Fragment>
             ))}
           </h1>
-          <p className="wc-hero-subtitle">{match ? `${match.time} - ${match.options.length} open markets from live backend data.` : 'Live markets load from the Railway backend.'}</p>
+          <p className="wc-hero-subtitle">
+            {match
+              ? `${match.time} - ${match.options.length} open markets from live backend data.`
+              : loading
+                ? 'Fetching live football markets from the backend.'
+                : 'No backend World Cup cards are available right now.'}
+          </p>
           <div className="wc-hero-badges">
             <span>{match?.homeCode || 'WC'}</span>
             <span>{match?.awayCode || '2026'}</span>
@@ -708,8 +747,7 @@ function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () =
   const [statsOpen, setStatsOpen] = useState(false);
   const groups = useMemo(() => ['All', ...Array.from(new Set(match.options.map(optionCategory)))], [match]);
   const shownOptions = group === 'All' ? match.options : match.options.filter(option => optionCategory(option) === group);
-  const homeForm = useMemo(() => buildFormRows(match.homeCode, match.home), [match.homeCode, match.home]);
-  const awayForm = useMemo(() => buildFormRows(match.awayCode, match.away), [match.awayCode, match.away]);
+  const realStats = useMemo(() => statsForMatch(match), [match]);
 
   useEffect(() => {
     setGroup('All');
@@ -745,13 +783,18 @@ function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () =
           {statsOpen ? (
             <div className="stats-dropdown">
               <div className="stats-dropdown__header">
-                <strong>Last 5 matches</strong>
-                <span>Placeholder form data</span>
+                <strong>Match stats</strong>
+                <span>{realStats.hasData ? 'Backend fixture data' : 'No backend stats available for this fixture yet'}</span>
               </div>
-              <div className="stats-grid">
-                <FormColumn title={match.home} rows={homeForm} />
-                <FormColumn title={match.away} rows={awayForm} />
-              </div>
+              {realStats.hasData ? (
+                <div className="stats-grid">
+                  <FormColumn title={match.home} rows={realStats.homeForm} />
+                  <FormColumn title={match.away} rows={realStats.awayForm} />
+                  {realStats.rows.length ? <StatsTable rows={realStats.rows} /> : null}
+                </div>
+              ) : (
+                <EmptyState title="Stats not available" text="This backend fixture does not include recent form or team statistics yet." />
+              )}
             </div>
           ) : null}
         </div>
@@ -788,27 +831,72 @@ function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () =
   );
 }
 
-function buildFormRows(code: string, name: string) {
-  const shortCode = code || getInitials(name);
-  return [
-    { result: 'W', venue: 'Home', score: '2-1', opponent: 'USA' },
-    { result: 'D', venue: 'Away', score: '1-1', opponent: 'Japan' },
-    { result: 'W', venue: 'Home', score: '3-0', opponent: 'Canada' },
-    { result: 'L', venue: 'Away', score: '0-1', opponent: 'France' },
-    { result: 'D', venue: 'Home', score: '2-2', opponent: 'Mexico' },
-  ].map(row => ({ ...row, code: shortCode }));
+function statsForMatch(match: MarketMatch) {
+  const homeForm = normalizeFormRows(match.fixture?.recentForm?.home);
+  const awayForm = normalizeFormRows(match.fixture?.recentForm?.away);
+  const rows = normalizeStatRows(match.fixture?.statistics || match.fixture?.stats);
+  return {
+    homeForm,
+    awayForm,
+    rows,
+    hasData: Boolean(homeForm.length || awayForm.length || rows.length),
+  };
 }
 
-function FormColumn({ title, rows }: { title: string; rows: ReturnType<typeof buildFormRows> }) {
+function normalizeFormRows(rows?: FormRowData[]) {
+  if (!Array.isArray(rows)) return [];
+  return rows.flatMap(row => {
+    if (!row || (!row.opponent && !row.score)) return [];
+    return [{
+      result: String(row.result || '-').slice(0, 1).toUpperCase(),
+      venue: row.venue || '',
+      score: row.score || '-',
+      opponent: row.opponent || 'Opponent',
+      date: row.date || '',
+    }];
+  }).slice(0, 5);
+}
+
+function normalizeStatRows(rows?: TeamStats[]) {
+  if (!Array.isArray(rows)) return [];
+  return rows.flatMap(row => {
+    const label = row.label || row.name || row.team;
+    if (!label) return [];
+    return [{
+      label,
+      home: row.home ?? row.value ?? '-',
+      away: row.away ?? '-',
+    }];
+  });
+}
+
+function FormColumn({ title, rows }: { title: string; rows: ReturnType<typeof normalizeFormRows> }) {
+  if (!rows.length) return null;
   return (
     <div className="form-column">
       <h3>{title}</h3>
       {rows.map((row, index) => (
-        <div className="form-row" key={`${row.code}-${row.opponent}-${index}`}>
+        <div className="form-row" key={`${title}-${row.opponent}-${index}`}>
           <span className={`form-badge ${row.result.toLowerCase()}`}>{row.result}</span>
-          <strong>{row.code}</strong>
-          <span>{row.score}</span>
-          <small>{row.venue} vs {row.opponent}</small>
+          <strong>{row.score}</strong>
+          <span>{row.date || row.venue}</span>
+          <small>{row.venue ? `${row.venue} vs ${row.opponent}` : row.opponent}</small>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function StatsTable({ rows }: { rows: ReturnType<typeof normalizeStatRows> }) {
+  return (
+    <div className="form-column">
+      <h3>Team stats</h3>
+      {rows.map((row, index) => (
+        <div className="form-row" key={`${row.label}-${index}`}>
+          <span className="form-badge">{index + 1}</span>
+          <strong>{row.label}</strong>
+          <span>{row.home}</span>
+          <small>{row.home} / {row.away}</small>
         </div>
       ))}
     </div>
@@ -1018,6 +1106,16 @@ export function App() {
     setTickets([...(appState.tickets || [])] as Ticket[]);
   }, []);
 
+  const changeSport = useCallback((nextSport: string) => {
+    setQuery('');
+    setSport(nextSport);
+  }, []);
+
+  const changeCategory = useCallback((nextCategory: string) => {
+    setQuery('');
+    setCategory(nextCategory);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -1026,18 +1124,13 @@ export function App() {
       const ok = await withTimeout(hydrateFromBackend(), 15000, 'Backend market load');
       if (cancelled) return;
       const nextMatches = dedupeMatches([...(gameMarkets as MarketMatch[])]);
+      const nextPlayers = [...(playerPropMarkets as PlayerMarket[])];
       if (ok && nextMatches.length) {
         setMatches(nextMatches);
         const nextSport = nextMatches.some(match => match.sport === sport) ? sport : nextMatches[0].sport;
-        const nextCategory =
-          nextSport === 'football' && (
-            category === 'all' ||
-            nextMatches.some(match => match.sport === nextSport && match.group === category)
-          )
-            ? category
-            : nextSport === 'football' && nextMatches.some(match => match.sport === nextSport && match.group === 'world-cup')
-              ? 'world-cup'
-              : 'all';
+        const nextCategory = categoryHasMarkets(nextSport, category, nextMatches, nextPlayers)
+          ? category
+          : defaultCategoryForSport(nextSport, nextMatches);
         if (nextSport !== sport) setSport(nextSport);
         if (nextCategory !== category) setCategory(nextCategory);
       } else {
@@ -1047,7 +1140,7 @@ export function App() {
         setLoadingMarkets(false);
         return;
       }
-      setPlayers([...(playerPropMarkets as PlayerMarket[])]);
+      setPlayers(nextPlayers);
       if (!sports.includes(sport)) setSport(appState.sport || 'football');
       const route = initialRoute.current;
       if (route.page === 'match' && route.matchId) {
@@ -1083,7 +1176,7 @@ export function App() {
       didHandleInitialSport.current = true;
       return;
     }
-    setCategory(sport === 'football' ? 'world-cup' : 'all');
+    setCategory(defaultCategoryForSport(sport, matches));
     setSelectedMatch(null);
     setPage('home');
   }, [sport]);
@@ -1234,7 +1327,7 @@ export function App() {
       <WalletSync onWalletChange={refreshWalletState} />
       <Header
         sport={sport}
-        setSport={setSport}
+        setSport={changeSport}
         query={query}
         setQuery={setQuery}
         positionCount={tickets.length}
@@ -1252,12 +1345,12 @@ export function App() {
         <section className="main-column">
           {page === 'home' ? (
             <>
-              {sport === 'football' ? <Hero match={heroMatch} onOpen={openMatch} /> : null}
+              {sport === 'football' ? <Hero match={heroMatch} onOpen={openMatch} loading={loadingMarkets} /> : null}
               {sport === 'football' ? (
                 <FeaturedStrip matches={sportMatches} mode={featuredMode} setMode={setFeaturedMode} onOpen={openMatch} onPick={pickMarket} />
               ) : null}
               {loadingMarkets ? <LoadingMarkets /> : null}
-              <MarketBoard sport={sport} category={category} setCategory={setCategory} matches={matches} players={players} query={query} onOpen={openMatch} onPick={pickMarket} />
+              <MarketBoard sport={sport} category={category} setCategory={changeCategory} matches={matches} players={players} query={query} onOpen={openMatch} onPick={pickMarket} />
               {apiError ? <div id="error-screen"><div className="error-content"><strong>Backend unavailable</strong><p>{apiError}</p><button type="button" onClick={() => window.location.reload()}>Retry</button></div></div> : null}
             </>
           ) : null}

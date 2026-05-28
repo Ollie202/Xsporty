@@ -20,9 +20,9 @@ export async function hydrateFromBackend() {
   try {
     const results = await Promise.all([
       apiGet('/wallet/config'),
-      apiGet('/markets/cards?status=open&limit=250&sort=kickoff_time'),
-      apiGet('/markets/cards?sport=football&competitionName=World%20Cup&status=open&limit=100&sort=kickoff_time'),
-      apiGet('/markets/cards?category=player_future&status=open&limit=100&sort=newest_activity')
+      apiGet('/markets/cards?status=open&tradingStatus=open&limit=250&sort=kickoff_time'),
+      apiGet('/markets/cards?sport=football&competitionName=World%20Cup&status=open&tradingStatus=open&limit=100&sort=kickoff_time'),
+      apiGet('/markets/cards?category=player_future&status=open&tradingStatus=open&limit=100&sort=newest_activity')
     ]);
     state.walletConfig = results[0];
     const backendCards = mergeBackendCards(results[1].cards || [], results[2].cards || []);

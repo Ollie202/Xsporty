@@ -26,15 +26,15 @@ export async function apiRequest<TResponse>(path: string, options: RequestInit =
 
 export const marketApi = {
   walletConfig: () => apiRequest<WalletConfigResponse>('/wallet/config'),
-  marketCards: (query = 'status=open&limit=250&sort=kickoff_time') =>
+  marketCards: (query = 'status=open&tradingStatus=open&limit=250&sort=kickoff_time') =>
     apiRequest<MarketCardsResponse>(`/markets/cards?${query}`),
   worldCupCards: () =>
     apiRequest<MarketCardsResponse>(
-      '/markets/cards?sport=football&competitionName=World%20Cup&status=open&limit=100&sort=kickoff_time'
+      '/markets/cards?sport=football&competitionName=World%20Cup&status=open&tradingStatus=open&limit=100&sort=kickoff_time'
     ),
   playerFutureCards: () =>
     apiRequest<MarketCardsResponse>(
-      '/markets/cards?category=player_future&status=open&limit=100&sort=newest_activity'
+      '/markets/cards?category=player_future&status=open&tradingStatus=open&limit=100&sort=newest_activity'
     ),
   portfolio: (address: string) =>
     apiRequest<PortfolioResponse>(`/portfolio/${encodeURIComponent(address)}`),

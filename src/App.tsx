@@ -26,9 +26,10 @@ const appState = legacyState as {
 };
 const labelsBySport = sportLabels as Record<string, { title: string; icon: string }>;
 const alpha3ToAlpha2: Record<string, string> = {
-  ARG: 'ar', AUS: 'au', BEL: 'be', BRA: 'br', CAN: 'ca', CZE: 'cz', ECU: 'ec', ENG: 'gb-eng', ESP: 'es', FRA: 'fr',
-  GER: 'de', HAI: 'ht', CIV: 'ci', JPN: 'jp', KOR: 'kr', MAR: 'ma', MEX: 'mx', NED: 'nl', PAR: 'py', POR: 'pt',
-  QAT: 'qa', RSA: 'za', SCO: 'gb-sct', SWE: 'se', SUI: 'ch', TUN: 'tn', TUR: 'tr', URU: 'uy', USA: 'us',
+  ARG: 'ar', AUS: 'au', BEL: 'be', BIH: 'ba', BRA: 'br', CAN: 'ca', CRC: 'cr', CUW: 'cw', CZE: 'cz',
+  ECU: 'ec', ENG: 'gb-eng', ESP: 'es', FRA: 'fr', GER: 'de', HAI: 'ht', CIV: 'ci', JPN: 'jp', KOR: 'kr',
+  MAR: 'ma', MEX: 'mx', NED: 'nl', PAR: 'py', POR: 'pt', QAT: 'qa', RSA: 'za', SCO: 'gb-sct', SWE: 'se',
+  SUI: 'ch', TUN: 'tn', TUR: 'tr', URU: 'uy', USA: 'us',
 };
 
 type MatchOption = [string, string, number, number, string?, string?, string?, string?, string?, string?];
@@ -178,15 +179,17 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: str
   }
 }
 
-function imageFor(match: MarketMatch, side: 'home' | 'away') {
-  if (side === 'home') return match.homeLogoUrl || flagUrl(match.homeFlag || 'un');
-  return match.awayLogoUrl || flagUrl(match.awayFlag || 'un');
-}
-
 function countryFlagFor(match: MarketMatch, side: 'home' | 'away') {
   const flag = side === 'home' ? match.homeFlag : match.awayFlag;
   const code = side === 'home' ? match.homeCode : match.awayCode;
-  return flagUrl(flag || alpha3ToAlpha2[String(code || '').toUpperCase()] || 'un');
+  const normalizedFlag = String(flag || '').toLowerCase();
+  if (normalizedFlag && normalizedFlag !== 'un') return flagUrl(normalizedFlag);
+  return flagUrl(alpha3ToAlpha2[String(code || '').toUpperCase()] || 'un');
+}
+
+function imageFor(match: MarketMatch, side: 'home' | 'away') {
+  if (side === 'home') return match.homeLogoUrl || countryFlagFor(match, 'home');
+  return match.awayLogoUrl || countryFlagFor(match, 'away');
 }
 
 function priceNumber(price: string | number) {
@@ -494,7 +497,7 @@ function Hero({ match, onOpen, loading }: { match?: MarketMatch; onOpen: (match:
         </div>
 
         <div className="wc-hero-right">
-          <img className="wc-hero-logo" src="wc2026.png" alt="FIFA World Cup 2026" />
+          <img className="wc-hero-logo" src="/wc2026.png" alt="FIFA World Cup 2026" />
           <div className="wc-hero-teams" aria-label="Featured matchup teams">
             <span>{match ? <img src={countryFlagFor(match, 'home')} alt={match.home} /> : null}</span>
             <b>VS</b>
@@ -1386,7 +1389,7 @@ export function App() {
         aria-label={tickets.length ? 'Open positions' : 'FIFA World Cup 2026'}
       >
         {tickets.length ? <span className="ticket-count-badge">{tickets.length}</span> : null}
-        <img src="wc2026.png" alt="FIFA World Cup 2026" className="wc26-logo" />
+        <img src="/wc2026.png" alt="FIFA World Cup 2026" className="wc26-logo" />
       </button>
       <PnlModal ticket={pnlTicket} onClose={() => setPnlTicket(null)} />
       <Footer />

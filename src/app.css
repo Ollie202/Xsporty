@@ -546,6 +546,45 @@ body {
   gap: 10px;
 }
 
+.esports-dashboard {
+  display: grid;
+  gap: 18px;
+}
+
+.esports-market-section {
+  display: grid;
+  gap: 10px;
+}
+
+.esports-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+  border-bottom: 1px solid #e1e8f0;
+}
+
+.esports-section-head h3 {
+  margin: 0;
+  color: #101827;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.esports-section-head span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+  border: 1px solid #d8e1eb;
+  border-radius: 999px;
+  color: #556274;
+  background: #f8fafc;
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .match-row {
   min-height: 190px;
   display: grid;
@@ -2748,6 +2787,7 @@ html[data-theme='dark'] .header-search input::placeholder {
 
 html[data-theme='dark'] .brand strong,
 html[data-theme='dark'] .section-head h2,
+html[data-theme='dark'] .esports-section-head h3,
 html[data-theme='dark'] .market-tabs button.is-active,
 html[data-theme='dark'] .top-sport-nav button.is-active,
 html[data-theme='dark'] .match-teams strong,
@@ -2763,6 +2803,7 @@ html[data-theme='dark'] .brand small,
 html[data-theme='dark'] .market-tabs button,
 html[data-theme='dark'] .top-sport-nav button,
 html[data-theme='dark'] .match-meta,
+html[data-theme='dark'] .esports-section-head span,
 html[data-theme='dark'] .option-row small,
 html[data-theme='dark'] .option-row span,
 html[data-theme='dark'] .trade-slip label {
@@ -2781,6 +2822,15 @@ html[data-theme='dark'] .positions-dashboard__history {
   background: var(--panel) !important;
   border-color: var(--line) !important;
   box-shadow: none !important;
+}
+
+html[data-theme='dark'] .esports-section-head {
+  border-color: var(--line) !important;
+}
+
+html[data-theme='dark'] .esports-section-head span {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: var(--line) !important;
 }
 
 html[data-theme='dark'] .quick-odds button,

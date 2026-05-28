@@ -185,14 +185,16 @@ function parseRoute(): RouteState {
   };
 }
 
-function writeRoute(route: RouteState) {
+function writeRoute(route: RouteState, mode: 'push' | 'replace' = 'replace') {
   const params = new URLSearchParams();
   params.set('page', route.page);
   params.set('sport', route.sport);
   params.set('category', route.category);
   if (route.page === 'match' && route.matchId) params.set('match', route.matchId);
   const nextHash = `#${params.toString()}`;
-  if (window.location.hash !== nextHash) window.history.replaceState(null, '', nextHash);
+  if (window.location.hash === nextHash) return;
+  if (mode === 'push') window.history.pushState(null, '', nextHash);
+  else window.history.replaceState(null, '', nextHash);
 }
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> {
@@ -681,6 +683,42 @@ function PlayerMarketCard({ player, onPick }: { player: PlayerMarket; onPick: (c
   );
 }
 
+function EsportsMarketSection({
+  title,
+  count,
+  matches,
+  emptyTitle,
+  emptyText,
+  onOpen,
+  onPick,
+}: {
+  title: string;
+  count: number;
+  matches: MarketMatch[];
+  emptyTitle: string;
+  emptyText: string;
+  onOpen: (match: MarketMatch) => void;
+  onPick: (choice: Choice) => void;
+}) {
+  return (
+    <section className="esports-market-section" aria-label={title}>
+      <div className="esports-section-head">
+        <h3>{title}</h3>
+        <span>{count}</span>
+      </div>
+      {matches.length ? (
+        <div className="match-list" aria-label={`${title} cards`}>
+          {matches.map(match => (
+            <MatchCard key={match.id} match={match} onOpen={onOpen} onPick={onPick} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState title={emptyTitle} text={emptyText} />
+      )}
+    </section>
+  );
+}
+
 function MarketBoard({
   sport,
   category,
@@ -714,6 +752,8 @@ function MarketBoard({
     if (!query) return true;
     return `${player.name} ${player.country} ${player.title} ${player.label}`.toLowerCase().includes(query.toLowerCase());
   });
+  const liveEsportsMatches = filteredMatches.filter(match => match.isLive);
+  const upcomingEsportsMatches = filteredMatches.filter(match => !match.isLive);
 
   return (
     <section className="market-board home-section" id="games-board">
@@ -731,7 +771,28 @@ function MarketBoard({
           </button>
         ))}
       </div>
-      {category === 'players' ? (
+      {sport === 'esports' ? (
+        <div className="esports-dashboard">
+          <EsportsMarketSection
+            title="Live Games"
+            count={liveEsportsMatches.length}
+            matches={liveEsportsMatches}
+            emptyTitle="No live esports games"
+            emptyText="Live cards will appear here as soon as the backend marks a game live."
+            onOpen={onOpen}
+            onPick={onPick}
+          />
+          <EsportsMarketSection
+            title="Upcoming Games"
+            count={upcomingEsportsMatches.length}
+            matches={upcomingEsportsMatches}
+            emptyTitle="No upcoming esports games"
+            emptyText="The backend is online, but there are no upcoming esports cards right now."
+            onOpen={onOpen}
+            onPick={onPick}
+          />
+        </div>
+      ) : category === 'players' ? (
         <div className="player-market-grid">
           {filteredPlayers.map(player => (
             <PlayerMarketCard key={`${player.name}-${player.title}`} player={player} onPick={onPick} />
@@ -1112,6 +1173,7 @@ function Footer() {
 
 export function App() {
   const initialRoute = useRef<RouteState>(parseRoute());
+  const routeWriteMode = useRef<'push' | 'replace'>('replace');
   const [matches, setMatches] = useState<MarketMatch[]>([]);
   const [players, setPlayers] = useState<PlayerMarket[]>([]);
   const [sport, setSport] = useState(initialRoute.current.sport);
@@ -1160,15 +1222,26 @@ export function App() {
     walletActionsRef.current.disconnect?.();
   }, []);
 
-  const changeSport = useCallback((nextSport: string) => {
-    setQuery('');
-    setSport(nextSport);
+  const queueRoutePush = useCallback(() => {
+    routeWriteMode.current = 'push';
   }, []);
 
-  const changeCategory = useCallback((nextCategory: string) => {
+  const changeSport = useCallback((nextSport: string) => {
+    queueRoutePush();
     setQuery('');
+    setSelectedMatch(null);
+    setSport(nextSport);
+    setCategory(defaultCategoryForSport(nextSport, matches));
+    setPage('home');
+  }, [matches, queueRoutePush]);
+
+  const changeCategory = useCallback((nextCategory: string) => {
+    queueRoutePush();
+    setQuery('');
+    setSelectedMatch(null);
     setCategory(nextCategory);
-  }, []);
+    setPage('home');
+  }, [queueRoutePush]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1237,12 +1310,14 @@ export function App() {
 
   useEffect(() => {
     if (page === 'match' && !selectedMatch) return;
+    const mode = routeWriteMode.current;
+    routeWriteMode.current = 'replace';
     writeRoute({
       page,
       sport,
       category,
       matchId: selectedMatch?.id,
-    });
+    }, mode);
   }, [category, page, selectedMatch?.id, sport]);
 
   useEffect(() => {
@@ -1322,16 +1397,18 @@ export function App() {
   }, []);
 
   const openMatch = useCallback((match: MarketMatch) => {
+    queueRoutePush();
     appState.pendingTicket = null;
     setSelectedMatch(match);
     setPending(null);
     setPage('match');
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
-  }, []);
+  }, [queueRoutePush]);
 
   const submitSearch = useCallback(() => {
     const term = query.trim().toLowerCase();
     const showResults = () => {
+      queueRoutePush();
       setSelectedMatch(null);
       setPage('home');
       window.requestAnimationFrame(() => {
@@ -1358,22 +1435,24 @@ export function App() {
       return;
     }
     showResults();
-  }, [matches, players, query, sport]);
+  }, [matches, players, query, queueRoutePush, sport]);
 
   const showHome = useCallback(() => {
+    queueRoutePush();
     setSelectedMatch(null);
     setPage('home');
     window.requestAnimationFrame(() => {
       const target = document.querySelector('.wc-hero-banner') || document.querySelector('#games-board');
       target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-  }, []);
+  }, [queueRoutePush]);
 
   const openPositions = useCallback(() => {
+    queueRoutePush();
     setSelectedMatch(null);
     setSeenPositionCount(tickets.length);
     setPage('positions');
-  }, [tickets.length]);
+  }, [queueRoutePush, tickets.length]);
 
   const confirmTicket = useCallback(async () => {
     if (!pending) {
@@ -1399,12 +1478,13 @@ export function App() {
       refreshWalletState();
       setSeenPositionCount((appState.tickets || []).length);
       setPending(null);
+      queueRoutePush();
       setPage('positions');
     } catch (error) {
       console.warn(error);
       window.alert(error instanceof Error ? error.message : 'Order submission failed');
     }
-  }, [amount, pending, refreshWalletState, requestWalletConnect, walletState.address, walletState.connected]);
+  }, [amount, pending, queueRoutePush, refreshWalletState, requestWalletConnect, walletState.address, walletState.connected]);
 
   const animateOrb = useCallback(() => {
     const node = orbRef.current;
@@ -1454,8 +1534,8 @@ export function App() {
               {apiError ? <div id="error-screen"><div className="error-content"><strong>Backend unavailable</strong><p>{apiError}</p><button type="button" onClick={() => window.location.reload()}>Retry</button></div></div> : null}
             </>
           ) : null}
-          {page === 'match' && selectedMatch ? <MatchPage match={selectedMatch} onBack={() => setPage('home')} onPick={pickMarket} /> : null}
-          {page === 'positions' ? <PositionsPage tickets={tickets} onBack={() => setPage('home')} onPnl={setPnlTicket} /> : null}
+          {page === 'match' && selectedMatch ? <MatchPage match={selectedMatch} onBack={showHome} onPick={pickMarket} /> : null}
+          {page === 'positions' ? <PositionsPage tickets={tickets} onBack={showHome} onPnl={setPnlTicket} /> : null}
         </section>
         {pending && page === 'match' ? (
           <TradeSlip

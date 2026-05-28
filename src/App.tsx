@@ -311,6 +311,18 @@ function priceNumber(price: string | number) {
   return String(price).includes('.') ? Math.max(1, Math.min(99, Math.round(100 / value))) : value;
 }
 
+function displayProbability(price: string | number) {
+  return `${Math.round(priceNumber(price))}%`;
+}
+
+function quickChoiceClass(choice: Choice, match: MarketMatch) {
+  const classes = [choice.cssClass].filter(Boolean) as string[];
+  if (choice.label === match.home || choice.label === match.homeCode) classes.push('side-home');
+  if (choice.label === match.away || choice.label === match.awayCode) classes.push('side-away');
+  if (choice.label.toLowerCase() === 'draw') classes.push('side-draw');
+  return classes.join(' ');
+}
+
 function marketSearch(match: MarketMatch) {
   return `${match.home} ${match.away} ${match.homeCode} ${match.awayCode} ${match.leagueName || ''}`.toLowerCase();
 }
@@ -589,11 +601,12 @@ function Hero({ match, onOpen, loading }: { match?: MarketMatch; onOpen: (match:
 
 function PriceButton({ choice, onPick, compact = false }: { choice: Choice; onPick: (choice: Choice) => void; compact?: boolean }) {
   const showLabel = !compact || choice.label.toLowerCase() === 'draw';
+  const shownPrice = displayProbability(choice.price);
   return (
     <button
       className={choice.cssClass || ''}
       type="button"
-      aria-label={`${choice.label} ${choice.disabled ? 'Closed' : choice.price}`}
+      aria-label={`${choice.label} ${choice.disabled ? 'Closed' : shownPrice}`}
       disabled={choice.disabled}
       aria-disabled={choice.disabled || undefined}
       onClick={event => {
@@ -602,7 +615,7 @@ function PriceButton({ choice, onPick, compact = false }: { choice: Choice; onPi
       }}
     >
       {showLabel ? <span>{choice.label}</span> : null}
-      <b>{choice.disabled ? 'Closed' : choice.price}</b>
+      <b>{choice.disabled ? 'Closed' : shownPrice}</b>
     </button>
   );
 }
@@ -666,7 +679,7 @@ function FeaturedStrip({
               </div>
               <div className="featured-odds">
                 {choices.map(choice => (
-                  <PriceButton key={`${match.id}-${choice.title}-${choice.label}`} choice={choice} onPick={onPick} compact />
+                  <PriceButton key={`${match.id}-${choice.title}-${choice.label}`} choice={{ ...choice, cssClass: quickChoiceClass(choice, match) }} onPick={onPick} compact />
                 ))}
               </div>
             </article>
@@ -703,7 +716,7 @@ function MatchCard({ match, onOpen, onPick }: { match: MarketMatch; onOpen: (mat
       </div>
       <div className="quick-odds">
         {choices.map(choice => (
-          <PriceButton key={`${match.id}-${choice.title}-${choice.label}`} choice={choice} onPick={onPick} compact />
+          <PriceButton key={`${match.id}-${choice.title}-${choice.label}`} choice={{ ...choice, cssClass: quickChoiceClass(choice, match) }} onPick={onPick} compact />
         ))}
       </div>
     </article>

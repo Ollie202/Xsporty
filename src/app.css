@@ -4205,3 +4205,41 @@ html.theme-switching .theme-top-btn {
     min-height: 40px !important;
   }
 }
+
+.quick-odds button.side-home,
+.featured-odds button.side-home {
+  color: #064e3b !important;
+  background: linear-gradient(180deg, #ecfdf5 0%, #bbf7d0 100%) !important;
+  border-color: #34d399 !important;
+}
+
+.quick-odds button.side-away,
+.featured-odds button.side-away {
+  color: #7f1d1d !important;
+  background: linear-gradient(180deg, #fff1f2 0%, #fecdd3 100%) !important;
+  border-color: #fb7185 !important;
+}
+
+.quick-odds button.side-home b,
+.featured-odds button.side-home b {
+  color: #047857 !important;
+}
+
+.quick-odds button.side-away b,
+.featured-odds button.side-away b {
+  color: #e11d48 !important;
+}
+
+html[data-theme='dark'] .quick-odds button.side-home,
+html[data-theme='dark'] .featured-odds button.side-home {
+  color: #d1fae5 !important;
+  background: rgba(6, 78, 59, 0.78) !important;
+  border-color: rgba(52, 211, 153, 0.72) !important;
+}
+
+html[data-theme='dark'] .quick-odds button.side-away,
+html[data-theme='dark'] .featured-odds button.side-away {
+  color: #ffe4e6 !important;
+  background: rgba(127, 29, 29, 0.78) !important;
+  border-color: rgba(251, 113, 133, 0.72) !important;
+}

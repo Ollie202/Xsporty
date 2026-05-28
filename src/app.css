@@ -3180,9 +3180,9 @@ html[data-theme='dark'] .brand__mark {
   }
 
   #app-root {
-    width: calc(100% / 0.92);
-    min-height: calc(100vh / 0.92);
-    zoom: 0.92;
+    width: calc(100% / 0.8);
+    min-height: calc(100vh / 0.8);
+    zoom: 0.8;
     transform: none;
     transform-origin: top left;
   }

@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronDown, ChevronRight, Copy, Search, X as XIcon } from 'lucide-react';
+import { Bot, ChevronDown, ChevronRight, Copy, Send, Sparkles, Trash2, Search, X as XIcon } from 'lucide-react';
 import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
@@ -118,6 +118,14 @@ type PendingTicket = Omit<Ticket, 'id' | 'amount' | 'updatedAt'> & {
   backendMarketId?: string;
   marketScope?: string;
   sidePrices?: Partial<Record<'YES' | 'NO', { price: number; outcomeSide: string }>>;
+};
+type AssistantMessage = {
+  role: 'assistant' | 'user';
+  text: string;
+};
+type AssistantContext = {
+  match?: MarketMatch | null;
+  matches: MarketMatch[];
 };
 type PageName = 'home' | 'match' | 'positions';
 type RouteState = {
@@ -1108,6 +1116,233 @@ function PositionsPage({ tickets, onBack, onPnl }: { tickets: Ticket[]; onBack: 
   );
 }
 
+function AssistantLogo({ small = false }: { small?: boolean }) {
+  return (
+    <span className={small ? 'assistant-logo assistant-logo--small' : 'assistant-logo'} aria-hidden="true">
+      <Bot size={small ? 18 : 25} strokeWidth={2.4} />
+    </span>
+  );
+}
+
+function XsportyAssistant({
+  matches,
+  players,
+  onOpenMatch,
+  onPrepareBet,
+  onShowPlayers,
+}: {
+  matches: MarketMatch[];
+  players: PlayerMarket[];
+  onOpenMatch: (match: MarketMatch) => void;
+  onPrepareBet: (match: MarketMatch, choice: Choice, amount: number) => void;
+  onShowPlayers: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [messages, setMessages] = useState<AssistantMessage[]>([
+    { role: 'assistant', text: 'Tell me what you want to find, compare, or bet. I can answer sports questions without forcing a ticket.' },
+  ]);
+  const [context, setContext] = useState<AssistantContext>({ match: null, matches: [] });
+  const logRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: 'smooth' });
+  }, [messages, open]);
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    const text = draft.trim();
+    if (!text) return;
+    setDraft('');
+    setMessages(previous => [...previous, { role: 'user', text }]);
+    const answer = await answerAssistant(text, matches, players, context, { onOpenMatch, onPrepareBet, onShowPlayers });
+    setContext(answer.context);
+    setMessages(previous => [...previous, { role: 'assistant', text: answer.text }]);
+  }
+
+  function clearChat() {
+    setContext({ match: null, matches: [] });
+    setMessages([{ role: 'assistant', text: 'Fresh chat. Ask about games, players, markets, or type the bet you want.' }]);
+  }
+
+  return (
+    <div className={open ? 'xs-assistant is-open' : 'xs-assistant'}>
+      {open ? (
+        <section className="xs-assistant-panel" aria-label="Xsporty Assistant chat">
+          <header className="xs-assistant-head">
+            <AssistantLogo />
+            <div>
+              <strong>Xsporty Assistant</strong>
+              <small>Sports answers and natural-language tickets</small>
+            </div>
+            <button type="button" className="xs-assistant-icon-btn" aria-label="Clear chat" onClick={clearChat}>
+              <Trash2 size={17} aria-hidden="true" />
+            </button>
+            <button type="button" className="xs-assistant-icon-btn" aria-label="Close assistant" onClick={() => setOpen(false)}>
+              <XIcon size={18} aria-hidden="true" />
+            </button>
+          </header>
+          <div className="xs-assistant-log" ref={logRef}>
+            {messages.map((message, index) => (
+              <div className={`xs-assistant-message is-${message.role}`} key={`${message.role}-${index}`}>
+                {message.role === 'assistant' ? <AssistantLogo small /> : null}
+                <p>{message.text}</p>
+              </div>
+            ))}
+          </div>
+          <form className="xs-assistant-input" onSubmit={submit}>
+            <input value={draft} onChange={event => setDraft(event.target.value)} placeholder="Ask about games, players, markets, or type a bet..." />
+            <button type="submit" aria-label="Send message">
+              <Send size={18} aria-hidden="true" />
+            </button>
+          </form>
+        </section>
+      ) : null}
+      <button type="button" className="xs-assistant-launcher" aria-label="Open Xsporty Assistant" onClick={() => setOpen(value => !value)}>
+        <AssistantLogo />
+        <span><Sparkles size={14} aria-hidden="true" /> Ask</span>
+      </button>
+    </div>
+  );
+}
+
+async function answerAssistant(
+  text: string,
+  matches: MarketMatch[],
+  players: PlayerMarket[],
+  context: AssistantContext,
+  actions: {
+    onOpenMatch: (match: MarketMatch) => void;
+    onPrepareBet: (match: MarketMatch, choice: Choice, amount: number) => void;
+    onShowPlayers: () => void;
+  },
+): Promise<{ text: string; context: AssistantContext }> {
+  const request = normalizeAssistantText(text);
+  const ranked = rankAssistantMatches(text, matches);
+  const nextContext: AssistantContext = { match: ranked[0]?.match || context.match || null, matches: ranked.length ? ranked.slice(0, 5).map(item => item.match) : context.matches };
+  const wantsBet = /\b(bet|stake|wager|ticket|place|put|buy)\b/.test(request);
+  const asksPlayer = /\b(player|playing|injured|injury|available|roster|squad|lineup|starting|neymar|messi|mbappe|ronaldo)\b/.test(request);
+
+  if (/^(hi|hello|hey|yo)\b/.test(request)) return { text: 'Hey. Ask me for games, player info, prices, comparisons, or tell me the ticket you want.', context: nextContext };
+  if (asksPlayer && !wantsBet) return { text: await answerAssistantPlayerQuestion(text, players), context: nextContext };
+
+  if (wantsBet) {
+    const match = pickAssistantMatch(request, ranked, context, matches);
+    if (!match) return { text: 'Tell me the team, player, or game first, then I can prepare the ticket.', context: nextContext };
+    const choice = findAssistantChoice(text, match);
+    if (!choice) return { text: `I found ${match.home} vs ${match.away}, but I need the side or market. Try "bet 50 on ${match.home}" or "bet 25 on draw".`, context: { ...nextContext, match } };
+    const amount = extractAssistantAmount(request) || 100;
+    actions.onPrepareBet(match, choice, amount);
+    return { text: `Ticket loaded: ${amount} on ${choice.label} in ${choice.title} at ${choice.price}. Confirm it in the slip when ready.`, context: { ...nextContext, match } };
+  }
+
+  if (/\b(open|show|load|take me|go to)\b/.test(request)) {
+    const match = pickAssistantMatch(request, ranked, context, matches);
+    if (!match) return { text: 'Which game do you want me to open?', context: nextContext };
+    actions.onOpenMatch(match);
+    return { text: `Opened ${match.home} vs ${match.away}.`, context: { ...nextContext, match } };
+  }
+
+  if (/\b(compare|odds|price|prices|markets|lines)\b/.test(request)) {
+    const match = pickAssistantMatch(request, ranked, context, matches);
+    if (!match) return { text: 'Name a team, player, or game and I will compare the available prices.', context: nextContext };
+    const lines = match.options.slice(0, 5).map(option => `${option[0]}: ${optionChoices(option, match).map(choice => `${choice.label} ${choice.price}`).join(' / ')}`);
+    return { text: `${match.home} vs ${match.away}\n${lines.join('\n')}`, context: { ...nextContext, match } };
+  }
+
+  if (/\b(players|player futures)\b/.test(request)) {
+    actions.onShowPlayers();
+    const shown = players.slice(0, 4).map(player => `${player.name}: ${player.title} - Yes ${player.yes}c / No ${player.no}c`);
+    return { text: shown.length ? shown.join('\n') : 'No player markets are loaded right now.', context: nextContext };
+  }
+
+  if (/\b(games|matches|fixtures|schedule|world cup|football|basketball|cricket|tennis|ufc|formula|esports)\b/.test(request)) {
+    const shown = ranked.length ? ranked.slice(0, 4).map(item => item.match) : matches.slice(0, 4);
+    return { text: shown.length ? shown.map(match => `${match.home} vs ${match.away} - ${match.time} - ${match.options.length} markets`).join('\n') : 'No backend games are loaded right now.', context: { match: shown[0] || nextContext.match || null, matches: shown } };
+  }
+
+  return { text: 'I can answer from the loaded sports and market data. Ask for games, players, prices, comparisons, or type the bet you want.', context: nextContext };
+}
+
+async function answerAssistantPlayerQuestion(text: string, players: PlayerMarket[]) {
+  const player = extractAssistantPlayer(text, players);
+  if (!player) return 'Which player should I check?';
+  const params = `query=${encodeURIComponent(player)}&competition=world-cup&season=2026`;
+  for (const path of [`/sports/players/status?${params}`, `/players/status?${params}`]) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}${path}`);
+      if (!response.ok) continue;
+      const data = await response.json();
+      const result = data?.player || data?.result || data;
+      const status = result?.availability || result?.status || result?.playingStatus;
+      if (status) return `${result.name || player}: ${status}.${result.reason ? ` ${result.reason}` : ''}`;
+    } catch {
+      // Fall back to market data below.
+    }
+  }
+  const market = players.find(item => normalizeAssistantText(item.name).includes(normalizeAssistantText(player)));
+  if (market) return `I can see ${market.name} in player markets, but that does not confirm official availability. Related market: ${market.title} - Yes ${market.yes}c / No ${market.no}c.`;
+  return `I cannot confirm ${player}'s official status from the current backend routes yet. The frontend is ready for /sports/players/status or /players/status when the backend exposes it.`;
+}
+
+function extractAssistantPlayer(text: string, players: PlayerMarket[]) {
+  const request = normalizeAssistantText(text);
+  const known = ['Neymar', 'Neymar Jr', 'Lionel Messi', 'Kylian Mbappe', 'Cristiano Ronaldo', ...players.map(player => player.name)];
+  const found = known.find(name => request.includes(normalizeAssistantText(name)));
+  if (found) return found;
+  return text.replace(/\b(is|are|will|does|do|did|playing|play|in|the|this|world|cup|available|injured|starting|lineup|roster|squad|for)\b/gi, ' ').replace(/[^\w\s'-]/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 3).join(' ');
+}
+
+function rankAssistantMatches(text: string, matches: MarketMatch[]) {
+  const request = normalizeAssistantText(text);
+  const terms = request.split(' ').filter(term => term.length > 2);
+  return matches.map(match => {
+    const haystack = normalizeAssistantText(`${match.home} ${match.away} ${match.homeCode} ${match.awayCode} ${match.leagueName || ''} ${match.group} ${match.sport} ${match.options.map(option => option[0]).join(' ')}`);
+    const teamHits = [match.home, match.away, match.homeCode, match.awayCode].filter(Boolean).reduce((score, value) => score + (request.includes(normalizeAssistantText(value)) ? 8 : 0), 0);
+    const termHits = terms.reduce((score, term) => score + (haystack.includes(term) ? 1 : 0), 0);
+    const worldCupHit = request.includes('world cup') && match.group === 'world-cup' ? 5 : 0;
+    return { match, score: teamHits + termHits + worldCupHit };
+  }).filter(item => item.score > 0).sort((a, b) => b.score - a.score);
+}
+
+function pickAssistantMatch(request: string, ranked: ReturnType<typeof rankAssistantMatches>, context: AssistantContext, matches: MarketMatch[]) {
+  if (/\b(this|that|current|same)\b/.test(request) && context.match) return context.match;
+  const ordinal = request.match(/\b(first|second|third|fourth|1st|2nd|3rd|4th)\b/)?.[0] || '';
+  const indexes: Record<string, number> = { first: 0, '1st': 0, second: 1, '2nd': 1, third: 2, '3rd': 2, fourth: 3, '4th': 3 };
+  const index = indexes[ordinal];
+  if (index !== undefined) return context.matches[index] || ranked[index]?.match || matches[index];
+  return ranked[0]?.match || context.match || null;
+}
+
+function findAssistantChoice(text: string, match: MarketMatch) {
+  const request = normalizeAssistantText(text);
+  const choices = match.options.flatMap(option => optionChoices(option, match));
+  const teamName = [match.home, match.away].find(team => request.includes(normalizeAssistantText(team)));
+  const scored = choices.map(choice => {
+    const haystack = normalizeAssistantText(`${choice.title} ${choice.label} ${choice.outcomeSide || ''}`);
+    let score = 0;
+    if (teamName && haystack.includes(normalizeAssistantText(teamName))) score += 14;
+    ['draw', 'over', 'under', 'yes', 'no'].forEach(word => {
+      if (request.includes(word) && haystack.includes(word)) score += 8;
+    });
+    request.split(' ').forEach(term => {
+      if (term.length > 2 && haystack.includes(term)) score += 1;
+    });
+    if (choice.disabled) score -= 100;
+    return { choice, score };
+  }).sort((a, b) => b.score - a.score);
+  return scored[0]?.score > 0 ? scored[0].choice : null;
+}
+
+function extractAssistantAmount(request: string) {
+  const amount = Number(request.match(/\$?(\d+(?:\.\d+)?)/)?.[1]);
+  return Number.isFinite(amount) && amount > 0 ? amount : null;
+}
+
+function normalizeAssistantText(value: string) {
+  return String(value || '').toLowerCase().replace(/[^a-z0-9.\s-]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function PnlModal({ ticket, onClose }: { ticket: Ticket | null; onClose: () => void }) {
   if (!ticket) return null;
   const pnl = pNl(ticket, 0);
@@ -1405,6 +1640,24 @@ export function App() {
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }, [queueRoutePush]);
 
+  const prepareAssistantBet = useCallback((match: MarketMatch, choice: Choice, stake: number) => {
+    setAmount(String(stake));
+    setSelectedMatch(match);
+    setPage('match');
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    pickMarket(choice);
+  }, [pickMarket]);
+
+  const showPlayerMarkets = useCallback(() => {
+    setSport('football');
+    setCategory('players');
+    setSelectedMatch(null);
+    setPage('home');
+    window.requestAnimationFrame(() => {
+      document.querySelector('#games-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
+
   const submitSearch = useCallback(() => {
     const term = query.trim().toLowerCase();
     const showResults = () => {
@@ -1561,6 +1814,13 @@ export function App() {
       >
         <img src="/wc2026.png" alt="FIFA World Cup 2026" className="wc26-logo" />
       </button>
+      <XsportyAssistant
+        matches={matches}
+        players={players}
+        onOpenMatch={openMatch}
+        onPrepareBet={prepareAssistantBet}
+        onShowPlayers={showPlayerMarkets}
+      />
       <PnlModal ticket={pnlTicket} onClose={() => setPnlTicket(null)} />
       <Footer />
     </>

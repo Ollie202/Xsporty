@@ -76,14 +76,14 @@ The active page loads CSS in this order:
 
 Keep new styles in the narrowest matching file.
 
-## WhatsApp Bot
+## Xsporty Assistant
 
-The WhatsApp bot lives in `whatsapp-bot/`. It uses the official WhatsApp Cloud API webhook shape and keeps trading outside WhatsApp for compliance. The bot answers World Cup fixture/update/market-discovery prompts, then redirects eligible users to the website.
+The Xsporty Assistant lives in `Xsporty_Assistant/`. The active product direction is the on-site assistant: users can ask sports questions, compare markets, and load a ticket in natural language from the floating assistant on the page.
 
 Run it with:
 
 ```bash
-cd whatsapp-bot
+cd Xsporty_Assistant
 copy .env.example .env
 npm start
 ```

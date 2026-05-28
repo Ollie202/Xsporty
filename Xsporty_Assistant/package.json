@@ -1,8 +1,8 @@
 {
-  "name": "x-cup-whatsapp-bot",
+  "name": "xsporty-assistant",
   "version": "0.1.0",
   "private": true,
-  "description": "WhatsApp Cloud API bot for X Cup market discovery and World Cup updates.",
+  "description": "Xsporty Assistant service for sports answers and market discovery.",
   "type": "module",
   "scripts": {
     "start": "node server.js",

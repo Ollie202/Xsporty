@@ -7,11 +7,11 @@ loadEnvFile();
 
 const config = {
   port: Number(process.env.PORT || 8787),
-  verifyToken: process.env.WHATSAPP_VERIFY_TOKEN || "change-this-local-verify-token",
-  accessToken: process.env.WHATSAPP_ACCESS_TOKEN || "",
-  phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || "",
-  appSecret: process.env.WHATSAPP_APP_SECRET || "",
-  apiVersion: process.env.WHATSAPP_API_VERSION || "v20.0",
+  verifyToken: process.env.XSPORTY_ASSISTANT_VERIFY_TOKEN || "change-this-local-verify-token",
+  accessToken: process.env.XSPORTY_ASSISTANT_ACCESS_TOKEN || "",
+  channelId: process.env.XSPORTY_ASSISTANT_CHANNEL_ID || "",
+  appSecret: process.env.XSPORTY_ASSISTANT_APP_SECRET || "",
+  apiVersion: process.env.XSPORTY_ASSISTANT_API_VERSION || "v1",
   siteUrl: trimSlash(process.env.SITE_URL || ""),
   marketApiBaseUrl: trimSlash(process.env.MARKET_API_BASE_URL || "http://127.0.0.1:3000"),
   termsUrl: process.env.TERMS_URL || "",
@@ -46,16 +46,16 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if (req.method === "GET" && url.pathname === "/health") {
-      return sendJson(res, 200, { ok: true, service: "x-cup-whatsapp-bot" });
+      return sendJson(res, 200, { ok: true, service: "xsporty-assistant" });
     }
 
-    if (req.method === "GET" && url.pathname === "/webhooks/whatsapp") {
+    if (req.method === "GET" && url.pathname === "/webhooks/xsporty-assistant") {
       return verifyWebhook(url, res);
     }
 
-    if (req.method === "POST" && url.pathname === "/webhooks/whatsapp") {
+    if (req.method === "POST" && url.pathname === "/webhooks/xsporty-assistant") {
       const rawBody = await readBody(req);
-      if (!isValidMetaSignature(req, rawBody)) {
+      if (!isValidWebhookSignature(req, rawBody)) {
         return sendJson(res, 403, { error: "Invalid webhook signature" });
       }
 
@@ -81,9 +81,9 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(config.port, () => {
-  console.log(`X Cup WhatsApp bot listening on http://localhost:${config.port}`);
-  if (!config.accessToken || !config.phoneNumberId) {
-    console.log("WhatsApp send is disabled until WHATSAPP_ACCESS_TOKEN and WHATSAPP_PHONE_NUMBER_ID are set.");
+  console.log(`Xsporty Assistant listening on http://localhost:${config.port}`);
+  if (!config.accessToken || !config.channelId) {
+    console.log("Outbound channel send is disabled until XSPORTY_ASSISTANT_ACCESS_TOKEN and XSPORTY_ASSISTANT_CHANNEL_ID are set.");
   }
 });
 
@@ -123,7 +123,7 @@ async function handleIncomingMessage(message, value) {
 
   const session = getSession(from, contactName);
   const reply = await buildReply(text, session);
-  await sendWhatsAppText(from, reply);
+  await sendChannelText(from, reply);
 }
 
 async function buildReply(rawText, session) {
@@ -141,15 +141,15 @@ async function buildReply(rawText, session) {
   }
 
   if (session.optedOut) {
-    return "You are currently opted out. Message START to use X Cup updates again.";
+    return "You are currently opted out. Message START to use xSporty updates again.";
   }
 
   if (["yes", "yes i am", "i am 18", "18", "18+"].includes(text)) {
     session.ageConfirmed = true;
     return [
-      "Nice. You can use this bot for World Cup updates and market discovery.",
+      "Nice. You can use Xsporty Assistant for World Cup updates and market discovery.",
       "",
-      "Trading only happens on the X Cup site after wallet connection and local eligibility checks.",
+      "Trading only happens on the xSporty site after wallet connection and local eligibility checks.",
       "",
       menuLine(),
     ].join("\n");
@@ -157,7 +157,7 @@ async function buildReply(rawText, session) {
 
   if (["no", "under 18", "not 18"].includes(text)) {
     session.ageConfirmed = false;
-    return "Thanks for being honest. X Cup market links are only for users who are 18+ and allowed in their jurisdiction. I can still answer general World Cup info.";
+    return "Thanks for being honest. xSporty market links are only for users who are 18+ and allowed in their jurisdiction. I can still answer general World Cup info.";
   }
 
   if (containsAny(text, ["sports", "categories", "available sports", "what can i ask"])) {
@@ -165,10 +165,10 @@ async function buildReply(rawText, session) {
       "Sports I can help with",
       "",
       "- Football: World Cup fixtures, live scores, groups, player markets, match markets",
-      "- Basketball: featured games and market summaries from X Cup",
-      "- Cricket: featured games and market summaries from X Cup",
-      "- Formula 1: race winner markets from X Cup",
-      "- UFC: fight winner markets from X Cup",
+      "- Basketball: featured games and market summaries from xSporty",
+      "- Cricket: featured games and market summaries from xSporty",
+      "- Formula 1: race winner markets from xSporty",
+      "- UFC: fight winner markets from xSporty",
       "",
       "Try: Brazil fixtures, live games, World Cup groups, Messi markets, UFC markets, F1 races.",
     ].join("\n");
@@ -223,7 +223,7 @@ async function buildReply(rawText, session) {
   if (containsAny(text, ["market", "markets", "odds", "prediction", "predict"])) {
     const fixtures = await loadFixtureSummaries({ query: text });
     return [
-      "Popular X Cup markets",
+      "Popular xSporty markets",
       "",
       ...fixtures.slice(0, 5).map(fixture => `- ${fixture.market}: YES ${fixture.yes}c / NO ${fixture.no}c`),
       "",
@@ -251,7 +251,7 @@ async function buildReply(rawText, session) {
       ].join("\n");
     }
     return [
-      "Open X Cup",
+      "Open xSporty",
       config.siteUrl,
       "",
       "18+ only. Availability depends on your location. Trading happens only on the website after wallet connection and eligibility checks.",
@@ -267,9 +267,9 @@ async function buildReply(rawText, session) {
 
 function welcome(session) {
   return [
-    `Hey ${session.name}. I am the X Cup World Cup assistant.`,
+    `Hey ${session.name}. I am the Xsporty Assistant.`,
     "",
-    "I can show fixtures, live updates, and prediction market summaries. I cannot place trades inside WhatsApp.",
+    "I can show fixtures, live updates, player info, and prediction market summaries. Final ticket confirmation happens on the xSporty site.",
     "",
     "For market links, please confirm you are 18+ and allowed to access prediction markets where you live.",
     "",
@@ -283,9 +283,9 @@ function menuLine() {
 
 function safePlayLine(intent) {
   if (!config.siteUrl) {
-    return "The X Cup web app link is not live yet. Once SITE_URL is set, I will send users straight to the right market page.";
+    return "The xSporty web app link is not live yet. Once SITE_URL is set, I will send users straight to the right market page.";
   }
-  const url = `${config.siteUrl}?source=whatsapp&intent=${encodeURIComponent(intent)}`;
+  const url = `${config.siteUrl}?source=xsporty-assistant&intent=${encodeURIComponent(intent)}`;
   return `To play, continue on the website: ${url}\n18+ only. Location and wallet eligibility checks apply.`;
 }
 
@@ -342,7 +342,7 @@ async function loadWorldCupStandings() {
       "",
       "Connect a sports API key to answer current group tables here.",
       "",
-      "Set SPORTS_API_PROVIDER=api-football and SPORTS_API_KEY in whatsapp-bot/.env.",
+      "Set SPORTS_API_PROVIDER=api-football and SPORTS_API_KEY in Xsporty_Assistant/.env.",
     ].join("\n");
   }
 
@@ -363,7 +363,7 @@ async function loadWorldCupStandings() {
       ]),
     ].join("\n").trim();
   } catch (error) {
-    return "I could not load current World Cup standings yet. Check the sports API key, league id, and season in whatsapp-bot/.env.";
+    return "I could not load current World Cup standings yet. Check the sports API key, league id, and season in Xsporty_Assistant/.env.";
   }
 }
 
@@ -452,7 +452,7 @@ function sportMarketReply(text) {
   return [
     `${sport} markets`,
     "",
-    "I will pull live markets from the X Cup backend when MARKET_API_BASE_URL is online.",
+    "I will pull live markets from the xSporty backend when MARKET_API_BASE_URL is online.",
     "",
     ...(examples[sport] || examples.Basketball).map(item => `- ${item}`),
     "",
@@ -471,7 +471,7 @@ function generalSportsReply(text) {
   }
 
   return [
-    "I can help with World Cup fixtures, live updates, groups, player markets, and the sports available on X Cup.",
+    "I can help with World Cup fixtures, live updates, groups, player markets, and the sports available on xSporty.",
     "",
     "Ask naturally, for example:",
     "- Who hosts the World Cup?",
@@ -527,34 +527,14 @@ function formatKickoff(value) {
   }).format(date);
 }
 
-async function sendWhatsAppText(to, body) {
-  if (!config.accessToken || !config.phoneNumberId) {
-    console.log("[dry-run] WhatsApp reply to", to, "\n" + body);
+async function sendChannelText(to, body) {
+  if (!config.accessToken || !config.channelId) {
+    console.log("[dry-run] Xsporty Assistant reply to", to, "\n" + body);
     return;
   }
 
-  const response = await fetch(`https://graph.facebook.com/${config.apiVersion}/${config.phoneNumberId}/messages`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${config.accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      messaging_product: "whatsapp",
-      recipient_type: "individual",
-      to,
-      type: "text",
-      text: {
-        preview_url: true,
-        body: body.slice(0, 4096),
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => "");
-    console.error("WhatsApp send failed:", response.status, errorText);
-  }
+  console.log("[channel-send pending]", { to, apiVersion: config.apiVersion, channelId: config.channelId });
+  console.log(body);
 }
 
 function extractMessageText(message) {
@@ -581,7 +561,7 @@ function getSession(phone, name) {
   return session;
 }
 
-function isValidMetaSignature(req, rawBody) {
+function isValidWebhookSignature(req, rawBody) {
   if (!config.appSecret) return true;
   const signature = req.headers["x-hub-signature-256"];
   if (!signature || !signature.startsWith("sha256=")) return false;

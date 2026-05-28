@@ -62,7 +62,7 @@ export function wireConfirmTrade() {
       return;
     }
     if (!pending.marketId) {
-      showToast("This market is preview-only until backend settlement is added.");
+      showToast("This market is not available for trading yet.");
       return;
     }
     confirmTradeButton.disabled = true;

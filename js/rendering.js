@@ -82,7 +82,7 @@ function updateWorldCupHeadlineHero() {
   if (heroKicker) heroKicker.textContent = "FIFA World Cup 2026 - Prediction Market";
   heroTitle.innerHTML = `${escapeHtml(match.home)}<br><span>vs</span><br>${escapeHtml(match.away)}`;
   if (heroCopy) {
-    heroCopy.textContent = `${match.time} - ${marketCount} open markets from live backend data.`;
+    heroCopy.textContent = `${match.time} - ${marketCount} open markets.`;
   }
   if (heroBadges) {
     heroBadges.innerHTML = [match.homeCode, match.awayCode, "World Cup", "X Layer"]

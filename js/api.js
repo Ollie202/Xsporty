@@ -41,13 +41,19 @@ export async function hydrateFromBackend() {
       return true;
     }
     state.apiOnline = false;
-    throw new Error('Backend returned no open tradable market cards');
+    throw new Error('No open tradable market cards are available right now');
   } catch (error) {
-    console.warn('Backend market load failed:', error);
+    console.warn('Market data load failed:', error);
     state.apiOnline = false;
-    state.apiError = error instanceof Error ? error.message : String(error);
+    const message = error instanceof Error ? error.message : String(error);
+    state.apiError = message.replace(/\bbackend\b/gi, 'market data service');
   }
   return false;
+}
+
+export async function fetchFixtureInsights(fixtureId) {
+  if (!fixtureId) return null;
+  return apiGet('/fixtures/' + encodeURIComponent(fixtureId) + '/insights');
 }
 
 function mergeBackendCards(...cardGroups) {
@@ -77,7 +83,7 @@ function mapBackendPlayerFutureCards(cards) {
     const market = summary?.market;
     const future = market?.template?.category === 'PLAYER_FUTURE' ? market.template : null;
     const player = future?.player || card.player;
-    if (!market || !future || !player?.playerName) return [];
+    if (!market || !market.conditionId || !future || !player?.playerName) return [];
     const [yesCents, noCents] = outcomePairCents(
       summary?.summary?.prices?.YES,
       summary?.summary?.prices?.NO
@@ -100,7 +106,7 @@ function mapBackendPlayerFutureCards(cards) {
 export function mapBackendCards(cards) {
   return cards.flatMap((card, index) => {
     const fixture = card.fixture || (card.summaries && card.summaries[0] && card.summaries[0].fixture);
-    const summaries = card.summaries || [];
+    const summaries = (card.summaries || []).filter(summary => summary?.market?.conditionId);
     if (!fixture || summaries.length === 0) return [];
     const sport = mapBackendSport(fixture.sport);
     const options = summaries

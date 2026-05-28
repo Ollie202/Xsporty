@@ -548,7 +548,35 @@ body {
 
 .esports-dashboard {
   display: grid;
-  gap: 18px;
+  gap: 12px;
+}
+
+.esports-status-toggle {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(104px, 1fr));
+  justify-self: start;
+  padding: 3px;
+  border: 1px solid #d8e1eb;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.esports-status-toggle button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 14px;
+  color: #556274;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.esports-status-toggle button.is-active {
+  color: #101827;
+  background: #fff;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.08);
 }
 
 .esports-market-section {
@@ -2024,6 +2052,7 @@ html[data-theme='dark'] .brand strong,
 html[data-theme='dark'] .top-sport-nav button.is-active,
 html[data-theme='dark'] .section-head h2,
 html[data-theme='dark'] .market-tabs button.is-active,
+html[data-theme='dark'] .esports-status-toggle button.is-active,
 html[data-theme='dark'] .match-teams strong,
 html[data-theme='dark'] .featured-names span,
 html[data-theme='dark'] .detail-matchup h2,
@@ -2035,6 +2064,7 @@ html[data-theme='dark'] .trade-slip h2 {
 html[data-theme='dark'] .brand small,
 html[data-theme='dark'] .top-sport-nav button,
 html[data-theme='dark'] .market-tabs button,
+html[data-theme='dark'] .esports-status-toggle button,
 html[data-theme='dark'] .match-meta,
 html[data-theme='dark'] .option-row small,
 html[data-theme='dark'] .trade-slip label,
@@ -2789,6 +2819,7 @@ html[data-theme='dark'] .brand strong,
 html[data-theme='dark'] .section-head h2,
 html[data-theme='dark'] .esports-section-head h3,
 html[data-theme='dark'] .market-tabs button.is-active,
+html[data-theme='dark'] .esports-status-toggle button.is-active,
 html[data-theme='dark'] .top-sport-nav button.is-active,
 html[data-theme='dark'] .match-teams strong,
 html[data-theme='dark'] .featured-names span,
@@ -2801,6 +2832,7 @@ html[data-theme='dark'] .trade-slip h2 {
 
 html[data-theme='dark'] .brand small,
 html[data-theme='dark'] .market-tabs button,
+html[data-theme='dark'] .esports-status-toggle button,
 html[data-theme='dark'] .top-sport-nav button,
 html[data-theme='dark'] .match-meta,
 html[data-theme='dark'] .esports-section-head span,
@@ -2826,6 +2858,16 @@ html[data-theme='dark'] .positions-dashboard__history {
 
 html[data-theme='dark'] .esports-section-head {
   border-color: var(--line) !important;
+}
+
+html[data-theme='dark'] .esports-status-toggle {
+  background: var(--panel-soft) !important;
+  border-color: var(--line) !important;
+}
+
+html[data-theme='dark'] .esports-status-toggle button.is-active {
+  background: var(--panel-raised) !important;
+  box-shadow: none !important;
 }
 
 html[data-theme='dark'] .esports-section-head span {

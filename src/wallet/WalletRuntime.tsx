@@ -25,6 +25,10 @@ const appState = legacyState as {
   pendingTicket: unknown;
 };
 
+type DisconnectState = {
+  requested: boolean;
+};
+
 const xLayerTestnet = defineChain({
   id: 1952,
   name: 'X Layer Testnet',
@@ -53,6 +57,10 @@ const walletConnectProjectId =
   import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ||
   '00000000000000000000000000000000';
 
+const WALLET_CONNECTED_KEY = 'x-cup-wallet-connected';
+const WALLET_DISCONNECTED_KEY = 'x-cup-wallet-disconnected';
+const WALLET_PROVIDER_KEY = 'x-cup-wallet-provider';
+
 const wagmiConfig = getDefaultConfig({
   appName: 'Xsporty',
   projectId: walletConnectProjectId,
@@ -65,11 +73,13 @@ const wagmiConfig = getDefaultConfig({
 const queryClient = new QueryClient();
 
 export function WalletRuntime(props: WalletRuntimeProps) {
+  const disconnectState = useRef<DisconnectState>({ requested: false });
+
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          <WalletBridge {...props} />
+          <WalletBridge {...props} disconnectState={disconnectState.current} />
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
@@ -81,7 +91,8 @@ function WalletBridge({
   onWalletChange,
   onWalletState,
   onActions,
-}: WalletRuntimeProps) {
+  disconnectState,
+}: WalletRuntimeProps & { disconnectState: DisconnectState }) {
   const { address, connector, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { openConnectModal } = useConnectModal();
@@ -90,9 +101,12 @@ function WalletBridge({
   useEffect(() => {
     onActions({
       openConnectModal: openConnectModal || undefined,
-      disconnect,
+      disconnect: () => {
+        disconnectState.requested = true;
+        disconnect();
+      },
     });
-  }, [disconnect, onActions, openConnectModal]);
+  }, [disconnect, disconnectState, onActions, openConnectModal]);
 
   useEffect(() => {
     if (!connectRequestId || handledConnectRequest.current === connectRequestId || isConnected || !openConnectModal) return;
@@ -113,6 +127,12 @@ function WalletBridge({
           appState.balance = null;
           appState.portfolio = null;
           appState.pendingTicket = null;
+          localStorage.removeItem(WALLET_CONNECTED_KEY);
+          if (disconnectState.requested) {
+            localStorage.setItem(WALLET_DISCONNECTED_KEY, '1');
+            localStorage.removeItem(WALLET_PROVIDER_KEY);
+          }
+          disconnectState.requested = false;
         }
         onWalletState({ connected: false });
         onWalletChange();
@@ -128,6 +148,10 @@ function WalletBridge({
       appState.connected = true;
       appState.balance = null;
       appState.portfolio = null;
+      disconnectState.requested = false;
+      localStorage.setItem(WALLET_CONNECTED_KEY, '1');
+      localStorage.removeItem(WALLET_DISCONNECTED_KEY);
+      localStorage.setItem(WALLET_PROVIDER_KEY, 'rainbowkit');
 
       await refreshPortfolio().catch(() => undefined);
       onWalletState({ connected: true, address });
@@ -142,7 +166,7 @@ function WalletBridge({
     return () => {
       cancelled = true;
     };
-  }, [address, connector, isConnected, onWalletChange, onWalletState]);
+  }, [address, connector, disconnectState, isConnected, onWalletChange, onWalletState]);
 
   return null;
 }

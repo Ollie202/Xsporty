@@ -1,9 +1,9 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Bot, ChevronDown, ChevronRight, Copy, Send, Trash2, Search, X as XIcon } from 'lucide-react';
-import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
+import { fetchFixtureInsights, hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
-import { getApiBaseUrl, sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
+import { sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
 import { flagUrl, getInitials, shortAddress } from '../js/utils.js';
 import { useUiStore } from './stores/uiStore';
 import type { WalletActions } from './wallet/types';
@@ -74,7 +74,46 @@ type MarketMatch = {
       home?: FormRowData[];
       away?: FormRowData[];
     };
+    insights?: FixtureInsights;
   };
+};
+type FixtureInsights = {
+  headToHead?: {
+    played?: number;
+    homeWins?: number;
+    draws?: number;
+    awayWins?: number;
+    homeGoals?: number;
+    awayGoals?: number;
+  };
+  formGauge?: {
+    home?: { score?: number; summary?: string; form?: string };
+    away?: { score?: number; summary?: string; form?: string };
+  };
+  lastMeetings?: Array<{
+    date?: string;
+    leagueName?: string;
+    homeTeam?: string;
+    awayTeam?: string;
+    homeGoals?: number;
+    awayGoals?: number;
+    status?: string;
+  }>;
+  standings?: {
+    home?: TeamStanding;
+    away?: TeamStanding;
+  };
+};
+type TeamStanding = {
+  rank?: number;
+  points?: number;
+  goalsDiff?: number;
+  played?: number;
+  wins?: number;
+  draws?: number;
+  losses?: number;
+  form?: string;
+  group?: string;
 };
 type FormRowData = {
   result?: string;
@@ -145,6 +184,9 @@ const footballTabs = [
 ];
 const nonFootballTabs = [['all', 'All Games']];
 const MARKET_LOAD_TIMEOUT_MS = 45000;
+const WALLET_CONNECTED_KEY = 'x-cup-wallet-connected';
+const WALLET_DISCONNECTED_KEY = 'x-cup-wallet-disconnected';
+const WALLET_PROVIDER_KEY = 'x-cup-wallet-provider';
 const LazyWalletRuntime = lazy(() => import('./wallet/WalletRuntime').then(module => ({ default: module.WalletRuntime })));
 
 type WalletUiState = {
@@ -153,7 +195,10 @@ type WalletUiState = {
 };
 
 function shouldLoadWalletRuntimeOnBoot() {
-  return appState.connected;
+  if (appState.connected) return true;
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(WALLET_DISCONNECTED_KEY) !== '1'
+    && (localStorage.getItem(WALLET_CONNECTED_KEY) === '1' || Boolean(localStorage.getItem(WALLET_PROVIDER_KEY)));
 }
 
 function BrandMark() {
@@ -488,8 +533,8 @@ function Hero({ match, onOpen, loading }: { match?: MarketMatch; onOpen: (match:
             {match
               ? `${match.time} - Prediction markets are open.`
               : loading
-                ? 'Fetching live football markets from the backend.'
-                : 'No backend World Cup cards are available right now.'}
+                ? 'Fetching live football markets.'
+                : 'No World Cup markets are available right now.'}
           </p>
           <div className="wc-hero-badges">
             <span>WC</span>
@@ -747,6 +792,7 @@ function MarketBoard({
   onPick: (choice: Choice) => void;
 }) {
   const tabs = sport === 'football' ? footballTabs : nonFootballTabs;
+  const [esportsStatus, setEsportsStatus] = useState<'upcoming' | 'live'>('upcoming');
   const filteredMatches = matches.filter(match => {
     if (match.sport !== sport) return false;
     if (query && !marketSearch(match).includes(query.toLowerCase())) return false;
@@ -762,6 +808,7 @@ function MarketBoard({
   });
   const liveEsportsMatches = filteredMatches.filter(match => match.isLive);
   const upcomingEsportsMatches = filteredMatches.filter(match => !match.isLive);
+  const selectedEsportsMatches = esportsStatus === 'live' ? liveEsportsMatches : upcomingEsportsMatches;
 
   return (
     <section className="market-board home-section" id="games-board">
@@ -781,21 +828,32 @@ function MarketBoard({
       </div>
       {sport === 'esports' ? (
         <div className="esports-dashboard">
+          <div className="esports-status-toggle" aria-label="Esports game status">
+            <button
+              className={esportsStatus === 'upcoming' ? 'is-active' : ''}
+              type="button"
+              onClick={() => setEsportsStatus('upcoming')}
+            >
+              Upcoming
+            </button>
+            <button
+              className={esportsStatus === 'live' ? 'is-active' : ''}
+              type="button"
+              onClick={() => setEsportsStatus('live')}
+            >
+              Live
+            </button>
+          </div>
           <EsportsMarketSection
-            title="Live Games"
-            count={liveEsportsMatches.length}
-            matches={liveEsportsMatches}
-            emptyTitle="No live esports games"
-            emptyText="Live cards will appear here as soon as the backend marks a game live."
-            onOpen={onOpen}
-            onPick={onPick}
-          />
-          <EsportsMarketSection
-            title="Upcoming Games"
-            count={upcomingEsportsMatches.length}
-            matches={upcomingEsportsMatches}
-            emptyTitle="No upcoming esports games"
-            emptyText="The backend is online, but there are no upcoming esports cards right now."
+            title={esportsStatus === 'live' ? 'Live Games' : 'Upcoming Games'}
+            count={selectedEsportsMatches.length}
+            matches={selectedEsportsMatches}
+            emptyTitle={esportsStatus === 'live' ? 'No live esports games' : 'No upcoming esports games'}
+            emptyText={
+              esportsStatus === 'live'
+                ? 'Live cards will appear here as soon as games are in play.'
+                : 'There are no upcoming esports cards right now.'
+            }
             onOpen={onOpen}
             onPick={onPick}
           />
@@ -805,14 +863,14 @@ function MarketBoard({
           {filteredPlayers.map(player => (
             <PlayerMarketCard key={`${player.name}-${player.title}`} player={player} onPick={onPick} />
           ))}
-          {!filteredPlayers.length ? <EmptyState title="No player markets found" text="Try another search term or check back after the next sync." /> : null}
+          {!filteredPlayers.length ? <EmptyState title="No player markets found" text="Try another search term or check back soon." /> : null}
         </div>
       ) : (
         <div className="match-list" aria-label="Market game cards">
           {filteredMatches.map(match => (
             <MatchCard key={match.id} match={match} onOpen={onOpen} onPick={onPick} />
           ))}
-          {!filteredMatches.length ? <EmptyState title={`No ${labelsBySport[sport]?.title || 'sports'} markets yet`} text="The backend is online, but this sport has no open cards right now." /> : null}
+          {!filteredMatches.length ? <EmptyState title={`No ${labelsBySport[sport]?.title || 'sports'} markets yet`} text="This sport has no open cards right now." /> : null}
         </div>
       )}
     </section>
@@ -830,9 +888,8 @@ function EmptyState({ title, text }: { title: string; text: string }) {
 
 function LoadingMarkets() {
   return (
-    <div className="loading-markets" role="status" aria-live="polite">
-      <span />
-      Loading live markets from Railway...
+    <div className="loading-markets" role="status" aria-live="polite" aria-label="Loading live markets">
+      <span aria-hidden="true" />
     </div>
   );
 }
@@ -840,14 +897,41 @@ function LoadingMarkets() {
 function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () => void; onPick: (choice: Choice) => void }) {
   const [group, setGroup] = useState('All');
   const [statsOpen, setStatsOpen] = useState(false);
+  const [insights, setInsights] = useState<FixtureInsights | null>(match.fixture?.insights || null);
+  const [statsLoading, setStatsLoading] = useState(false);
   const groups = useMemo(() => ['All', ...Array.from(new Set(match.options.map(optionCategory)))], [match]);
   const shownOptions = group === 'All' ? match.options : match.options.filter(option => optionCategory(option) === group);
-  const realStats = useMemo(() => statsForMatch(match), [match]);
+  const matchWithInsights = useMemo(() => ({
+    ...match,
+    fixture: {
+      ...match.fixture,
+      ...(insights ? { insights } : {}),
+    },
+  }), [insights, match]);
+  const realStats = useMemo(() => statsForMatch(matchWithInsights), [matchWithInsights]);
 
   useEffect(() => {
     setGroup('All');
     setStatsOpen(false);
   }, [match.id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setInsights(match.fixture?.insights || null);
+    if (match.fixture?.insights || !match.id || match.sport !== 'football') return () => { cancelled = true; };
+    setStatsLoading(true);
+    fetchFixtureInsights(match.id)
+      .then(payload => {
+        if (!cancelled) setInsights(payload?.insights || null);
+      })
+      .catch(() => {
+        if (!cancelled) setInsights(null);
+      })
+      .finally(() => {
+        if (!cancelled) setStatsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [match.fixture?.insights, match.id, match.sport]);
 
   return (
     <section className="match-page" id="match-page">
@@ -879,7 +963,7 @@ function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () =
             <div className="stats-dropdown">
               <div className="stats-dropdown__header">
                 <strong>Match stats</strong>
-                <span>{realStats.hasData ? 'Backend fixture data' : 'No backend stats available for this fixture yet'}</span>
+                <span>{statsLoading ? 'Loading stats' : realStats.hasData ? 'Fixture data' : 'No stats available for this fixture yet'}</span>
               </div>
               {realStats.hasData ? (
                 <div className="stats-grid">
@@ -888,7 +972,7 @@ function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () =
                   {realStats.rows.length ? <StatsTable rows={realStats.rows} /> : null}
                 </div>
               ) : (
-                <EmptyState title="Stats not available" text="This backend fixture does not include recent form or team statistics yet." />
+                <EmptyState title="Stats not available" text="This fixture does not include recent form or team statistics yet." />
               )}
             </div>
           ) : null}
@@ -927,15 +1011,77 @@ function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () =
 }
 
 function statsForMatch(match: MarketMatch) {
+  const insights = match.fixture?.insights;
   const homeForm = normalizeFormRows(match.fixture?.recentForm?.home);
   const awayForm = normalizeFormRows(match.fixture?.recentForm?.away);
   const rows = normalizeStatRows(match.fixture?.statistics || match.fixture?.stats);
+  const insightHomeForm = meetingRowsForTeam(insights?.lastMeetings, match.home);
+  const insightAwayForm = meetingRowsForTeam(insights?.lastMeetings, match.away);
+  const insightRows = insightStatRows(insights);
   return {
-    homeForm,
-    awayForm,
-    rows,
-    hasData: Boolean(homeForm.length || awayForm.length || rows.length),
+    homeForm: homeForm.length ? homeForm : insightHomeForm,
+    awayForm: awayForm.length ? awayForm : insightAwayForm,
+    rows: rows.length ? rows : insightRows,
+    hasData: Boolean(homeForm.length || awayForm.length || rows.length || insightHomeForm.length || insightAwayForm.length || insightRows.length),
   };
+}
+
+function meetingRowsForTeam(meetings: FixtureInsights['lastMeetings'] | undefined, teamName: string) {
+  if (!Array.isArray(meetings)) return [];
+  const normalizedTeam = teamName.toLowerCase();
+  return meetings.flatMap(meeting => {
+    const homeTeam = meeting.homeTeam || '';
+    const awayTeam = meeting.awayTeam || '';
+    const isHome = homeTeam.toLowerCase() === normalizedTeam;
+    const isAway = awayTeam.toLowerCase() === normalizedTeam;
+    if (!isHome && !isAway) return [];
+    const teamGoals = isHome ? meeting.homeGoals : meeting.awayGoals;
+    const opponentGoals = isHome ? meeting.awayGoals : meeting.homeGoals;
+    return [{
+      result: scoreResult(teamGoals, opponentGoals),
+      venue: isHome ? 'Home' : 'Away',
+      score: teamGoals != null && opponentGoals != null ? `${teamGoals}-${opponentGoals}` : '-',
+      opponent: isHome ? awayTeam : homeTeam,
+      date: shortDate(meeting.date),
+    }];
+  }).slice(0, 5);
+}
+
+function scoreResult(teamGoals?: number, opponentGoals?: number) {
+  if (teamGoals == null || opponentGoals == null) return '-';
+  if (teamGoals > opponentGoals) return 'W';
+  if (teamGoals < opponentGoals) return 'L';
+  return 'D';
+}
+
+function shortDate(value?: string) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) return '';
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+function insightStatRows(insights?: FixtureInsights) {
+  if (!insights) return [];
+  const rows: TeamStats[] = [];
+  const h2h = insights.headToHead;
+  if (h2h?.played != null) {
+    rows.push({ label: 'Head-to-head', home: `${h2h.homeWins ?? 0}W`, away: `${h2h.awayWins ?? 0}W` });
+    rows.push({ label: 'H2H goals', home: h2h.homeGoals ?? '-', away: h2h.awayGoals ?? '-' });
+    if (h2h.draws != null) rows.push({ label: 'H2H draws', home: h2h.draws, away: h2h.played });
+  }
+  const homeStanding = insights.standings?.home;
+  const awayStanding = insights.standings?.away;
+  if (homeStanding || awayStanding) {
+    rows.push({ label: 'League rank', home: homeStanding?.rank ?? '-', away: awayStanding?.rank ?? '-' });
+    rows.push({ label: 'Points', home: homeStanding?.points ?? '-', away: awayStanding?.points ?? '-' });
+    rows.push({ label: 'Goal difference', home: homeStanding?.goalsDiff ?? '-', away: awayStanding?.goalsDiff ?? '-' });
+  }
+  const form = insights.formGauge;
+  if (form?.home || form?.away) {
+    rows.push({ label: 'Form score', home: form.home?.score ?? '-', away: form.away?.score ?? '-' });
+  }
+  return rows;
 }
 
 function normalizeFormRows(rows?: FormRowData[]) {
@@ -1599,7 +1745,7 @@ export function App() {
 
     async function load() {
       setApiError('');
-      const ok = await withTimeout(hydrateFromBackend(), MARKET_LOAD_TIMEOUT_MS, 'Backend market load');
+      const ok = await withTimeout(hydrateFromBackend(), MARKET_LOAD_TIMEOUT_MS, 'Market load');
       if (cancelled) return;
       const nextMatches = dedupeMatches([...(gameMarkets as MarketMatch[])]);
       const nextPlayers = [...(playerPropMarkets as PlayerMarket[])];
@@ -1614,7 +1760,7 @@ export function App() {
       } else {
         setMatches([]);
         setPlayers([]);
-        setApiError(appState.apiError || `Could not load backend market data from ${getApiBaseUrl()}.`);
+        setApiError(appState.apiError || 'Could not load market data. Please try again.');
         setLoadingMarkets(false);
         return;
       }
@@ -1636,7 +1782,7 @@ export function App() {
       if (!cancelled) {
         setMatches([]);
         setPlayers([]);
-        setApiError(error instanceof Error ? error.message : `Could not load backend market data from ${getApiBaseUrl()}.`);
+        setApiError(error instanceof Error ? error.message : 'Could not load market data. Please try again.');
         setLoadingMarkets(false);
       }
     });
@@ -1839,7 +1985,7 @@ export function App() {
     }
     try {
       if (!pending.marketId) {
-        window.alert('This market is preview-only until backend settlement is added.');
+        window.alert('This market is not available for trading yet.');
         return;
       }
       await submitBackendOrder(pending, stake);
@@ -1900,7 +2046,7 @@ export function App() {
               ) : null}
               {loadingMarkets ? <LoadingMarkets /> : null}
               <MarketBoard sport={sport} category={category} setCategory={changeCategory} matches={matches} players={players} query={query} onOpen={openMatch} onPick={pickMarket} />
-              {apiError ? <div id="error-screen"><div className="error-content"><strong>Backend unavailable</strong><p>{apiError}</p><button type="button" onClick={() => window.location.reload()}>Retry</button></div></div> : null}
+              {apiError ? <div id="error-screen"><div className="error-content"><strong>Markets unavailable</strong><p>{apiError}</p><button type="button" onClick={() => window.location.reload()}>Retry</button></div></div> : null}
             </>
           ) : null}
           {page === 'match' && selectedMatch ? <MatchPage match={selectedMatch} onBack={showHome} onPick={pickMarket} /> : null}

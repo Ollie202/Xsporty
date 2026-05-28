@@ -1143,11 +1143,102 @@ function XsportyAssistant({
     { role: 'assistant', text: 'Tell me what you want to find, compare, or bet. I can answer sports questions without forcing a ticket.' },
   ]);
   const [context, setContext] = useState<AssistantContext>({ match: null, matches: [] });
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const saved = window.localStorage.getItem('xsporty-assistant-position');
+      if (!saved) return null;
+      const parsed = JSON.parse(saved) as { x?: unknown; y?: unknown };
+      return typeof parsed.x === 'number' && typeof parsed.y === 'number' ? { x: parsed.x, y: parsed.y } : null;
+    } catch {
+      return null;
+    }
+  });
   const logRef = useRef<HTMLDivElement | null>(null);
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number; moved: boolean } | null>(null);
+  const suppressClickRef = useRef(false);
 
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, open]);
+
+  const moveAssistant = useCallback((x: number, y: number, persist = false) => {
+    if (typeof window === 'undefined') return;
+    const box = shellRef.current?.getBoundingClientRect();
+    const width = box?.width ?? 180;
+    const height = box?.height ?? 64;
+    const gutter = 12;
+    const maxX = Math.max(gutter, window.innerWidth - width - gutter);
+    const maxY = Math.max(gutter, window.innerHeight - height - gutter);
+    const next = {
+      x: Math.min(Math.max(x, gutter), maxX),
+      y: Math.min(Math.max(y, gutter), maxY),
+    };
+    setPosition(next);
+    if (persist) {
+      window.localStorage.setItem('xsporty-assistant-position', JSON.stringify(next));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!position) return;
+    const handleResize = () => moveAssistant(position.x, position.y, true);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [moveAssistant, position]);
+
+  useEffect(() => {
+    if (!open) return;
+    window.requestAnimationFrame(() => {
+      const box = shellRef.current?.getBoundingClientRect();
+      if (box) moveAssistant(box.left, box.top, true);
+    });
+  }, [moveAssistant, open]);
+
+  function startDrag(event: React.PointerEvent<HTMLDivElement>) {
+    if (event.button !== 0) return;
+    const target = event.target as HTMLElement;
+    const isLauncher = Boolean(target.closest('.xs-assistant-launcher'));
+    const isDragHandle = Boolean(target.closest('.xs-assistant-drag'));
+    if (!isLauncher && !isDragHandle) return;
+    if (!isLauncher && target.closest('button, input, textarea, select, a')) return;
+    const box = shellRef.current?.getBoundingClientRect();
+    if (!box) return;
+    dragRef.current = {
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: box.left,
+      originY: box.top,
+      moved: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function dragAssistant(event: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+    if (!drag) return;
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    if (Math.abs(deltaX) + Math.abs(deltaY) > 4) {
+      drag.moved = true;
+    }
+    moveAssistant(drag.originX + deltaX, drag.originY + deltaY);
+  }
+
+  function stopDrag(event: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+    if (!drag) return;
+    dragRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    const box = shellRef.current?.getBoundingClientRect();
+    if (box) {
+      moveAssistant(box.left, box.top, true);
+    }
+    suppressClickRef.current = drag.moved;
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -1165,11 +1256,31 @@ function XsportyAssistant({
     setMessages([{ role: 'assistant', text: 'Fresh chat. Ask about games, players, markets, or type the bet you want.' }]);
   }
 
+  function toggleAssistant() {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+    setOpen(value => !value);
+  }
+
+  const assistantStyle: React.CSSProperties | undefined = position
+    ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' }
+    : undefined;
+
   return (
-    <div className={open ? 'xs-assistant is-open' : 'xs-assistant'}>
+    <div
+      className={open ? 'xs-assistant is-open' : 'xs-assistant'}
+      ref={shellRef}
+      style={assistantStyle}
+      onPointerDown={startDrag}
+      onPointerMove={dragAssistant}
+      onPointerUp={stopDrag}
+      onPointerCancel={stopDrag}
+    >
       {open ? (
         <section className="xs-assistant-panel" aria-label="Xsporty Assistant chat">
-          <header className="xs-assistant-head">
+          <header className="xs-assistant-head xs-assistant-drag">
             <AssistantLogo />
             <div>
               <strong>Xsporty Assistant</strong>
@@ -1198,7 +1309,7 @@ function XsportyAssistant({
           </form>
         </section>
       ) : null}
-      <button type="button" className="xs-assistant-launcher" aria-label="Open Xsporty Assistant" onClick={() => setOpen(value => !value)}>
+      <button type="button" className="xs-assistant-launcher" aria-label="Open Xsporty Assistant" onClick={toggleAssistant}>
         <AssistantLogo />
         <span><Sparkles size={14} aria-hidden="true" /> Ask</span>
       </button>

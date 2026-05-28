@@ -3497,10 +3497,16 @@ html {
   justify-items: end;
   gap: 10px;
   pointer-events: none;
+  touch-action: none;
+  user-select: none;
 }
 
 .xs-assistant > * {
   pointer-events: auto;
+}
+
+.xs-assistant.is-open {
+  justify-items: stretch;
 }
 
 .xs-assistant-launcher {
@@ -3562,6 +3568,11 @@ html {
   gap: 10px;
   padding: 12px;
   border-bottom: 1px solid var(--line);
+  cursor: grab;
+}
+
+.xs-assistant-head:active {
+  cursor: grabbing;
 }
 
 .xs-assistant-head strong,
@@ -3681,4 +3692,74 @@ html {
   .xs-assistant-panel {
     width: calc(100vw - 24px);
   }
+}
+
+html[data-theme='dark'] .xs-assistant-panel {
+  border-color: #2f3947;
+  background: rgba(15, 20, 28, 0.98);
+  color: #f8fbff;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.52);
+}
+
+html[data-theme='dark'] .xs-assistant-head {
+  border-bottom-color: #2f3947;
+  background: rgba(17, 23, 32, 0.96);
+}
+
+html[data-theme='dark'] .xs-assistant-head strong {
+  color: #f8fbff;
+}
+
+html[data-theme='dark'] .xs-assistant-head small {
+  color: #aeb9c8;
+}
+
+html[data-theme='dark'] .xs-assistant-icon-btn {
+  border-color: #384555;
+  background: #151d28;
+  color: #f8fbff;
+}
+
+html[data-theme='dark'] .xs-assistant-log {
+  background:
+    linear-gradient(180deg, rgba(13, 18, 26, 0.98), rgba(9, 13, 19, 0.98)),
+    radial-gradient(circle at 8% 0%, rgba(14, 165, 198, 0.14), transparent 170px);
+}
+
+html[data-theme='dark'] .xs-assistant-message p {
+  background: #1b2430;
+  color: #f8fbff;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+}
+
+html[data-theme='dark'] .xs-assistant-message.is-user p {
+  background: #d8ff63;
+  color: #071015;
+}
+
+html[data-theme='dark'] .xs-assistant-input {
+  border-top-color: #2f3947;
+  background: #111822;
+}
+
+html[data-theme='dark'] .xs-assistant-input input {
+  border-color: #384555;
+  background: #0c121a;
+  color: #f8fbff;
+}
+
+html[data-theme='dark'] .xs-assistant-input input::placeholder {
+  color: #99a6b8;
+}
+
+html[data-theme='dark'] .xs-assistant-input button {
+  background: #e9f7ff;
+  color: #071421;
+}
+
+html[data-theme='dark'] .xs-assistant-launcher {
+  border-color: #384555;
+  background: linear-gradient(180deg, #182230, #0f1722);
+  color: #f8fbff;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
 }

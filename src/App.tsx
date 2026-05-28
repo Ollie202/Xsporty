@@ -315,14 +315,6 @@ function displayProbability(price: string | number) {
   return `${Math.round(priceNumber(price))}%`;
 }
 
-function quickChoiceClass(choice: Choice, match: MarketMatch) {
-  const classes = [choice.cssClass].filter(Boolean) as string[];
-  if (choice.label === match.home || choice.label === match.homeCode) classes.push('side-home');
-  if (choice.label === match.away || choice.label === match.awayCode) classes.push('side-away');
-  if (choice.label.toLowerCase() === 'draw') classes.push('side-draw');
-  return classes.join(' ');
-}
-
 function marketSearch(match: MarketMatch) {
   return `${match.home} ${match.away} ${match.homeCode} ${match.awayCode} ${match.leagueName || ''}`.toLowerCase();
 }
@@ -679,7 +671,7 @@ function FeaturedStrip({
               </div>
               <div className="featured-odds">
                 {choices.map(choice => (
-                  <PriceButton key={`${match.id}-${choice.title}-${choice.label}`} choice={{ ...choice, cssClass: quickChoiceClass(choice, match) }} onPick={onPick} compact />
+                  <PriceButton key={`${match.id}-${choice.title}-${choice.label}`} choice={choice} onPick={onPick} compact />
                 ))}
               </div>
             </article>
@@ -716,7 +708,7 @@ function MatchCard({ match, onOpen, onPick }: { match: MarketMatch; onOpen: (mat
       </div>
       <div className="quick-odds">
         {choices.map(choice => (
-          <PriceButton key={`${match.id}-${choice.title}-${choice.label}`} choice={{ ...choice, cssClass: quickChoiceClass(choice, match) }} onPick={onPick} compact />
+          <PriceButton key={`${match.id}-${choice.title}-${choice.label}`} choice={choice} onPick={onPick} compact />
         ))}
       </div>
     </article>

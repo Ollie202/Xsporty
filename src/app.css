@@ -3520,6 +3520,7 @@ html {
   background: transparent;
   color: #101827;
   box-shadow: none;
+  cursor: pointer;
 }
 
 .assistant-logo {

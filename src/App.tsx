@@ -1156,7 +1156,7 @@ function XsportyAssistant({
   });
   const logRef = useRef<HTMLDivElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
-  const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number; moved: boolean } | null>(null);
+  const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number; moved: boolean; launcher: boolean } | null>(null);
   const suppressClickRef = useRef(false);
 
   useEffect(() => {
@@ -1211,6 +1211,7 @@ function XsportyAssistant({
       originX: box.left,
       originY: box.top,
       moved: false,
+      launcher: isLauncher,
     };
     event.currentTarget.setPointerCapture(event.pointerId);
   }
@@ -1236,6 +1237,11 @@ function XsportyAssistant({
     const box = shellRef.current?.getBoundingClientRect();
     if (box) {
       moveAssistant(box.left, box.top, true);
+    }
+    if (drag.launcher && !drag.moved) {
+      suppressClickRef.current = true;
+      setOpen(value => !value);
+      return;
     }
     suppressClickRef.current = drag.moved;
   }

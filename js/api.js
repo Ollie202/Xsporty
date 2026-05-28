@@ -36,6 +36,7 @@ export async function hydrateFromBackend() {
       const backendPlayerFutures = mapBackendPlayerFutureCards(results[3].cards || []);
       replacePlayerPropMarkets(backendPlayerFutures);
       state.apiOnline = true;
+      state.apiError = "";
       if (!backendMarkets.some(match => match.sport === state.sport)) state.sport = backendMarkets[0].sport;
       return true;
     }

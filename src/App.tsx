@@ -1028,6 +1028,18 @@ export function App() {
       const nextMatches = dedupeMatches([...(gameMarkets as MarketMatch[])]);
       if (ok && nextMatches.length) {
         setMatches(nextMatches);
+        const nextSport = nextMatches.some(match => match.sport === sport) ? sport : nextMatches[0].sport;
+        const nextCategory =
+          nextSport === 'football' && (
+            category === 'all' ||
+            nextMatches.some(match => match.sport === nextSport && match.group === category)
+          )
+            ? category
+            : nextSport === 'football' && nextMatches.some(match => match.sport === nextSport && match.group === 'world-cup')
+              ? 'world-cup'
+              : 'all';
+        if (nextSport !== sport) setSport(nextSport);
+        if (nextCategory !== category) setCategory(nextCategory);
       } else {
         setMatches([]);
         setPlayers([]);

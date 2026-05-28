@@ -218,6 +218,36 @@ function imageFor(match: MarketMatch, side: 'home' | 'away') {
   return match.awayLogoUrl || countryFlagFor(match, 'away');
 }
 
+function logoFor(match: MarketMatch, side: 'home' | 'away') {
+  if (match.sport === 'esports') return side === 'home' ? match.homeLogoUrl : match.awayLogoUrl;
+  return imageFor(match, side);
+}
+
+function teamNameFor(match: MarketMatch, side: 'home' | 'away') {
+  return side === 'home' ? match.home : match.away;
+}
+
+function TeamLogo({ match, side }: { match: MarketMatch; side: 'home' | 'away' }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const name = teamNameFor(match, side);
+  const logo = logoFor(match, side);
+  const showInitials = match.sport === 'esports' && (!logo || imageFailed);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [logo]);
+
+  if (showInitials) {
+    return (
+      <span className="team-logo team-logo--initials" aria-label={`${name} logo`}>
+        {getInitials(name)}
+      </span>
+    );
+  }
+
+  return <img className="team-logo" src={logo} alt={name} onError={() => setImageFailed(true)} />;
+}
+
 function priceNumber(price: string | number) {
   const value = Number(String(price).replace(/[^\d.]/g, ''));
   if (!Number.isFinite(value)) return 50;
@@ -436,14 +466,14 @@ function Hero({ match, onOpen, loading }: { match?: MarketMatch; onOpen: (match:
           </h1>
           <p className="wc-hero-subtitle">
             {match
-              ? `${match.time} - ${match.options.length} open markets from live backend data.`
+              ? `${match.time} - Prediction markets are open.`
               : loading
                 ? 'Fetching live football markets from the backend.'
                 : 'No backend World Cup cards are available right now.'}
           </p>
           <div className="wc-hero-badges">
-            <span>{match?.homeCode || 'WC'}</span>
-            <span>{match?.awayCode || '2026'}</span>
+            <span>WC</span>
+            <span>2026</span>
             <span>World Cup</span>
             <span>X Layer</span>
           </div>
@@ -556,9 +586,9 @@ function FeaturedStrip({
               <span className="sport-icon">{labelsBySport[match.sport]?.icon || '•'}</span>
               <span className="feature-time">{match.isLive ? <><span className="status-dot live" /><span className="live-label">LIVE</span></> : match.time.toUpperCase()}</span>
               <div className="featured-flags">
-                <img src={imageFor(match, 'home')} alt={match.home} />
+                <TeamLogo match={match} side="home" />
                 <strong>VS</strong>
-                <img src={imageFor(match, 'away')} alt={match.away} />
+                <TeamLogo match={match} side="away" />
               </div>
               <div className="featured-names">
                 <span>{match.home}</span>
@@ -592,12 +622,12 @@ function MatchCard({ match, onOpen, onPick }: { match: MarketMatch; onOpen: (mat
       </div>
       <div className="match-teams">
         <div>
-          <img src={imageFor(match, 'home')} alt={match.home} />
+          <TeamLogo match={match} side="home" />
           <strong>{match.home}</strong>
         </div>
         <b>VS</b>
         <div>
-          <img src={imageFor(match, 'away')} alt={match.away} />
+          <TeamLogo match={match} side="away" />
           <strong>{match.away}</strong>
         </div>
       </div>
@@ -747,12 +777,12 @@ function MatchPage({ match, onBack, onPick }: { match: MarketMatch; onBack: () =
         <div className="detail-title-row">
           <div className="detail-matchup">
             <div className="detail-team">
-              <img src={imageFor(match, 'home')} alt={match.home} />
+              <TeamLogo match={match} side="home" />
               <span>{match.homeCode}</span>
             </div>
             <h2>{match.home} vs {match.away}</h2>
             <div className="detail-team">
-              <img src={imageFor(match, 'away')} alt={match.away} />
+              <TeamLogo match={match} side="away" />
               <span>{match.awayCode}</span>
             </div>
           </div>
@@ -1367,7 +1397,7 @@ export function App() {
         <section className="main-column">
           {page === 'home' ? (
             <>
-              {sport === 'football' ? <Hero match={heroMatch} onOpen={openMatch} loading={loadingMarkets} /> : null}
+              <Hero match={heroMatch} onOpen={openMatch} loading={loadingMarkets} />
               {sport === 'football' ? (
                 <FeaturedStrip matches={sportMatches} mode={featuredMode} setMode={setFeaturedMode} onOpen={openMatch} onPick={pickMarket} />
               ) : null}

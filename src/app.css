@@ -236,7 +236,8 @@ button:disabled {
 
 .featured-flags img,
 .match-teams img,
-.detail-team img {
+.detail-team img,
+.team-logo {
   width: 64px;
   height: 46px;
   object-fit: contain;
@@ -244,6 +245,21 @@ button:disabled {
   border-radius: 6px;
   background: transparent;
   box-shadow: none;
+}
+
+.team-logo {
+  display: inline-grid;
+  place-items: center;
+}
+
+.team-logo--initials {
+  border: 1px solid var(--line);
+  color: var(--text);
+  background: var(--panel-soft);
+  font-size: 14px;
+  font-weight: 950;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
 }
 
 .match-row {
@@ -678,7 +694,8 @@ body {
   justify-items: center;
 }
 
-.featured-flags img {
+.featured-flags img,
+.featured-flags .team-logo {
   display: block !important;
   width: 58px !important;
   height: 40px !important;
@@ -877,7 +894,8 @@ body {
   width: 100% !important;
 }
 
-.detail-team img {
+.detail-team img,
+.detail-team .team-logo {
   display: block !important;
   width: 72px !important;
   height: 52px !important;
@@ -1194,7 +1212,8 @@ body {
   gap: 8px;
 }
 
-.match-row--esports .match-teams img {
+.match-row--esports .match-teams img,
+.match-row--esports .match-teams .team-logo {
   width: 76px !important;
   height: 58px !important;
   padding: 2px;
@@ -3163,7 +3182,8 @@ html[data-theme='dark'] .brand__mark {
   #app-root {
     width: 125%;
     min-height: 125vh;
-    transform: scale(0.8);
+    zoom: 0.8;
+    transform: none;
     transform-origin: top left;
   }
 }
@@ -3355,4 +3375,34 @@ html[data-theme='dark'] .wallet-menu-row:hover {
     min-width: auto !important;
     white-space: nowrap !important;
   }
+}
+
+/* Keep the navigation visible after all migration overrides have cascaded. */
+html {
+  scroll-padding-top: 152px !important;
+}
+
+.topbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+}
+
+.wallet-panel,
+.wallet-panel .profile-wallet {
+  align-items: center !important;
+}
+
+.wallet-panel .positions-top-btn,
+.wallet-panel .account-chip,
+.wallet-panel .connect-wallet-btn {
+  height: 52px !important;
+  min-height: 52px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  margin-block: 0 !important;
+  line-height: 1 !important;
+  transform: none !important;
 }

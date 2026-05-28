@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Bot, ChevronDown, ChevronRight, Copy, Send, Sparkles, Trash2, Search, X as XIcon } from 'lucide-react';
+import { Bot, ChevronDown, ChevronRight, Copy, Send, Trash2, Search, X as XIcon } from 'lucide-react';
 import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
@@ -1311,7 +1311,6 @@ function XsportyAssistant({
       ) : null}
       <button type="button" className="xs-assistant-launcher" aria-label="Open Xsporty Assistant" onClick={toggleAssistant}>
         <AssistantLogo />
-        <span><Sparkles size={14} aria-hidden="true" /> Ask</span>
       </button>
     </div>
   );

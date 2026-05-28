@@ -3510,23 +3510,16 @@ html {
 }
 
 .xs-assistant-launcher {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 54px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  border-radius: 999px;
-  padding: 7px 14px 7px 7px;
-  background: linear-gradient(180deg, #ffffff, #edf5fa);
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: 18px;
+  padding: 6px;
+  background: transparent;
   color: #101827;
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.22);
-  font-weight: 950;
-}
-
-.xs-assistant-launcher span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  box-shadow: none;
 }
 
 .assistant-logo {
@@ -3758,8 +3751,7 @@ html[data-theme='dark'] .xs-assistant-input button {
 }
 
 html[data-theme='dark'] .xs-assistant-launcher {
-  border-color: #384555;
-  background: linear-gradient(180deg, #182230, #0f1722);
+  background: transparent;
   color: #f8fbff;
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
+  box-shadow: none;
 }

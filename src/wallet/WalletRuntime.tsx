@@ -29,9 +29,9 @@ type DisconnectState = {
   requested: boolean;
 };
 
-const xLayerTestnet = defineChain({
-  id: 1952,
-  name: 'X Layer Testnet',
+const xLayer = defineChain({
+  id: 196,
+  name: 'X Layer',
   nativeCurrency: {
     decimals: 18,
     name: 'OKB',
@@ -39,16 +39,15 @@ const xLayerTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://testrpc.xlayer.tech'],
+      http: ['https://rpc.xlayer.tech'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'X Layer Testnet Explorer',
-      url: 'https://www.okx.com/web3/explorer/xlayer-test',
+      name: 'X Layer Explorer',
+      url: 'https://www.okx.com/web3/explorer/xlayer',
     },
   },
-  testnet: true,
 });
 
 const walletConnectProjectId =
@@ -64,9 +63,9 @@ const WALLET_PROVIDER_KEY = 'x-cup-wallet-provider';
 const wagmiConfig = getDefaultConfig({
   appName: 'Xsporty',
   projectId: walletConnectProjectId,
-  chains: [xLayerTestnet],
+  chains: [xLayer],
   transports: {
-    [xLayerTestnet.id]: http(xLayerTestnet.rpcUrls.default.http[0]),
+    [xLayer.id]: http(xLayer.rpcUrls.default.http[0]),
   },
 });
 

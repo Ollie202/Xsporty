@@ -30,7 +30,7 @@ Cheap fees, fast confirmations, USDC-native, and the order book is on-chain via 
 
 * Frontend live on xsporty.xyz
 * Telegram bot live for World Cup markets
-* Running on X Layer Testnet
+* Running on X Layer
 
 ## Repo
 

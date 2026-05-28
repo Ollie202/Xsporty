@@ -6,7 +6,7 @@ import { state as legacyState } from '../js/state.js';
 import { getApiBaseUrl, sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
 import { flagUrl, getInitials, shortAddress } from '../js/utils.js';
 import { useUiStore } from './stores/uiStore';
-import type { WalletActions } from './wallet/WalletRuntime';
+import type { WalletActions } from './wallet/types';
 
 const appState = legacyState as {
   selectedWalletId: string | null;
@@ -143,7 +143,7 @@ type WalletUiState = {
 };
 
 function shouldLoadWalletRuntimeOnBoot() {
-  return appState.connected || window.localStorage.getItem('wagmi.store') !== null;
+  return appState.connected;
 }
 
 function BrandMark() {

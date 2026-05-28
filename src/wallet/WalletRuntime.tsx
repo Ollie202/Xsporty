@@ -6,16 +6,7 @@ import { WagmiProvider, http, useAccount, useDisconnect } from 'wagmi';
 import { defineChain } from 'viem';
 import { refreshPortfolio } from '../../js/api.js';
 import { state as legacyState } from '../../js/state.js';
-
-type WalletState = {
-  connected: boolean;
-  address?: string;
-};
-
-export type WalletActions = {
-  openConnectModal?: () => void;
-  disconnect?: () => void;
-};
+import type { WalletActions, WalletState } from './types';
 
 type WalletRuntimeProps = {
   connectRequestId: number;

@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Bot, ChevronDown, ChevronRight, Copy, Send, Trash2, Search, X as XIcon } from 'lucide-react';
+import { Bot, ChevronDown, ChevronRight, Copy, Moon, Send, Sun, Trash2, Search, X as XIcon } from 'lucide-react';
 import { fetchFixtureInsights, hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
@@ -448,10 +448,21 @@ function Header({
 
         <div className="wallet-panel">
           {connected ? (
-            <button className="positions-top-btn" type="button" onClick={onOpenPositions}>
-              My Positions
-              {positionCount > 0 ? <span className="ticket-count-badge">{positionCount}</span> : null}
-            </button>
+            <>
+              <button className="positions-top-btn" type="button" onClick={onOpenPositions}>
+                My Positions
+                {positionCount > 0 ? <span className="ticket-count-badge">{positionCount}</span> : null}
+              </button>
+              <button
+                className="theme-top-btn"
+                type="button"
+                onClick={toggleTheme}
+                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+              >
+                {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
+              </button>
+            </>
           ) : null}
           {connected ? (
             <div className="profile-wallet" onClick={event => event.stopPropagation()}>
@@ -476,10 +487,6 @@ function Header({
                   <button className="wallet-menu-row" type="button" onClick={() => { setWalletOpen(false); onOpenPositions(); }}>
                     <span>History</span>
                     <ChevronRight size={15} aria-hidden="true" />
-                  </button>
-                  <button className="wallet-menu-row" type="button" onClick={toggleTheme}>
-                    <span>Dark theme</span>
-                    <i className={theme === 'dark' ? 'toggle is-on' : 'toggle'} aria-hidden="true" />
                   </button>
                   <button className="wallet-menu-logout" type="button" onClick={() => { setWalletOpen(false); onDisconnectWallet(); }}>
                     Log out

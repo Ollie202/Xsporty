@@ -144,6 +144,23 @@ button:disabled {
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
 }
 
+.theme-top-btn {
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  color: var(--text);
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.theme-top-btn:hover {
+  border-color: #90ff00;
+}
+
 .top-sport-nav {
   grid-area: sports;
   width: 100%;
@@ -3289,7 +3306,8 @@ html *::after {
 }
 
 .account-chip,
-.positions-top-btn {
+.positions-top-btn,
+.theme-top-btn {
   height: 52px !important;
   min-height: 52px !important;
   border-radius: 12px !important;
@@ -3472,6 +3490,7 @@ html {
 }
 
 .wallet-panel > .positions-top-btn,
+.wallet-panel > .theme-top-btn,
 .wallet-panel > .profile-wallet {
   height: 52px !important;
   min-height: 52px !important;
@@ -3483,6 +3502,7 @@ html {
 }
 
 .wallet-panel .positions-top-btn,
+.wallet-panel .theme-top-btn,
 .wallet-panel .account-chip,
 .wallet-panel .connect-wallet-btn {
   height: 52px !important;
@@ -3835,6 +3855,7 @@ html[data-theme='dark'] .xs-assistant-launcher {
   }
 
   .wallet-panel .positions-top-btn,
+  .wallet-panel .theme-top-btn,
   .wallet-panel .account-chip,
   .wallet-panel .connect-wallet-btn {
     height: 40px !important;
@@ -4153,5 +4174,34 @@ html[data-theme='dark'] .xs-assistant-launcher {
 
   .xs-assistant-panel {
     width: calc(100vw - 20px) !important;
+  }
+}
+
+.wallet-panel .theme-top-btn {
+  width: 52px !important;
+  min-width: 52px !important;
+  padding: 0 !important;
+}
+
+html[data-theme='dark'] .theme-top-btn {
+  color: #f8fafc !important;
+  background: rgba(15, 23, 42, 0.94) !important;
+  border-color: rgba(148, 163, 184, 0.26) !important;
+}
+
+html.theme-switching .theme-top-btn {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease !important;
+}
+
+@media (max-width: 760px) {
+  .wallet-panel .theme-top-btn {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
   }
 }

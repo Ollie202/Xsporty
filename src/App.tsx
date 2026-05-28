@@ -2036,7 +2036,7 @@ export function App() {
         onConnectWallet={requestWalletConnect}
         onDisconnectWallet={disconnectWallet}
       />
-      <main className={`dashboard-shell ${page === 'match' ? 'is-match-open' : ''} ${pending && page === 'match' ? 'has-right-rail' : 'no-right-rail'}`}>
+      <main className={`dashboard-shell ${page === 'match' ? 'is-match-open' : ''} ${pending ? 'has-right-rail' : 'no-right-rail'}`}>
         <section className="main-column">
           {page === 'home' ? (
             <>
@@ -2052,7 +2052,7 @@ export function App() {
           {page === 'match' && selectedMatch ? <MatchPage match={selectedMatch} onBack={showHome} onPick={pickMarket} /> : null}
           {page === 'positions' ? <PositionsPage tickets={tickets} onBack={showHome} onPnl={setPnlTicket} /> : null}
         </section>
-        {pending && page === 'match' ? (
+        {pending ? (
           <TradeSlip
             pending={pending}
             amount={amount}

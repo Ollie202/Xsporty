@@ -8,11 +8,13 @@ type UiState = {
   toggleTheme: () => void;
 };
 
+const THEME_TRANSITION_MS = 760;
+
 function applyTheme(theme: Theme, animate = true) {
   const root = document.documentElement;
   if (animate) {
     root.classList.add('theme-switching');
-    window.setTimeout(() => root.classList.remove('theme-switching'), 520);
+    window.setTimeout(() => root.classList.remove('theme-switching'), THEME_TRANSITION_MS);
   }
   root.dataset.theme = theme;
   root.classList.toggle('dark', theme === 'dark');

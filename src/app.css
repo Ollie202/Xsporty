@@ -3108,3 +3108,222 @@ html[data-theme='dark'] .slip-close:hover {
     flex-direction: column !important;
   }
 }
+
+/* Use the real Xsporty image asset everywhere the old text X mark appeared. */
+.brand__mark {
+  overflow: hidden !important;
+  padding: 0 !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  background: #fff !important;
+}
+
+.brand__mark img {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  transform: scale(1.34) !important;
+  transform-origin: center !important;
+}
+
+html[data-theme='dark'] .brand__mark {
+  background: #fff !important;
+}
+
+/* Final wallet and scale polish. Keep this last so older migration CSS cannot win. */
+@media (min-width: 560px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  #app-root {
+    width: 125%;
+    min-height: 125vh;
+    transform: scale(0.8);
+    transform-origin: top left;
+  }
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(255, 255, 255, 0.18);
+  transition: opacity 380ms ease;
+}
+
+html[data-theme='dark'] body::before {
+  background: rgba(5, 7, 10, 0.24);
+}
+
+html.theme-switching body::before {
+  opacity: 1;
+}
+
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition:
+    background-color 760ms ease,
+    border-color 760ms ease,
+    color 760ms ease,
+    box-shadow 760ms ease,
+    opacity 760ms ease,
+    fill 760ms ease,
+    stroke 760ms ease !important;
+}
+
+.wallet-panel {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+}
+
+.profile-wallet {
+  height: 52px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.account-chip,
+.positions-top-btn {
+  height: 52px !important;
+  min-height: 52px !important;
+  border-radius: 12px !important;
+}
+
+.account-chip {
+  min-width: 148px !important;
+  padding: 0 18px !important;
+  gap: 12px !important;
+}
+
+.account-chip .profile-pixel,
+.wallet-menu-head .profile-pixel {
+  display: none !important;
+}
+
+.positions-top-btn {
+  position: relative !important;
+}
+
+.positions-top-btn .ticket-count-badge {
+  position: absolute !important;
+  top: -9px !important;
+  right: -9px !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  color: #fff !important;
+  background: #ef0020 !important;
+  font-size: 11px !important;
+  font-weight: 950 !important;
+  box-shadow:
+    0 0 0 4px #fff,
+    0 0 20px rgba(239, 0, 32, 0.72) !important;
+  animation: ticketPulse 1.6s ease-in-out infinite !important;
+}
+
+html[data-theme='dark'] .positions-top-btn .ticket-count-badge {
+  box-shadow:
+    0 0 0 4px #10141a,
+    0 0 22px rgba(239, 0, 32, 0.86) !important;
+}
+
+@keyframes ticketPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.modern-wallet-menu {
+  width: 330px !important;
+  padding: 18px 20px !important;
+  border-radius: 18px !important;
+}
+
+.wallet-menu-head--simple {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0 !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.wallet-menu-head--simple strong,
+.wallet-menu-head--simple small {
+  max-width: 100% !important;
+}
+
+.wallet-menu-head--simple small {
+  color: var(--muted) !important;
+}
+
+.wallet-menu-balance {
+  padding: 12px 0 !important;
+}
+
+.wallet-menu-row {
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 0 !important;
+  border-radius: 10px !important;
+}
+
+.wallet-menu-row:hover {
+  color: #101827 !important;
+}
+
+html[data-theme='dark'] .wallet-menu-row:hover {
+  color: #9cff00 !important;
+}
+
+.connect-wallet-btn {
+  background: #7ee600 !important;
+  color: #061108 !important;
+  box-shadow: 0 14px 28px rgba(126, 230, 0, 0.18) !important;
+}
+
+.connect-wallet-btn:hover {
+  background: #72d900 !important;
+}
+
+@media (max-width: 559px) {
+  #app-root {
+    width: 100%;
+    min-height: 100vh;
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .wallet-panel {
+    justify-content: flex-end !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .profile-wallet {
+    width: auto !important;
+  }
+
+  .account-chip,
+  .positions-top-btn,
+  .connect-wallet-btn {
+    min-width: auto !important;
+    white-space: nowrap !important;
+  }
+}

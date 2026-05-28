@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
-import { ChevronDown, ChevronRight, Copy, Search, Settings, X as XIcon } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, X as XIcon } from 'lucide-react';
 import { useAccount, useDisconnect } from 'wagmi';
 import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
@@ -111,6 +111,14 @@ const footballTabs = [
   ['players', 'Player Futures'],
 ];
 const nonFootballTabs = [['all', 'All Games']];
+
+function BrandMark() {
+  return (
+    <span className="brand__mark" aria-hidden="true">
+      <img src="/xsporty-logo.jpg" alt="" />
+    </span>
+  );
+}
 
 function parseRoute(): RouteState {
   const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
@@ -312,7 +320,7 @@ function Header({
     <header className="topbar">
       <div className="topbar__inner">
         <button className="brand brand-button" type="button" aria-label="Xsporty home" onClick={onHome}>
-          <span className="brand__mark">X</span>
+          <BrandMark />
           <span>
             <strong>Xsporty</strong>
             <small>Prediction Market</small>
@@ -336,31 +344,25 @@ function Header({
               <button className="account-chip" type="button" onClick={() => setWalletOpen(open => !open)} aria-expanded={walletOpen} aria-label="Open wallet menu">
                 <span>{balanceText}</span>
                 <ChevronDown size={16} aria-hidden="true" />
-                <span className="profile-pixel" aria-hidden="true" />
               </button>
               {walletOpen ? (
                 <div className="profile-dropdown modern-wallet-menu">
-                  <div className="wallet-menu-head">
-                    <span className="profile-pixel is-large" aria-hidden="true" />
+                  <div className="wallet-menu-head wallet-menu-head--simple">
                     <div>
                       <strong>{displayAddress}</strong>
-                      <small>{displayAddress}</small>
+                      <small>{address || displayAddress}</small>
                     </div>
-                    <button type="button" aria-label="Copy wallet address" onClick={() => address && navigator.clipboard?.writeText(address)}>
-                      <Copy size={18} />
-                    </button>
-                    <button type="button" aria-label="Wallet settings">
-                      <Settings size={18} />
-                    </button>
                   </div>
                   <div className="wallet-menu-balance">
                     <strong>~{balanceText}</strong>
-                    <button type="button">
-                      Wallet <ChevronRight size={15} />
-                    </button>
                   </div>
+                  <button className="wallet-menu-row" type="button" onClick={() => { setWalletOpen(false); onOpenPositions(); }}>
+                    <span>History</span>
+                    <ChevronRight size={15} aria-hidden="true" />
+                  </button>
                   <button className="wallet-menu-row" type="button" onClick={toggleTheme}>
-                    <span>Dark theme</span><i className={theme === 'dark' ? 'toggle is-on' : 'toggle'} aria-hidden="true" />
+                    <span>Dark theme</span>
+                    <i className={theme === 'dark' ? 'toggle is-on' : 'toggle'} aria-hidden="true" />
                   </button>
                   <button className="wallet-menu-logout" type="button" onClick={() => disconnect()}>
                     Log out
@@ -929,7 +931,7 @@ function PnlModal({ ticket, onClose }: { ticket: Ticket | null; onClose: () => v
       <article className="share-pnl-card" role="dialog" aria-modal="true" aria-labelledby="share-pnl-title">
         <button className="share-pnl-card__close" type="button" onClick={onClose} aria-label="Close PnL card">x</button>
         <div className="share-pnl-card__brand">
-          <span className="brand__mark">X</span>
+          <BrandMark />
           <div><strong>Xsporty Markets</strong><small>Position on X Layer</small></div>
         </div>
         <div className="share-pnl-card__headline">
@@ -956,7 +958,7 @@ function Footer() {
       <div className="footer-main">
         <div className="footer-brand">
           <a className="brand footer-logo" href="#" onClick={event => event.preventDefault()}>
-            <span className="brand__mark">X</span>
+            <BrandMark />
             <span><strong>Xsporty</strong><small>Prediction Market on X Layer</small></span>
           </a>
           <p>World Cup markets for match outcomes and player moments.</p>
@@ -1214,13 +1216,6 @@ export function App() {
     void node.offsetWidth;
     node.classList.add(WC_ANIMS[Math.floor(Math.random() * WC_ANIMS.length)]);
   }, []);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      if (Math.random() < 0.45) animateOrb();
-    }, 14000);
-    return () => window.clearInterval(timer);
-  }, [animateOrb]);
 
   return (
     <>

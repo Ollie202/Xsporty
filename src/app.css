@@ -3180,9 +3180,9 @@ html[data-theme='dark'] .brand__mark {
   }
 
   #app-root {
-    width: 125%;
-    min-height: 125vh;
-    zoom: 0.8;
+    width: 100%;
+    min-height: 100vh;
+    zoom: 1;
     transform: none;
     transform-origin: top left;
   }
@@ -3358,11 +3358,21 @@ html[data-theme='dark'] .wallet-menu-row:hover {
 }
 
 @media (max-width: 760px) {
+  .topbar__inner {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "brand wallet"
+      "search search"
+      "sports sports" !important;
+  }
+
   .wallet-panel {
+    grid-area: wallet !important;
+    grid-column: auto !important;
     justify-content: flex-end !important;
     flex-wrap: nowrap !important;
-    grid-column: 2 / 4 !important;
     justify-self: end !important;
+    max-width: 100% !important;
   }
 
   .profile-wallet {

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
-import { ChevronDown, ChevronRight, Search, X as XIcon } from 'lucide-react';
+import { ChevronDown, ChevronRight, Copy, Search, X as XIcon } from 'lucide-react';
 import { useAccount, useDisconnect } from 'wagmi';
 import { hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
@@ -352,6 +352,9 @@ function Header({
                       <strong>{displayAddress}</strong>
                       <small>{address || displayAddress}</small>
                     </div>
+                    <button className="wallet-copy-btn" type="button" aria-label="Copy wallet address" onClick={() => address && navigator.clipboard?.writeText(address)}>
+                      <Copy size={18} aria-hidden="true" />
+                    </button>
                   </div>
                   <div className="wallet-menu-balance">
                     <strong>~{balanceText}</strong>

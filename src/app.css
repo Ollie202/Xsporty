@@ -3148,35 +3148,16 @@ html[data-theme='dark'] .brand__mark {
 }
 
 body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 2147483000;
-  pointer-events: none;
-  opacity: 0;
-  background: rgba(255, 255, 255, 0.18);
-  transition: opacity 380ms ease;
+  display: none !important;
+  content: none !important;
 }
 
-html[data-theme='dark'] body::before {
-  background: rgba(5, 7, 10, 0.24);
-}
-
-html.theme-switching body::before {
-  opacity: 1;
-}
-
-html.theme-switching *,
-html.theme-switching *::before,
-html.theme-switching *::after {
-  transition:
-    background-color 760ms ease,
-    border-color 760ms ease,
-    color 760ms ease,
-    box-shadow 760ms ease,
-    opacity 760ms ease,
-    fill 760ms ease,
-    stroke 760ms ease !important;
+html *,
+html *::before,
+html *::after {
+  transition-property: transform, opacity, box-shadow, border-color !important;
+  transition-duration: 120ms !important;
+  transition-timing-function: ease-out !important;
 }
 
 .wallet-panel {
@@ -3184,10 +3165,14 @@ html.theme-switching *::after {
   align-items: center !important;
   justify-content: flex-end !important;
   gap: 12px !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
 }
 
 .profile-wallet {
   height: 52px !important;
+  display: inline-flex !important;
+  align-items: center !important;
   padding: 0 !important;
   border: 0 !important;
   background: transparent !important;
@@ -3199,6 +3184,7 @@ html.theme-switching *::after {
   height: 52px !important;
   min-height: 52px !important;
   border-radius: 12px !important;
+  flex: 0 0 auto !important;
 }
 
 .account-chip {
@@ -3258,10 +3244,30 @@ html[data-theme='dark'] .positions-top-btn .ticket-count-badge {
 }
 
 .wallet-menu-head--simple {
-  grid-template-columns: minmax(0, 1fr) !important;
-  gap: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 42px !important;
+  align-items: center !important;
+  gap: 12px !important;
   padding-bottom: 12px !important;
   border-bottom: 1px solid var(--line) !important;
+}
+
+.wallet-copy-btn {
+  width: 42px !important;
+  height: 42px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  color: var(--text) !important;
+  background: var(--panel-soft) !important;
+  cursor: pointer !important;
+}
+
+.wallet-copy-btn:hover {
+  border-color: #7ee600 !important;
+  color: #061108 !important;
+  background: #7ee600 !important;
 }
 
 .wallet-menu-head--simple strong,
@@ -3314,6 +3320,8 @@ html[data-theme='dark'] .wallet-menu-row:hover {
   .wallet-panel {
     justify-content: flex-end !important;
     flex-wrap: nowrap !important;
+    grid-column: 2 / 4 !important;
+    justify-self: end !important;
   }
 
   .profile-wallet {

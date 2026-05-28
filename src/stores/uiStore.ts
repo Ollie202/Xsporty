@@ -8,21 +8,16 @@ type UiState = {
   toggleTheme: () => void;
 };
 
-const THEME_TRANSITION_MS = 760;
-
-function applyTheme(theme: Theme, animate = true) {
+function applyTheme(theme: Theme) {
   const root = document.documentElement;
-  if (animate) {
-    root.classList.add('theme-switching');
-    window.setTimeout(() => root.classList.remove('theme-switching'), THEME_TRANSITION_MS);
-  }
+  root.classList.remove('theme-switching');
   root.dataset.theme = theme;
   root.classList.toggle('dark', theme === 'dark');
   localStorage.setItem('xsporty-theme', theme);
 }
 
 const storedTheme = localStorage.getItem('xsporty-theme') === 'dark' ? 'dark' : 'light';
-applyTheme(storedTheme, false);
+applyTheme(storedTheme);
 
 export const useUiStore = create<UiState>(set => ({
   theme: storedTheme,

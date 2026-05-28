@@ -3180,9 +3180,9 @@ html[data-theme='dark'] .brand__mark {
   }
 
   #app-root {
-    width: 100%;
-    min-height: 100vh;
-    zoom: 1;
+    width: calc(100% / 0.92);
+    min-height: calc(100vh / 0.92);
+    zoom: 0.92;
     transform: none;
     transform-origin: top left;
   }
@@ -3403,6 +3403,17 @@ html {
   align-items: center !important;
 }
 
+.wallet-panel > .positions-top-btn,
+.wallet-panel > .profile-wallet {
+  height: 52px !important;
+  min-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  align-self: center !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
 .wallet-panel .positions-top-btn,
 .wallet-panel .account-chip,
 .wallet-panel .connect-wallet-btn {
@@ -3414,5 +3425,14 @@ html {
   align-self: center !important;
   margin-block: 0 !important;
   line-height: 1 !important;
+  transform: none !important;
+}
+
+.wallet-panel .profile-wallet {
+  position: relative !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   transform: none !important;
 }

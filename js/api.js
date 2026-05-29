@@ -1,8 +1,10 @@
 import { state } from './state.js';
 import { getApiBaseUrl } from './constants.js';
-import { replaceGameMarkets, replaceLiveFeaturedMarkets, replacePlayerPropMarkets, game } from './data.js';
+import { gameMarkets, replaceGameMarkets, replaceLiveFeaturedMarkets, replacePlayerPropMarkets, game } from './data.js';
 import { countryCodeFromUrl, humanMarketLabel, teamCode } from './utils.js';
 import { describeWalletProvider, getWalletProvider } from './provider.js';
+
+export const MARKET_CARD_PAGE_SIZE = 100;
 
 export async function apiGet(path) {
   return apiRequest(path, { method: 'GET' });
@@ -16,39 +18,46 @@ export async function apiRequest(path, options = {}) {
   return payload;
 }
 
-export async function hydrateFromBackend() {
+export async function hydrateFromBackend(options = {}) {
+  const offset = Number(options.offset || 0);
+  const append = Boolean(options.append);
+  const marketCardsPath = `/markets/cards?status=open&tradingStatus=open&limit=${MARKET_CARD_PAGE_SIZE}&offset=${offset}&sort=kickoff_time`;
   try {
-    const results = await Promise.all([
-      apiGet('/wallet/config'),
-      apiGet('/markets/cards?status=open&tradingStatus=open&limit=250&sort=kickoff_time'),
-      apiGet('/markets/cards?sport=football&competitionName=World%20Cup&status=open&tradingStatus=open&limit=100&sort=kickoff_time'),
-      apiGet('/markets/cards?category=player_future&status=open&tradingStatus=open&limit=100&sort=newest_activity')
-    ]);
-    state.walletConfig = results[0];
-    const backendCards = mergeBackendCards(results[1].cards || [], results[2].cards || []);
+    const results = offset === 0
+      ? await Promise.all([
+        apiGet('/wallet/config'),
+        apiGet(marketCardsPath),
+        apiGet('/markets/cards?sport=football&competitionName=World%20Cup&status=open&tradingStatus=open&limit=100&sort=kickoff_time'),
+        apiGet('/markets/cards?category=player_future&status=open&tradingStatus=open&limit=100&sort=newest_activity')
+      ])
+      : [state.walletConfig, await apiGet(marketCardsPath), { cards: [] }, { cards: [] }];
+    if (results[0]) state.walletConfig = results[0];
+    const marketPage = results[1] || {};
+    const backendCards = mergeBackendCards(marketPage.cards || [], results[2].cards || []);
     const backendMarkets = mapBackendCards(backendCards).filter(match => {
       if (isFinishedHomepageMatch(match)) return false;
       return true;
     });
     if (backendMarkets.length > 0) {
-      replaceGameMarkets(backendMarkets);
-      replaceLiveFeaturedMarkets(backendMarkets.filter(match => match.isLive).slice(0, 8));
+      const nextMarkets = append ? mergeMarketMatches(gameMarkets, backendMarkets) : backendMarkets;
+      replaceGameMarkets(nextMarkets);
+      replaceLiveFeaturedMarkets(nextMarkets.filter(match => match.isLive).slice(0, 8));
       const backendPlayerFutures = mapBackendPlayerFutureCards(results[3].cards || []);
-      replacePlayerPropMarkets(backendPlayerFutures);
+      if (offset === 0) replacePlayerPropMarkets(backendPlayerFutures);
       state.apiOnline = true;
       state.apiError = "";
-      if (!backendMarkets.some(match => match.sport === state.sport)) state.sport = backendMarkets[0].sport;
-      return true;
+      if (!nextMarkets.some(match => match.sport === state.sport)) state.sport = nextMarkets[0].sport;
+      return { ok: true, pagination: marketPage.pagination || null };
     }
-    state.apiOnline = false;
+    if (offset === 0) state.apiOnline = false;
     throw new Error('No open tradable market cards are available right now');
   } catch (error) {
     console.warn('Market data load failed:', error);
-    state.apiOnline = false;
+    if (offset === 0) state.apiOnline = false;
     const message = error instanceof Error ? error.message : String(error);
     state.apiError = message.replace(/\bbackend\b/gi, 'market data service');
   }
-  return false;
+  return { ok: false, pagination: null };
 }
 
 export async function fetchFixtureInsights(fixtureId) {
@@ -65,6 +74,14 @@ function mergeBackendCards(...cardGroups) {
     cardsByKey.set(key, card);
   });
   return [...cardsByKey.values()];
+}
+
+function mergeMarketMatches(currentMarkets, nextMarkets) {
+  const matchesById = new Map();
+  [...currentMarkets, ...nextMarkets].forEach(match => {
+    matchesById.set(match.id, match);
+  });
+  return [...matchesById.values()];
 }
 
 function isFinishedHomepageMatch(match) {

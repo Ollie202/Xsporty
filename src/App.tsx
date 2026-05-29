@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Bot, ChevronDown, ChevronRight, Copy, Moon, Send, Sun, Trash2, Search, X as XIcon } from 'lucide-react';
-import { fetchFixtureInsights, hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
+import { MARKET_CARD_PAGE_SIZE, fetchFixtureInsights, hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
 import { getApiBaseUrl, sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
@@ -172,6 +172,14 @@ type RouteState = {
   sport: string;
   category: string;
   matchId?: string;
+};
+type MarketPageState = {
+  hasMore: boolean;
+  nextOffset?: number;
+};
+type HydrateMarketResult = {
+  ok: boolean;
+  pagination?: MarketPageState | null;
 };
 
 const sports = ['football', 'basketball', 'cricket', 'tennis', 'formula-1', 'ufc', 'esports'];
@@ -789,6 +797,9 @@ function MarketBoard({
   matches,
   players,
   query,
+  hasMoreMarkets,
+  loadingMoreMarkets,
+  onLoadMoreMarkets,
   onOpen,
   onPick,
 }: {
@@ -798,6 +809,9 @@ function MarketBoard({
   matches: MarketMatch[];
   players: PlayerMarket[];
   query: string;
+  hasMoreMarkets: boolean;
+  loadingMoreMarkets: boolean;
+  onLoadMoreMarkets: () => void;
   onOpen: (match: MarketMatch) => void;
   onPick: (choice: Choice) => void;
 }) {
@@ -819,6 +833,7 @@ function MarketBoard({
   const liveEsportsMatches = filteredMatches.filter(match => match.isLive);
   const upcomingEsportsMatches = filteredMatches.filter(match => !match.isLive);
   const selectedEsportsMatches = esportsStatus === 'live' ? liveEsportsMatches : upcomingEsportsMatches;
+  const canLoadMore = hasMoreMarkets && category !== 'players' && !query;
 
   return (
     <section className="market-board home-section" id="games-board">
@@ -876,12 +891,21 @@ function MarketBoard({
           {!filteredPlayers.length ? <EmptyState title="No player markets found" text="Try another search term or check back soon." /> : null}
         </div>
       ) : (
-        <div className="match-list" aria-label="Market game cards">
-          {filteredMatches.map(match => (
-            <MatchCard key={match.id} match={match} onOpen={onOpen} onPick={onPick} />
-          ))}
-          {!filteredMatches.length ? <EmptyState title={`No ${labelsBySport[sport]?.title || 'sports'} markets yet`} text="This sport has no open cards right now." /> : null}
-        </div>
+        <>
+          <div className="match-list" aria-label="Market game cards">
+            {filteredMatches.map(match => (
+              <MatchCard key={match.id} match={match} onOpen={onOpen} onPick={onPick} />
+            ))}
+            {!filteredMatches.length ? <EmptyState title={`No ${labelsBySport[sport]?.title || 'sports'} markets yet`} text="This sport has no open cards right now." /> : null}
+          </div>
+          {canLoadMore ? (
+            <div className="market-load-more">
+              <button type="button" onClick={onLoadMoreMarkets} disabled={loadingMoreMarkets}>
+                {loadingMoreMarkets ? 'Loading markets' : `Load ${MARKET_CARD_PAGE_SIZE} more`}
+              </button>
+            </div>
+          ) : null}
+        </>
       )}
     </section>
   );
@@ -1696,6 +1720,8 @@ export function App() {
   const [pnlTicket, setPnlTicket] = useState<Ticket | null>(null);
   const [apiError, setApiError] = useState('');
   const [loadingMarkets, setLoadingMarkets] = useState(true);
+  const [loadingMoreMarkets, setLoadingMoreMarkets] = useState(false);
+  const [marketPage, setMarketPage] = useState<MarketPageState>({ hasMore: false });
   const [walletPulse, setWalletPulse] = useState(0);
   const [walletRuntimeEnabled, setWalletRuntimeEnabled] = useState(shouldLoadWalletRuntimeOnBoot);
   const [walletConnectRequestId, setWalletConnectRequestId] = useState(0);
@@ -1755,12 +1781,14 @@ export function App() {
 
     async function load() {
       setApiError('');
-      const ok = await withTimeout(hydrateFromBackend(), MARKET_LOAD_TIMEOUT_MS, 'Market load');
+      const result = await withTimeout(hydrateFromBackend(), MARKET_LOAD_TIMEOUT_MS, 'Market load') as HydrateMarketResult;
+      const ok = Boolean(result?.ok);
       if (cancelled) return;
       const nextMatches = dedupeMatches([...(gameMarkets as MarketMatch[])]);
       const nextPlayers = [...(playerPropMarkets as PlayerMarket[])];
       if (ok && nextMatches.length) {
         setMatches(nextMatches);
+        setMarketPage(result.pagination || { hasMore: false });
         const nextSport = nextMatches.some(match => match.sport === sport) ? sport : nextMatches[0].sport;
         const nextCategory = categoryHasMarkets(nextSport, category, nextMatches, nextPlayers)
           ? category
@@ -1770,6 +1798,7 @@ export function App() {
       } else {
         setMatches([]);
         setPlayers([]);
+        setMarketPage({ hasMore: false });
         setApiError(appState.apiError || 'Could not load market data. Please try again.');
         setLoadingMarkets(false);
         return;
@@ -1792,6 +1821,7 @@ export function App() {
       if (!cancelled) {
         setMatches([]);
         setPlayers([]);
+        setMarketPage({ hasMore: false });
         setApiError(error instanceof Error ? error.message : 'Could not load market data. Please try again.');
         setLoadingMarkets(false);
       }
@@ -1804,6 +1834,32 @@ export function App() {
       window.clearInterval(refreshId);
     };
   }, []);
+
+  const loadMoreMarkets = useCallback(async () => {
+    if (loadingMoreMarkets || !marketPage.hasMore) return;
+    setLoadingMoreMarkets(true);
+    setApiError('');
+    try {
+      const offset = marketPage.nextOffset ?? (gameMarkets as MarketMatch[]).length;
+      const result = await withTimeout(
+        hydrateFromBackend({ offset, append: true }),
+        MARKET_LOAD_TIMEOUT_MS,
+        'More markets'
+      ) as HydrateMarketResult;
+      const nextMatches = dedupeMatches([...(gameMarkets as MarketMatch[])]);
+      if (result.ok && nextMatches.length) {
+        setMatches(nextMatches);
+        setMarketPage(result.pagination || { hasMore: false });
+      } else {
+        setMarketPage({ hasMore: false });
+      }
+    } catch (error) {
+      console.warn('More market load failed:', error);
+      setApiError(error instanceof Error ? error.message : 'Could not load more markets. Please try again.');
+    } finally {
+      setLoadingMoreMarkets(false);
+    }
+  }, [loadingMoreMarkets, marketPage.hasMore, marketPage.nextOffset]);
 
   useEffect(() => {
     if (!didHandleInitialSport.current) {
@@ -1859,7 +1915,7 @@ export function App() {
   const sportMatches = useMemo(() => matches.filter(match => match.sport === sport), [matches, sport]);
   const heroMatch = useMemo(() => {
     const worldCup = matches.filter(match => match.sport === 'football' && match.group === 'world-cup');
-    return worldCup[0] || matches.find(match => match.sport === 'football') || matches[0];
+    return worldCup[0];
   }, [matches]);
 
   const pickMarket = useCallback((choice: Choice) => {
@@ -2055,7 +2111,19 @@ export function App() {
                 <FeaturedStrip matches={sportMatches} mode={featuredMode} setMode={setFeaturedMode} onOpen={openMatch} onPick={pickMarket} />
               ) : null}
               {loadingMarkets ? <LoadingMarkets /> : null}
-              <MarketBoard sport={sport} category={category} setCategory={changeCategory} matches={matches} players={players} query={query} onOpen={openMatch} onPick={pickMarket} />
+              <MarketBoard
+                sport={sport}
+                category={category}
+                setCategory={changeCategory}
+                matches={matches}
+                players={players}
+                query={query}
+                hasMoreMarkets={marketPage.hasMore}
+                loadingMoreMarkets={loadingMoreMarkets}
+                onLoadMoreMarkets={loadMoreMarkets}
+                onOpen={openMatch}
+                onPick={pickMarket}
+              />
               {apiError ? <div id="error-screen"><div className="error-content"><strong>Markets unavailable</strong><p>{apiError}</p><button type="button" onClick={() => window.location.reload()}>Retry</button></div></div> : null}
             </>
           ) : null}

@@ -563,6 +563,28 @@ body {
   gap: 10px;
 }
 
+.market-load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.market-load-more button {
+  min-height: 40px;
+  min-width: 180px;
+  border: 1px solid #d9e3ee;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #101827;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.market-load-more button:hover:not(:disabled) {
+  border-color: #9fef00;
+  box-shadow: 0 10px 24px rgba(16, 24, 39, 0.1);
+}
+
 .esports-dashboard {
   display: grid;
   gap: 12px;
@@ -2103,6 +2125,7 @@ html[data-theme='dark'] .header-search input {
 
 html[data-theme='dark'] .quick-odds button,
 html[data-theme='dark'] .featured-odds button,
+html[data-theme='dark'] .market-load-more button,
 html[data-theme='dark'] .option-row .price,
 html[data-theme='dark'] .amount-wrap,
 html[data-theme='dark'] .quote-grid,

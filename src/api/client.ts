@@ -26,7 +26,7 @@ export async function apiRequest<TResponse>(path: string, options: RequestInit =
 
 export const marketApi = {
   walletConfig: () => apiRequest<WalletConfigResponse>('/wallet/config'),
-  marketCards: (query = 'status=open&tradingStatus=open&limit=250&sort=kickoff_time') =>
+  marketCards: (query = 'status=open&tradingStatus=open&limit=100&sort=kickoff_time') =>
     apiRequest<MarketCardsResponse>(`/markets/cards?${query}`),
   worldCupCards: () =>
     apiRequest<MarketCardsResponse>(

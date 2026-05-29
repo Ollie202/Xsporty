@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Bot, ChevronDown, ChevronRight, Copy, Moon, Send, Sun, Trash2, Search, X as XIcon } from 'lucide-react';
-import { MARKET_CARD_PAGE_SIZE, fetchFixtureInsights, hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
+import { fetchFixtureInsights, hydrateFromBackend, refreshPortfolio, submitBackendOrder } from '../js/api.js';
 import { gameMarkets, playerPropMarkets, quickChoices } from '../js/data.js';
 import { state as legacyState } from '../js/state.js';
 import { getApiBaseUrl, sportLabels, SYMBOL, WC_ANIMS } from '../js/constants.js';
@@ -833,7 +833,7 @@ function MarketBoard({
   const liveEsportsMatches = filteredMatches.filter(match => match.isLive);
   const upcomingEsportsMatches = filteredMatches.filter(match => !match.isLive);
   const selectedEsportsMatches = esportsStatus === 'live' ? liveEsportsMatches : upcomingEsportsMatches;
-  const canLoadMore = hasMoreMarkets && category !== 'players' && !query;
+  const canLoadMore = hasMoreMarkets && filteredMatches.length > 0 && category !== 'players' && !query;
 
   return (
     <section className="market-board home-section" id="games-board">
@@ -901,7 +901,7 @@ function MarketBoard({
           {canLoadMore ? (
             <div className="market-load-more">
               <button type="button" onClick={onLoadMoreMarkets} disabled={loadingMoreMarkets}>
-                {loadingMoreMarkets ? 'Loading markets' : `Load ${MARKET_CARD_PAGE_SIZE} more`}
+                {loadingMoreMarkets ? 'Loading markets' : 'Load more'}
               </button>
             </div>
           ) : null}
